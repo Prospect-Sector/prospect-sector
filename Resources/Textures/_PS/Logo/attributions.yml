@@ -1,0 +1,8 @@
+# Attempted to keep the files in alphabetical order so its easier to audit.
+# Finding individual authors is an unfeasible task. If you can reference the author please do so.
+
+- files: ["icon.ico", "logo.png", "logo.svg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "tgstation commit 8abb19545828230d92ba18827feeb42a67a55d49, lattice background image"
+  source: "https://github.com/tgstation/tgstation/"
+

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 36px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: #ff0101;
+        font-family: "ROG Fonts";
+      }
+
+      .cls-2 {
+        font-size: 150px;
+        filter: url(#filter);
+      }
+    </style>
+    <filter id="filter" x="6" y="22" width="117" height="114" filterUnits="userSpaceOnUse">
+      <feOffset result="offset" dy="10" in="SourceAlpha"/>
+      <feGaussianBlur result="blur" stdDeviation="2.646"/>
+      <feFlood result="flood" flood-opacity="0.6"/>
+      <feComposite result="composite" operator="in" in2="blur"/>
+      <feBlend result="blend" in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <text id="Lorem_Ipsum" data-name="Lorem Ipsum" class="cls-1" x="-855" y="-520">Lorem Ipsum</text>
+  <image id="lattice" x="6" y="6" width="116" height="116" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHQAAAB0CAYAAABUmhYnAAADIElEQVR4nO2dMZLiMBBFzZaryMjIOIFPQMbZyXwCTkBGRkY0m2xRdi8lbCwP9tN7kalhLMSvr0ZtSb2pZmC/3/9077rf73uNNE3zvG7btve36/U6+DMdDodeO8fj8Xl9uVx6773dbvF1lr6n+trtZzWxr0P5k/uG8l0UFEa9pu6khtgqDLNzDbFLR4fCUFAYCgpj8TG0GzdTMbMKcbOUmBnRoTAUFIaCwlhcDF1COm/N6FAYCgpjcUOu6bxp6FAYCgpDQWF8JYZ2n9ybzsuLDoWhoDA2MTOTg8fj0bvLdrvtvR6T/Yn/K2l0KAwFhaGgMOo4bchBXFCcaiPGzNPpVLomk9ChMBQUhoLC2DRNk2Ueer/fn9fv0nld3m3o2e122C9/DnQoDAWFsYn7G4cyJZ3XJbV3tApDcEwpyv/oUBgKCkNBYYxaATB041CMmak4eT6fB7/3N84oGItnLMisKCgMBYWRXPU3ZePQUOJ8Nt6n206M223b9j7fEmLqt9GhMBQURm/IzXUO0KfpxHiffzzvFYf51BBc6vCrQ2EoKAwFhVEv/Ryg0E4vNqdiaqlTGh0KQ0FhKCiMek3nAKXmqFXBacLu7yAdCkNBYdRrPgeo1DRhKkWrQ2EoKAwFhVGTzgGipgnHPNbUoTAUFIaCwqip5+etPU346WNNHQpDQWGsqjrhFJaeJsxVDUOHwlBQGAoKo5gYGsmVJpxykMenG6hTU00dCkNBYSgojGJjaJeJacKP2x061xyTntWhMBQUhkPuCyamCV9ev3rvHCsudSgMBYWhoDBmKZVFJqb64tmEY45q78bNXCXBdCgMBYWhoDBmKZVVEqm55rulI3OUBdOhMBQURrbKSqXQnZZUI9N5cWoyR9UoHQpDQWEoKIyPS2WVRDf2jUnnxWlJnOLMUfpLh8JQUBgKCmOWDb+p8lHVCspfTdkJFvuaYo7vXofCUFAYrvqbWN5kaehQGAoKQ0FhFBtDc5U3WVrqVIfCUFAYxQy5uc4BWjo6FIaCwlBQGNgYmqta8drQoTAUFIaCwkDF0KVXK/4NdCgMBSVRVdVfSzXwp5STSaMAAAAASUVORK5CYII="/>
+  <text id="P" class="cls-2" transform="translate(8.701 26.296) scale(0.858)">P</text>
+</svg>
