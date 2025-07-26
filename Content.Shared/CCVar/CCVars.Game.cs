@@ -33,7 +33,7 @@ public sealed partial class CCVars
     ///     Controls the default game preset.
     /// </summary>
     public static readonly CVarDef<string>
-        GameLobbyDefaultPreset = CVarDef.Create("game.defaultpreset", "secret", CVar.ARCHIVE);
+        GameLobbyDefaultPreset = CVarDef.Create("game.defaultpreset", "prospect", CVar.ARCHIVE); // Prospect: secret>prospect
 
     /// <summary>
     ///     Controls if the game can force a different preset if the current preset's criteria are not met.
@@ -69,7 +69,7 @@ public sealed partial class CCVars
     ///     Controls the game map prototype to load. SS14 stores these prototypes in Prototypes/Maps.
     /// </summary>
     public static readonly CVarDef<string>
-        GameMap = CVarDef.Create("game.map", string.Empty, CVar.SERVERONLY);
+        GameMap = CVarDef.Create("game.map", "Prospect", CVar.SERVERONLY); // Prospect: String.empty>Prospect
 
     /// <summary>
     ///     Controls whether to use world persistence or not.

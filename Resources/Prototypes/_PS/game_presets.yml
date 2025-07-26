@@ -1,0 +1,19 @@
+﻿- type: gamePreset
+  id: ProspectGamePreset
+  alias:
+  - prospect
+  name: prospect-title
+  description: prospect-description
+  showInVote: true
+  rules:
+  - ProspectGameRule
+
+- type: gamePreset
+  id: ProspectTest
+  alias:
+  - prospecttest
+  name: prospect-test-title
+  description: prospect-test-description
+  showInVote: false
+  rules:
+  - ProspectGameRule
