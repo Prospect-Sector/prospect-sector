@@ -1,5 +1,5 @@
 ﻿- type: gameMap
-  id: Frontier
+  id: Prospect
   mapName: 'Prospect'
   mapPath: /Maps/box.yml
   #mapPath: /Maps/_PS/Outpost/prospect.yml
@@ -8,7 +8,7 @@
   randomRotation: false
   maxRandomOffset: 0
   stations:
-    Frontier:
+    Prospect:
       stationProto: StandardNanotrasenStation
       components:
       - type: StationNameSetup
