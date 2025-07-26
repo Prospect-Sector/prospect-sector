@@ -4,6 +4,7 @@ namespace Content.Shared._PS.CCVar;
 
 /// <summary>
 ///     General CCVars for the Prospect Sector game mode.
+/// </summary>
 public sealed partial class CCVars
 {
     // TODO: Add more CCVars as needed for the Prospect Sector game mode.
