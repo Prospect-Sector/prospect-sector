@@ -1,0 +1,32 @@
+﻿- type: entity
+  name: cargo storage computer
+  parent: BaseComputer
+  id: ComputerCargoStorageConsole
+  description: Used to get goods from the station's storage system.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Sprite
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      sprite: Structures/Machines/computers.rsi
+      state: generic
+    - map: ["computerLayerKeys"]
+      state: tech_key
+    - map: [ "enum.WiresVisualLayers.MaintenancePanel" ]
+      state: generic_panel_open
+  - type: CargoStorageConsole
+  - type: ActivatableUI
+    key: enum.CargoStorageConsoleUiKey.Default
+  - type: UserInterface
+    interfaces:
+      enum.CargoStorageConsoleUiKey.Default:
+        type: CargoStorageConsoleBoundUserInterface
+      enum.WiresUiKey.Key:
+        type: WiresBoundUserInterface
+  - type: Computer
+    board: Null

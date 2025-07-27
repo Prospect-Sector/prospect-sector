@@ -3,7 +3,7 @@ using Content.Server.GameTicking.Rules;
 using Content.Shared.GameTicking.Components;
 using Robust.Shared.Timing;
 
-namespace DefaultNamespace;
+namespace Content.Server._PS.GameRule.Systems;
 
 public sealed class ProspectGameRuleSystem : GameRuleSystem<ProspectGameRuleComponent>
 {
