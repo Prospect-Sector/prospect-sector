@@ -16,7 +16,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server._PS.CargoStorage.Systems;
 
-public sealed partial class CargoStorageSystem
+public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
 {
     [Dependency] private readonly IComponentFactory _componentFactory = default!;
     [Dependency] private readonly SharedMaterialStorageSystem _sharedMaterialStorageSystem = default!;
@@ -296,7 +296,7 @@ public sealed partial class CargoStorageSystem
             // Finite stack size, limit our withdrawal.
             if (amountPerEntity != null)
             {
-                var amountLeft = (30 - entityAmount) * amountPerEntity.Value;
+                var amountLeft = (CartMaxCapacity - entityAmount) * amountPerEntity.Value;
 
                 var existingCart = FindMarketDataByPrototype(consoleComponent.CartDataList, args.ItemPrototype!);
                 if (existingCart != null)
