@@ -28,6 +28,7 @@ public sealed class CargoStorageConsoleBoundUserInterface : BoundUserInterface
             _menu.OnAddToCartAll += args => AddToCart(args, int.MaxValue);
             _menu.OnReturn += Return;
             _menu.OnPurchaseCart += PurchaseCrate;
+            _menu.OnPurchaseLooseCart += PurchaseLoose;
         }
     }
 
@@ -66,6 +67,12 @@ public sealed class CargoStorageConsoleBoundUserInterface : BoundUserInterface
     private void PurchaseCrate(BaseButton.ButtonEventArgs args)
     {
         SendMessage(new CargoStoragePurchaseMessage());
+        Close();
+    }
+
+    private void PurchaseLoose(BaseButton.ButtonEventArgs args)
+    {
+        SendMessage(new CargoStoragePurchaseMessage(noCrate: true));
         Close();
     }
 }

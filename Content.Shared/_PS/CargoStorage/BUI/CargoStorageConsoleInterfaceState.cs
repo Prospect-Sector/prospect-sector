@@ -1,4 +1,6 @@
-﻿using Content.Shared._PS.CargoStorage.Data;
+﻿using System.Linq;
+using Content.Shared._PS.CargoStorage.Data;
+using Content.Shared._PS.CargoStorage.Systems;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._PS.CargoStorage.BUI;
@@ -16,6 +18,8 @@ public sealed class CargoStorageConsoleInterfaceState : BoundUserInterfaceState
     /// </summary>
     public List<CargoStorageData> CartDataList;
 
+    public bool CanRequestBoxedCart;
+
     /// <summary>
     /// are the buttons enabled
     /// </summary>
@@ -26,10 +30,16 @@ public sealed class CargoStorageConsoleInterfaceState : BoundUserInterfaceState
     /// </summary>
     public int CartEntities;
 
-    public CargoStorageConsoleInterfaceState(List<CargoStorageData> cargoStorageDataList, List<CargoStorageData> cartDataList, bool enabled, int cartEntities)
+    public CargoStorageConsoleInterfaceState(List<CargoStorageData> cargoStorageDataList,
+        List<CargoStorageData> cartDataList,
+        bool enabled,
+        int cartEntities)
     {
         CargoStorageDataList = cargoStorageDataList;
         CartDataList = cartDataList;
+        CanRequestBoxedCart = cargoStorageDataList.Any(data =>
+            data.Prototype.Id == SharedCargoStorageSystem.CartBoxProtoIdString &&
+            data.Quantity >= SharedCargoStorageSystem.CartBoxAmountRequired);
         Enabled = enabled;
         CartEntities = cartEntities;
     }

@@ -13,7 +13,7 @@ using Content.Shared.Whitelist;
 public sealed partial class CargoMarketDataComponent : Component
 {
     [DataField]
-    public List<CargoStorageData> MarketDataList = [];
+    public List<CargoStorageData> CargoStorageDataList = [];
 
     /// <summary>
     /// Sold items must match this whitelist to enter into this data set.

@@ -9,4 +9,7 @@ public sealed partial class CargoStorageItemSpawnerComponent : Component
 {
     [NonSerialized]
     public List<CargoStorageData> ItemsToSpawn;
+
+    [NonSerialized]
+    public bool NoCrate = false;
 }

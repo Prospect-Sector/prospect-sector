@@ -54,6 +54,12 @@ public sealed partial class CrateMachineComponent: Component
     [NonSerialized]
     public float ClosingTimeRemaining;
 
+    /// <summary>
+    /// Whether the crate machine should not show a crate when it opens.
+    /// </summary>
+    [NonSerialized]
+    public bool NoCrate = false;
+
     #region Graphics
 
     /// <summary>

@@ -30,6 +30,7 @@ public sealed partial class CargoStorageMenu : FancyWindow
     public event Action<BaseButton.ButtonEventArgs>? OnAddToCartAll;
     public event Action<BaseButton.ButtonEventArgs>? OnReturn;
     public event Action<BaseButton.ButtonEventArgs>? OnPurchaseCart;
+    public event Action<BaseButton.ButtonEventArgs>? OnPurchaseLooseCart;
 
     private CargoStorageConsoleInterfaceState? _lastStateUpdate;
     private string _searchText = "";
@@ -39,6 +40,7 @@ public sealed partial class CargoStorageMenu : FancyWindow
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
 
+        PurchaseLooseCart.OnPressed += args => OnPurchaseLooseCart?.Invoke(args);
         PurchaseCart.OnPressed += args => OnPurchaseCart?.Invoke(args);
         SearchText.OnTextChanged += args => OnSearchTextChanged(args.Text);
         ClearSearchButton.OnPressed += ClearSearchText;
@@ -78,8 +80,10 @@ public sealed partial class CargoStorageMenu : FancyWindow
             CartEntitiesCount.FontColorOverride = Color.OrangeRed;
         else
             CartEntitiesCount.FontColorOverride = null;
+
         SetUiEnabled(uiState.Enabled);
-        PurchaseCart.Disabled = uiState.CartDataList.Count <= 0;
+        PurchaseCart.Disabled = uiState.CartDataList.Count <= 0 || !uiState.CanRequestBoxedCart;
+        PurchaseLooseCart.Disabled = uiState.CartDataList.Count <= 0;
     }
 
     private void Populate(List<CargoStorageData> data, List<CargoStorageData> cartData, bool enabled = true)

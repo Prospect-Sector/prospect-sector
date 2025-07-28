@@ -16,7 +16,6 @@ namespace Content.Server._PS.CrateMachine;
 /// </summary>
 public sealed partial class CrateMachineSystem : SharedCrateMachineSystem
 {
-    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly EntityStorageSystem _storage = default!;
     [Dependency] private readonly TransformSystem _transform = default!;

@@ -23,21 +23,21 @@ public static class CargoStorageDataExtensions
         string? stackPrototypeId = null)
     {
         // Find the MarketData for the given EntityPrototype.
-        var prototypeMarketData = marketDataList.FirstOrDefault(md => md.Prototype == entityPrototypeId);
+        var prototypeCargoStorageData = marketDataList.FirstOrDefault(md => md.Prototype == entityPrototypeId);
 
-        if (prototypeMarketData != null)
+        if (prototypeCargoStorageData != null)
         {
-            prototypeMarketData.Quantity += increaseAmount;
+            prototypeCargoStorageData.Quantity += increaseAmount;
 
             // Prune empty/negative quantities (overflow, emptying, or excessive withdrawal)
-            if (prototypeMarketData.Quantity <= 0)
-                marketDataList.Remove(prototypeMarketData);
+            if (prototypeCargoStorageData.Quantity <= 0)
+                marketDataList.Remove(prototypeCargoStorageData);
         }
         else if (increaseAmount > 0)
         {
             // If it doesn't exist, create a new MarketData and add it to the list.
             marketDataList.Add(new CargoStorageData(entityPrototypeId,
-                stackPrototypeId ?? prototypeMarketData?.StackPrototype,
+                stackPrototypeId ?? prototypeCargoStorageData?.StackPrototype,
                 increaseAmount));
         }
     }
@@ -50,11 +50,11 @@ public static class CargoStorageDataExtensions
     /// <param name="prototypeId">The prototype ID of the item to move.</param>
     public static void Move(this List<CargoStorageData> sourceList, List<CargoStorageData> targetList, string prototypeId)
     {
-        var marketData = sourceList.FirstOrDefault(md => md.Prototype == prototypeId);
-        if (marketData != null)
+        var cargoStorageData = sourceList.FirstOrDefault(md => md.Prototype == prototypeId);
+        if (cargoStorageData != null)
         {
-            targetList.Upsert(marketData.Prototype, marketData.Quantity, marketData.StackPrototype);
-            sourceList.Remove(marketData);
+            targetList.Upsert(cargoStorageData.Prototype, cargoStorageData.Quantity, cargoStorageData.StackPrototype);
+            sourceList.Remove(cargoStorageData);
         }
     }
 

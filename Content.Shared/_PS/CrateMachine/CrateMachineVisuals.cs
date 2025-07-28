@@ -9,10 +9,13 @@ public enum CrateMachineVisualState : byte
     Closed,
     Opening,
     Closing,
+    CrateVisible,
+    CrateHidden,
 }
 
 [Serializable, NetSerializable]
 public enum CrateMachineVisuals : byte
 {
     VisualState,
+    CrateVisibility,
 }

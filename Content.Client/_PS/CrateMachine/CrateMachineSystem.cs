@@ -37,6 +37,10 @@ public sealed class CrateMachineSystem : SharedCrateMachineSystem
     /// </summary>
     private void UpdateState(EntityUid uid, CrateMachineComponent component, SpriteComponent sprite, AppearanceComponent appearance)
     {
+        _appearanceSystem.TryGetData<CrateMachineVisualState>(uid,
+            CrateMachineVisuals.CrateVisibility,
+            out var crateVisibility,
+            appearance);
         if (!_appearanceSystem.TryGetData<CrateMachineVisualState>(uid, CrateMachineVisuals.VisualState, out var state, appearance))
         {
             return;
@@ -47,7 +51,7 @@ public sealed class CrateMachineSystem : SharedCrateMachineSystem
         sprite.LayerSetVisible(CrateMachineVisualLayers.Opening, state == CrateMachineVisualState.Opening);
         sprite.LayerSetVisible(CrateMachineVisualLayers.Closing, state == CrateMachineVisualState.Closing);
         sprite.LayerSetVisible(CrateMachineVisualLayers.Open, state == CrateMachineVisualState.Open);
-        sprite.LayerSetVisible(CrateMachineVisualLayers.Crate, state == CrateMachineVisualState.Opening);
+        sprite.LayerSetVisible(CrateMachineVisualLayers.Crate, crateVisibility == CrateMachineVisualState.CrateVisible && state == CrateMachineVisualState.Opening);
 
         if (state == CrateMachineVisualState.Opening && !_animationSystem.HasRunningAnimation(uid, AnimationKey))
         {

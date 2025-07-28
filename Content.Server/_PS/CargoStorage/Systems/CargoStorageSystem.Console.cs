@@ -105,7 +105,7 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
 
         // Increase the count in the MarketData for this entity
         // Assuming the quantity to increase is 1 for each sold entity
-        market.MarketDataList.Upsert(entityPrototype.ID, count, stackPrototypeId);
+        market.CargoStorageDataList.Upsert(entityPrototype.ID, count, stackPrototypeId);
     }
 
     /// <summary>
@@ -191,7 +191,7 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
                 materialStorageComponent);
 
             // Increase the count in the MarketData for this material
-            marketDataComponent.MarketDataList.Upsert(entProto.ID, amountToSpawn, stack.StackTypeId);
+            marketDataComponent.CargoStorageDataList.Upsert(entProto.ID, amountToSpawn, stack.StackTypeId);
         }
     }
 
@@ -274,18 +274,18 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
         if (!TryComp<CargoMarketDataComponent>(stationUid, out var market))
             return;
 
-        var marketData = market.MarketDataList;
+        var cargoStorageData = market.CargoStorageDataList;
         if (args.RemoveFromCart)
         {
-            consoleComponent.CartDataList.Move(marketData, prototype.ID);
+            consoleComponent.CartDataList.Move(cargoStorageData, prototype.ID);
         }
         else
         {
-            var maxQuantityToWithdraw = marketData.GetMaxQuantityToWithdraw(prototype);
+            var maxQuantityToWithdraw = cargoStorageData.GetMaxQuantityToWithdraw(prototype);
             var toWithdraw = Math.Max(args.Amount, 0);
             toWithdraw = Math.Min(toWithdraw, maxQuantityToWithdraw);
 
-            var existing = FindMarketDataByPrototype(marketData, args.ItemPrototype!);
+            var existing = FindCargoStorageDataByPrototype(cargoStorageData, args.ItemPrototype!);
             if (existing == null)
                 return;
 
@@ -298,7 +298,7 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
             {
                 var amountLeft = (CartMaxCapacity - entityAmount) * amountPerEntity.Value;
 
-                var existingCart = FindMarketDataByPrototype(consoleComponent.CartDataList, args.ItemPrototype!);
+                var existingCart = FindCargoStorageDataByPrototype(consoleComponent.CartDataList, args.ItemPrototype!);
                 if (existingCart != null)
                 {
                     // Find if there's a partially filled entity in the cart.
@@ -311,7 +311,7 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
                 toWithdraw = int.Min(toWithdraw, amountLeft);
             }
 
-            marketData.Upsert(existing.Prototype, -toWithdraw, existing.StackPrototype);
+            cargoStorageData.Upsert(existing.Prototype, -toWithdraw, existing.StackPrototype);
             consoleComponent.CartDataList.Upsert(existing.Prototype, toWithdraw, existing.StackPrototype);
         }
 
@@ -328,7 +328,7 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
     /// <param name="marketDataList">The list of cargo storage data to search in.</param>
     /// <param name="prototypeId">The prototype ID to search for.</param>
     /// <returns>The MarketData item with the matching prototype, or null if not found.</returns>
-    public CargoStorageData? FindMarketDataByPrototype(List<CargoStorageData> marketDataList, string prototypeId)
+    public CargoStorageData? FindCargoStorageDataByPrototype(List<CargoStorageData> marketDataList, string prototypeId)
     {
         foreach (var marketData in marketDataList)
         {
@@ -366,7 +366,7 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
         var consoleStationUid = _station.GetOwningStation(consoleUid);
         if (TryComp<CargoMarketDataComponent>(consoleStationUid, out var market))
         {
-            marketData = market.MarketDataList;
+            marketData = market.CargoStorageDataList;
         }
 
         var newState = new CargoStorageConsoleInterfaceState(

@@ -87,6 +87,11 @@ public sealed partial class CrateMachineSystem : SharedCrateMachineSystem
         if (!Resolve(uid, ref component))
             return;
 
+        _appearanceSystem.SetData(uid,
+            CrateMachineVisuals.CrateVisibility,
+            component.NoCrate ? CrateMachineVisualState.CrateHidden : CrateMachineVisualState.CrateVisible);
+
+
         if (component.OpeningTimeRemaining > 0)
             _appearanceSystem.SetData(uid, CrateMachineVisuals.VisualState, CrateMachineVisualState.Opening);
         else if (component.ClosingTimeRemaining > 0)
@@ -102,9 +107,11 @@ public sealed partial class CrateMachineSystem : SharedCrateMachineSystem
     /// </summary>
     /// <param name="crateMachineUid">The Uid of the crate machine</param>
     /// <param name="component">The crate machine component</param>
-    public void OpenFor(EntityUid crateMachineUid, CrateMachineComponent component)
+    /// <param name="noCrate">If true, the crate machine will not show a crate in the animation.</param>
+    public void OpenFor(EntityUid crateMachineUid, CrateMachineComponent component, bool noCrate)
     {
         component.OpeningTimeRemaining = component.OpeningTime;
+        component.NoCrate = noCrate;
         UpdateVisualState(crateMachineUid, component);
     }
 }

@@ -8,4 +8,10 @@ namespace Content.Shared._PS.CargoStorage.Events;
 [Serializable, NetSerializable]
 public sealed class CargoStoragePurchaseMessage : BoundUserInterfaceMessage
 {
+    public bool NoCrate;
+
+    public CargoStoragePurchaseMessage(bool noCrate = false)
+    {
+        NoCrate = noCrate;
+    }
 };
