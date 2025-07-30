@@ -1,8 +1,8 @@
 ﻿- type: entity
-  name: cargo storage computer
+  name: expadition computer
   parent: BaseComputer
-  id: ComputerCargoStorageConsole
-  description: Used to get goods from the station's storage system.
+  id: ComputerExpaditionConsole
+  description: Used to beam yourself and your friends to adventure.
   placement:
     mode: SnapgridCenter
   components:
@@ -19,14 +19,14 @@
       state: tech_key
     - map: [ "enum.WiresVisualLayers.MaintenancePanel" ]
       state: generic_panel_open
-  - type: CargoStorageConsole
   - type: ActivatableUI
-    key: enum.CargoStorageConsoleUiKey.Default
+    key: enum.ExpaditionConsoleUiKey.Default
   - type: UserInterface
     interfaces:
-      enum.CargoStorageConsoleUiKey.Default:
-        type: CargoStorageConsoleBoundUserInterface
+      enum.ExpaditionConsoleUiKey.Default:
+        type: ExpaditionConsoleBoundUserInterface
       enum.WiresUiKey.Key:
         type: WiresBoundUserInterface
   - type: Computer
     board: Null
+  - type: ExpaditionConsole

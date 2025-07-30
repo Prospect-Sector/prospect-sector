@@ -1,0 +1,34 @@
+﻿- type: entity
+  id: Expad
+  name: expad
+  description: A teleportation pad that can be used to travel short distances.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Sprite
+    sprite: _PS/Structures/Machines/expad.rsi
+    layers:
+    - state: expad
+  - type: Transform
+    anchored: true
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      portalFixture:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.25,-0.48,0.25,0.48"
+        mask:
+        - FullTileMask
+        layer:
+        - WallLayer
+        hard: false
+  - type: InteractionOutline
+  - type: Clickable
+  - type: PointLight
+    color: SkyBlue
+    radius: 3
+    energy: 1
+    netsync: false
+  - type: ExpaditionPad
