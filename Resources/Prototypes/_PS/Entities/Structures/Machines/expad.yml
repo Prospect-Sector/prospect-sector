@@ -6,9 +6,11 @@
     mode: SnapgridCenter
   components:
   - type: Sprite
-    sprite: _PS/Structures/Machines/expad.rsi
+    sprite: _PS/Structures/Tiles/marked_tile.rsi
     layers:
-    - state: expad
+    - state: base
+    - state: unshaded
+      shader: unshaded
   - type: Transform
     anchored: true
   - type: Physics
