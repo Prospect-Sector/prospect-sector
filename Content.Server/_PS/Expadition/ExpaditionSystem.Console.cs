@@ -94,11 +94,12 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
                     var mapId = dataComponent.ActiveMissions.Last().Key;
 
                     var mapPortal = Spawn("PortalRed", new MapCoordinates(4f, 0f, mapId));
-
+                    if(TryComp<PortalComponent>(mapPortal, out var mapPortalComponent))
+                        mapPortalComponent.CanTeleportToOtherMaps = true;
 
                     // Activate all expedition pads to teleport to the new map.
                     var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, ExpaditionPadComponent>();
-                    while (enumerator.MoveNext(out var transform, out var pad))
+                    while (enumerator.MoveNext(out var uid, out var transform, out var pad))
                     {
                         pad.TeleportMapId = mapId;
                         pad.ActivatedAt = _timing.CurTime;
@@ -107,8 +108,11 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
                         if(TryComp<PortalComponent>(pad.Portal, out var portal))
                             portal.CanTeleportToOtherMaps = true;
 
-                        _link.TryLink(pad.Portal!.Value, mapPortal, true);
+                        _link.OneWayLink(pad.Portal!.Value, mapPortal);
                         _audio.PlayPvs(pad.NewPortalSound, transform.Coordinates);
+
+                        //var linkedEntityComponent = _entityManager.EnsureComponent<LinkedEntityComponent>(uid);
+                        _link.OneWayLink(mapPortal, uid);
                     }
                     break;
             }
@@ -123,6 +127,7 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
         var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, ExpaditionPadComponent>();
         while (enumerator.MoveNext(out var transform, out var pad))
         {
+
             if (_timing.CurTime < pad.ActivatedAt + pad.ClearPortalDelay)
                 continue;
             if (pad.Portal == null || Deleted(pad.Portal))
