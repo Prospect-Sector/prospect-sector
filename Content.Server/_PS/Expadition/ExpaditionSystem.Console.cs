@@ -9,6 +9,7 @@ using Robust.Shared.CPUJob.JobQueues;
 using Robust.Shared.CPUJob.JobQueues.Queues;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
+using Robust.Shared.Utility;
 
 namespace Content.Server._PS.Expadition;
 
@@ -97,6 +98,8 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
                     if(TryComp<PortalComponent>(mapPortal, out var mapPortalComponent))
                         mapPortalComponent.CanTeleportToOtherMaps = true;
 
+                    var returnMarker = _entityManager.AllEntities<ExpadReturnMarkerComponent>().FirstOrNull();
+
                     // Activate all expedition pads to teleport to the new map.
                     var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, ExpaditionPadComponent>();
                     while (enumerator.MoveNext(out var uid, out var transform, out var pad))
@@ -111,8 +114,11 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
                         _link.OneWayLink(pad.Portal!.Value, mapPortal);
                         _audio.PlayPvs(pad.NewPortalSound, transform.Coordinates);
 
-                        //var linkedEntityComponent = _entityManager.EnsureComponent<LinkedEntityComponent>(uid);
-                        _link.OneWayLink(mapPortal, uid);
+                        // Ensure that if no return marker is found we can still go back to the station.
+                        if (returnMarker != null)
+                            _link.OneWayLink(mapPortal, returnMarker.Value);
+                        else
+                            _link.OneWayLink(mapPortal, uid);
                     }
                     break;
             }

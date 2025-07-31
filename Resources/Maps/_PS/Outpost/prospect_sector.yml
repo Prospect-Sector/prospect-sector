@@ -4,8 +4,8 @@
   engineVersion: 264.0.0
   forkId: ""
   forkVersion: ""
-  time: 07/31/2025 13:47:46
-  entityCount: 305
+  time: 07/31/2025 14:42:35
+  entityCount: 306
 maps:
 - 1
 grids:
@@ -1076,6 +1076,13 @@ entities:
     components:
     - type: Transform
       pos: -2.5,6.5
+      parent: 4
+- proto: ExpadReturn
+  entities:
+  - uid: 3
+    components:
+    - type: Transform
+      pos: -1.5,4.5
       parent: 4
 - proto: GravityGeneratorMini
   entities:

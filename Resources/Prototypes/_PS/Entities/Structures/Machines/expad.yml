@@ -34,3 +34,18 @@
     energy: 1
     netsync: false
   - type: ExpaditionPad
+
+- type: entity
+  id: ExpadReturn
+  parent: MarkerBase
+  name: expad return marker
+  description: This will mark where players will return to when using the portal back.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Sprite
+    sprite: Markers/jobs.rsi
+    layers:
+    - state: green
+  - type: ExpadReturnMarker
+
