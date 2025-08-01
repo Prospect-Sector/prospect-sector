@@ -15,7 +15,7 @@ RELEASE_DIR = "release"
 # CONFIGURATION PARAMETERS
 # Forks should change these to publish to their own infrastructure.
 #
-ROBUST_CDN_URL = "https://cdn.prospect-sector.space/"
+ROBUST_CDN_URL = "https://ss14-cdn.prospect-sector.space/"
 FORK_ID = "prospect-sector"
 
 def main():

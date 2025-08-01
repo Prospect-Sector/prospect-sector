@@ -12,7 +12,7 @@ If you want to host or create content for Prospect Sector, this is the repo you 
 
 <div class="header" align="center">  
 
-[Discord](https://discord.prospect-sector.space/) | [Steam](https://store.steampowered.com/app/1255460/Space_Station_14/) | [Standalone Download](https://cdn.prospect-sector.space/fork/prospect-sector)  
+[Discord](https://discord.prospect-sector.space/) | [Steam](https://store.steampowered.com/app/1255460/Space_Station_14/) | [Standalone Download](https://ss14-cdn.prospect-sector.space/fork/prospect-sector)  
 
 </div>
 

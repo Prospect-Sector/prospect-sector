@@ -1,46 +1,46 @@
-﻿"Changes: Map":
+﻿"C: Map":
 - changed-files:
   - any-glob-to-any-file:
     - 'Resources/Maps/**/*.yml'
     - 'Resources/Prototypes/Maps/**/*.yml'
 
-"Sprites":
+"C: Sprites":
 - changed-files:
   - any-glob-to-any-file:
     - "**/*.rsi/*.png"
     - "**/*.rsi/*.json"
 
-"UI":
+"C: UI":
 - changed-files:
   - any-glob-to-any-file: "**/*.xaml*"
 
-"C#":
+"C: C#":
 - changed-files:
   - any-glob-to-any-file: "**/*.cs"
 
-"Shaders":
+"C: Shaders":
 - changed-files:
   - any-glob-to-any-file: '**/*.swsl'
 
-"Audio":
+"C: Audio":
 - changed-files:
   - any-glob-to-any-file: '**/*.ogg'
 
-"No C#":
+"C: No C#":
 - changed-files:
   - all-globs-to-all-files: "!**/*.cs"
 
-"Docs":
+"C: Docs":
 - changed-files:
   - any-glob-to-any-file:
     - "**/*.xml"
     - "**/*.md"
 
-"FTL":
+"C: FTL":
 - changed-files:
   - any-glob-to-any-file: "Resources/Locale/**/*.ftl"
 
-"YML":
+"C: YML":
 - all:
   - changed-files:
     - any-glob-to-any-file: "**/*.yml"
@@ -48,6 +48,6 @@
       - "!Resources/Maps/_PS/**/*.yml"
       - "!Resources/Prototypes/Maps/_PS/**/*.yml"
 
-"DB Migration":
+"C: DB Migration":
 - changed-files:
   - any-glob-to-any-file: "Content.Server.Database/Migrations/**/*.cs"

@@ -50,5 +50,5 @@ jobs:
           commit-message: Update Credits
           title: Update Credits
           body: This is an automated Pull Request. This PR updates the github contributors in the credits section.
-          author: PJBot <pieterjan.briers+bot@gmail.com>
+          author: ProspectBot <info+bot@prospect-sector.space> # Prospect: PJBot<ProspectBot
           branch: automated/credits-${{env.NOW}}
