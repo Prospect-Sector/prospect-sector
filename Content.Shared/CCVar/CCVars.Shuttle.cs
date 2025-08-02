@@ -25,7 +25,7 @@ public sealed partial class CCVars
     ///     Whether the arrivals terminal should be on a planet map.
     /// </summary>
     public static readonly CVarDef<bool> ArrivalsPlanet =
-        CVarDef.Create("shuttle.arrivals_planet", true, CVar.SERVERONLY);
+        CVarDef.Create("shuttle.arrivals_planet", false, CVar.SERVERONLY);
 
     /// <summary>
     ///     Whether the arrivals shuttle is enabled.
@@ -74,7 +74,7 @@ public sealed partial class CCVars
     ///     Whether to automatically preloading grids by GridPreloaderSystem
     /// </summary>
     public static readonly CVarDef<bool> PreloadGrids =
-        CVarDef.Create("shuttle.preload_grids", true, CVar.SERVERONLY);
+        CVarDef.Create("shuttle.preload_grids", false, CVar.SERVERONLY);
 
     /// <summary>
     ///     How long the warmup time before FTL start should be.

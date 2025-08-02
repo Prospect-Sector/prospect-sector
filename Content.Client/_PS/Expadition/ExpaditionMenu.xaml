@@ -1,0 +1,34 @@
+﻿<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      xmlns:customControls="clr-namespace:Content.Client.Administration.UI.CustomControls"
+                      xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+                      MinSize="1000 500"
+                      Title="{Loc 'expadition-console-menu-title'}">
+    <BoxContainer Name="ViewContainer"
+                  HorizontalExpand="True"
+                  VerticalExpand="True"
+                  Access="Public"
+                  Orientation="Vertical">
+        <BoxContainer Orientation="Vertical"
+                      VerticalExpand="True"
+                      HorizontalExpand="True"
+                      MinSize="50 50"
+                      Margin="8">
+
+            <Button Name="StartExpaditionButton"
+                    Access="Public"
+                    ToolTip=""
+                    HorizontalExpand="True"
+                    Margin="5 0 5 0"
+                    Text="{Loc 'expadition-console-start-button'}"
+                    StyleClasses="LabelSubText" />
+
+        </BoxContainer>
+        <BoxContainer Name="ContentFooter" HorizontalExpand="True" SetHeight="28" Margin="1 0 2 1">
+            <controls:StripeBack HasBottomEdge="False" HasMargins="False" HorizontalExpand="True">
+                <Label Text="Robust#OS ™" VerticalAlignment="Center" HorizontalAlignment="Right" HorizontalExpand="True"
+                       Margin="6 0" StyleClasses="PdaContentFooterText" />
+            </controls:StripeBack>
+        </BoxContainer>
+    </BoxContainer>
+</controls:FancyWindow>
