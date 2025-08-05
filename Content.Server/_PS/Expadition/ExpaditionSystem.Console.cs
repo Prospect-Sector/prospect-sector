@@ -18,6 +18,7 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly LinkedEntitySystem _link = default!;
     //[Dependency] private readonly SalvageSystem _salvage = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
 
     private readonly JobQueue _salvageQueue = new();
     private readonly List<(SpawnExpaditionJob Job, CancellationTokenSource CancelToken)> _salvageJobs = new();
@@ -74,6 +75,7 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
             _mapSystem,
             station,
             missionParams,
+            new Tile(_tileDefinitionManager["FloorSteel"].TileId),
             cancelToken.Token);
 
         _salvageJobs.Add((job, cancelToken));
@@ -94,6 +96,7 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
                     var dataComponent = EntityManager.GetComponent<ExpaditionDataComponent>(job.Station);
                     var mapId = dataComponent.ActiveMissions.Last().Key;
 
+                    var roomMarker = Spawn("MaintsRoomMarker", new MapCoordinates(4f, 0f, mapId));
                     var mapPortal = Spawn("PortalRed", new MapCoordinates(4f, 0f, mapId));
                     if(TryComp<PortalComponent>(mapPortal, out var mapPortalComponent))
                         mapPortalComponent.CanTeleportToOtherMaps = true;

@@ -25,6 +25,7 @@ using Content.Shared.Salvage.Expeditions.Modifiers;
 using Content.Shared.Shuttles.Components;
 using Robust.Shared.Collections;
 using Robust.Shared.CPUJob.JobQueues;
+using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -49,6 +50,8 @@ public sealed class SpawnExpaditionJob : Job<bool>
 
     private readonly ISawmill _sawmill;
 
+    private readonly Tile _padTile;
+
     public SpawnExpaditionJob(
         double maxTime,
         IEntityManager entManager,
@@ -62,6 +65,7 @@ public sealed class SpawnExpaditionJob : Job<bool>
         SharedMapSystem map,
         EntityUid station,
         SalvageMissionParams missionParams,
+        Tile padTile,
         CancellationToken cancellation = default) : base(maxTime, cancellation)
     {
         _entManager = entManager;
@@ -74,6 +78,7 @@ public sealed class SpawnExpaditionJob : Job<bool>
         _map = map;
         Station = station;
         _missionParams = missionParams;
+        _padTile = padTile;
         _sawmill = logManager.GetSawmill("salvage_job");
 #if !DEBUG
         _sawmill.Level = LogLevel.Info;
@@ -87,13 +92,11 @@ public sealed class SpawnExpaditionJob : Job<bool>
         MetaDataComponent? metadata = null;
         var grid = _entManager.EnsureComponent<MapGridComponent>(mapUid);
         var random = new Random(_missionParams.Seed);
-        var destComp = _entManager.AddComponent<FTLDestinationComponent>(mapUid);
-        destComp.BeaconsOnly = true;
-        destComp.RequireCoordinateDisk = true;
-        destComp.Enabled = true;
+
         _metaData.SetEntityName(
             mapUid,
-            _entManager.System<SharedSalvageSystem>().GetFTLName(_prototypeManager.Index(SalvageSystem.PlanetNames), _missionParams.Seed));
+            _entManager.System<SharedSalvageSystem>()
+                .GetFTLName(_prototypeManager.Index(SalvageSystem.PlanetNames), _missionParams.Seed));
         _entManager.AddComponent<FTLBeaconComponent>(mapUid);
 
         var dataComponent = _entManager.GetComponent<ExpaditionDataComponent>(Station);
@@ -113,7 +116,9 @@ public sealed class SpawnExpaditionJob : Job<bool>
         {
             var biome = _entManager.AddComponent<BiomeComponent>(mapUid);
             var biomeSystem = _entManager.System<BiomeSystem>();
-            biomeSystem.SetTemplate(mapUid, biome, _prototypeManager.Index<BiomeTemplatePrototype>(missionBiome.BiomePrototype));
+            biomeSystem.SetTemplate(mapUid,
+                biome,
+                _prototypeManager.Index<BiomeTemplatePrototype>(missionBiome.BiomePrototype));
             biomeSystem.SetSeed(mapUid, biome, mission.Seed);
             _entManager.Dirty(mapUid, biome);
 
@@ -129,7 +134,8 @@ public sealed class SpawnExpaditionJob : Job<bool>
             air.Gases.CopyTo(moles, 0);
             var atmos = _entManager.EnsureComponent<MapAtmosphereComponent>(mapUid);
             _entManager.System<AtmosphereSystem>().SetMapSpace(mapUid, air.Space, atmos);
-            _entManager.System<AtmosphereSystem>().SetMapGasMixture(mapUid, new GasMixture(moles, mission.Temperature), atmos);
+            _entManager.System<AtmosphereSystem>()
+                .SetMapGasMixture(mapUid, new GasMixture(moles, mission.Temperature), atmos);
 
             if (mission.Color != null)
             {
@@ -142,13 +148,17 @@ public sealed class SpawnExpaditionJob : Job<bool>
         _map.InitializeMap(mapId);
         //_map.SetPaused(mapUid, true);
 
+        // Setup the map info for expad
+        var expaditionMapComponent = _entManager.EnsureComponent<ExpaditionMapComponent>(mapUid);
+
+
         // Setup expedition
         var expedition = _entManager.AddComponent<SalvageExpeditionComponent>(mapUid);
         expedition.Station = Station;
         expedition.EndTime = _timing.CurTime + mission.Duration;
         expedition.MissionParams = _missionParams;
 
-        var landingPadRadius = 24;
+        var landingPadRadius = 6;
         var minDungeonOffset = landingPadRadius + 4;
 
         // We'll use the dungeon rotation as the spawn angle
@@ -160,8 +170,15 @@ public sealed class SpawnExpaditionJob : Job<bool>
         dungeonOffset = dungeonRotation.RotateVec(dungeonOffset);
         var dungeonMod = _prototypeManager.Index<SalvageDungeonModPrototype>(mission.Dungeon);
         var dungeonConfig = _prototypeManager.Index(dungeonMod.Proto);
-        var dungeons = await WaitAsyncTask(_dungeon.GenerateDungeonAsync(dungeonConfig, mapUid, grid, (Vector2i)dungeonOffset,
-            _missionParams.Seed));
+        var dungeons = await WaitAsyncTask(
+            _dungeon.GenerateDungeonAsync(
+                dungeonConfig,
+                mapUid,
+                grid,
+                (Vector2i)dungeonOffset,
+                _missionParams.Seed
+            )
+        );
 
         var dungeon = dungeons.First();
 
@@ -175,13 +192,23 @@ public sealed class SpawnExpaditionJob : Job<bool>
 
         List<Vector2i> reservedTiles = new();
 
+        // Setup the landing pad
+        var landingPadExtents = new Vector2i(landingPadRadius, landingPadRadius);
+        var tiles = new List<(Vector2i Indices, Tile Tile)>(landingPadExtents.X * landingPadExtents.Y * 2);
+
+        // Set the tiles themselves
+        var landingTile = _padTile;
+
         foreach (var tile in _map.GetTilesIntersecting(mapUid, grid, new Circle(Vector2.Zero, landingPadRadius), false))
         {
             if (!_biome.TryGetBiomeTile(mapUid, grid, tile.GridIndices, out _))
                 continue;
 
+            tiles.Add((tile.GridIndices, landingTile));
             reservedTiles.Add(tile.GridIndices);
         }
+
+        grid.SetTiles(tiles);
 
         var budgetEntries = new List<IBudgetEntry>();
 
@@ -206,15 +233,7 @@ public sealed class SpawnExpaditionJob : Job<bool>
             }
         }
 
-        // Handle boss loot (when relevant).
-
-        // Handle mob loot.
-
-        // Handle remaining loot
-
-        /*
-         * MOB SPAWNS
-         */
+        // Mob spawns
 
         var mobBudget = difficultyProto.MobBudget;
         var faction = _prototypeManager.Index<SalvageFactionPrototype>(mission.Faction);
@@ -269,6 +288,7 @@ public sealed class SpawnExpaditionJob : Job<bool>
                         _sawmill.Debug($"Spawning dungeon loot {entry.Proto}");
                         await SpawnRandomEntry((mapUid, grid), entry, dungeon, random);
                     }
+
                     break;
                 default:
                     throw new NotImplementedException();
@@ -278,7 +298,10 @@ public sealed class SpawnExpaditionJob : Job<bool>
         return true;
     }
 
-    private async Task SpawnRandomEntry(Entity<MapGridComponent> grid, IBudgetEntry entry, Dungeon dungeon, Random random)
+    private async Task SpawnRandomEntry(Entity<MapGridComponent> grid,
+        IBudgetEntry entry,
+        Dungeon dungeon,
+        Random random)
     {
         await SuspendIfOutOfTime();
 
@@ -296,7 +319,9 @@ public sealed class SpawnExpaditionJob : Job<bool>
             {
                 var tile = availableTiles.RemoveSwap(random.Next(availableTiles.Count));
 
-                if (!_anchorable.TileFree(grid, tile, (int)CollisionGroup.MachineLayer,
+                if (!_anchorable.TileFree(grid,
+                        tile,
+                        (int)CollisionGroup.MachineLayer,
                         (int)CollisionGroup.MachineLayer))
                 {
                     continue;
@@ -321,20 +346,24 @@ public sealed class SpawnExpaditionJob : Job<bool>
             switch (rule)
             {
                 case BiomeMarkerLoot biomeLoot:
+                {
+                    if (_entManager.TryGetComponent<BiomeComponent>(gridUid, out var biome))
                     {
-                        if (_entManager.TryGetComponent<BiomeComponent>(gridUid, out var biome))
-                        {
-                            _biome.AddMarkerLayer(gridUid, biome, biomeLoot.Prototype);
-                        }
+                        _biome.AddMarkerLayer(gridUid, biome, biomeLoot.Prototype);
                     }
+                }
                     break;
                 case BiomeTemplateLoot biomeLoot:
+                {
+                    if (_entManager.TryGetComponent<BiomeComponent>(gridUid, out var biome))
                     {
-                        if (_entManager.TryGetComponent<BiomeComponent>(gridUid, out var biome))
-                        {
-                            _biome.AddTemplate(gridUid, biome, "Loot", _prototypeManager.Index<BiomeTemplatePrototype>(biomeLoot.Prototype), i);
-                        }
+                        _biome.AddTemplate(gridUid,
+                            biome,
+                            "Loot",
+                            _prototypeManager.Index<BiomeTemplatePrototype>(biomeLoot.Prototype),
+                            i);
                     }
+                }
                     break;
             }
         }
