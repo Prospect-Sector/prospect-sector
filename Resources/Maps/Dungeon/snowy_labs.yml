@@ -45,6 +45,7 @@ entities:
   - uid: 1653
     components:
     - type: MetaData
+      name: snowy_labs prefabs # Prospect - adds meaning to map list
     - type: Transform
     - type: Map
     - type: Broadphase
