@@ -1,0 +1,4 @@
+﻿- type: gameMapPool
+  id: ProspectMapPool
+  maps:
+  - Prospect

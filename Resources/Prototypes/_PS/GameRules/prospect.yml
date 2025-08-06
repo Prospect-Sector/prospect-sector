@@ -1,6 +1,5 @@
 ﻿- type: entity
   id: ProspectGameRule
-  parent: BaseGameRule
   categories: [ HideSpawnMenu ]
   components:
   - type: ProspectGameRule
