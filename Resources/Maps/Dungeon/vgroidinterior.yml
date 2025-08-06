@@ -19,7 +19,6 @@ entities:
   - uid: 1
     components:
     - type: MetaData
-      name: vgroidinterior prefabs # Prospect - adds meaning to map list
     - type: Transform
     - type: Map
       mapPaused: True

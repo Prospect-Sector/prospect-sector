@@ -26,7 +26,6 @@ entities:
   - uid: 588
     components:
     - type: MetaData
-      name: lava_brig prefabs # Prospect - adds meaning to map list
     - type: Transform
     - type: Map
     - type: Broadphase

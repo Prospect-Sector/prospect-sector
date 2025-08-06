@@ -15,7 +15,6 @@ entities:
   - uid: 2
     components:
     - type: MetaData
-      name: mineshaft prefabs # Prospect - adds meaning to map list
     - type: Transform
     - type: Map
     - type: Broadphase

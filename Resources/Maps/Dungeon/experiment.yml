@@ -40,7 +40,6 @@ entities:
   - uid: 1653
     components:
     - type: MetaData
-      name: experiment prefabs # Prospect - adds meaning to map list
     - type: Transform
     - type: Map
     - type: Broadphase
