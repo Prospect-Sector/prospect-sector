@@ -8,7 +8,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared._PS.Terradrop;
 
 [RegisterComponent]
-[NetworkedComponent] [AutoGenerateComponentState(true, true)] [Access(typeof(SharedTerradropSystem))]
+[NetworkedComponent, AutoGenerateComponentState(true, true), Access(typeof(SharedTerradropSystem))]
 public sealed partial class TerradropPadComponent : Component
 {
     /// <summary>
@@ -16,7 +16,7 @@ public sealed partial class TerradropPadComponent : Component
     /// </summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoNetworkedField]
-    public TimeSpan? ActivatedAt;
+    public TimeSpan ActivatedAt = TimeSpan.FromSeconds(-30);
 
     /// <summary>
     /// The time it takes from ActivatedAt to the pad being active.
@@ -30,7 +30,7 @@ public sealed partial class TerradropPadComponent : Component
     [DataField] public SoundSpecifier NewPortalSound =
         new SoundPathSpecifier("/Audio/Machines/high_tech_confirm.ogg");
 
-    [ViewVariables] [DataField("Portal")]
+    [ViewVariables, DataField("Portal")]
     public EntityUid? Portal;
 
     [DataField("PortalPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
@@ -39,10 +39,6 @@ public sealed partial class TerradropPadComponent : Component
     /// <summary>
     /// The destination map ID for the terradrop pad.
     /// </summary>
-    [ViewVariables(VVAccess.ReadOnly)] [Access(typeof(SharedTerradropSystem), Other = AccessPermissions.ReadExecute)]
+    [ViewVariables(VVAccess.ReadOnly), Access(typeof(SharedTerradropSystem), Other = AccessPermissions.ReadExecute)]
     public MapId TeleportMapId { get; set; }
-}
-
-public class EntityUidSerializer
-{
 }
