@@ -1,4 +1,4 @@
-﻿using Content.Shared.Administration;
+using Content.Shared.Administration;
 using Content.Shared.CCVar.CVarAccess;
 using Robust.Shared.Configuration;
 
@@ -74,7 +74,7 @@ public sealed partial class CCVars
     ///     Whether to automatically preloading grids by GridPreloaderSystem
     /// </summary>
     public static readonly CVarDef<bool> PreloadGrids =
-        CVarDef.Create("shuttle.preload_grids", false, CVar.SERVERONLY);
+        CVarDef.Create("shuttle.preload_grids", false, CVar.SERVERONLY); // Prospect: true->false
 
     /// <summary>
     ///     How long the warmup time before FTL start should be.

@@ -29,7 +29,7 @@ CHANGELOG_RSS_KEY = os.environ.get("CHANGELOG_RSS_KEY")
 
 # Change these to suit your server settings
 # https://docs.fabfile.org/en/stable/getting-started.html#run-commands-via-connections-and-run
-SSH_HOST = "moon.spacestation14.com"
+SSH_HOST = "changelog.prospect-sector.space"
 SSH_USER = "changelog-rss"
 SSH_PORT = 22
 RSS_FILE = "changelog.xml"
@@ -39,14 +39,14 @@ HOST_KEYS = [
 ]
 
 # RSS feed parameters, change these
-FEED_TITLE       = "Space Station 14 Changelog"
-FEED_LINK        = "https://github.com/space-wizards/space-station-14/"
-FEED_DESCRIPTION = "Changelog for the official Wizard's Den branch of Space Station 14."
+FEED_TITLE       = "Prospect Sector Changelog"
+FEED_LINK        = "https://github.com/Prospect-Sector/prospect-sector/"
+FEED_DESCRIPTION = "Changelog for the Prospect Sector branch of Space Station 14."
 FEED_LANGUAGE    = "en-US"
-FEED_GUID_PREFIX = "ss14-changelog-wizards-"
-FEED_URL         = "https://central.spacestation14.io/changelog.xml"
+FEED_GUID_PREFIX = "ss14-changelog-prospect-sector-"
+FEED_URL         = "https://changelog.prospect-sector.space/changelog.xml"
 
-CHANGELOG_FILE = "Resources/Changelog/Changelog.yml"
+CHANGELOG_FILE = "Resources/Changelog/Prospect.yml" # Prospect: Changelog.yml<Prospect.yml
 
 TYPES_TO_EMOJI = {
     "Fix":    "🐛",

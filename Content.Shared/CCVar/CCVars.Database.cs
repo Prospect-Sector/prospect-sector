@@ -1,4 +1,4 @@
-﻿using Robust.Shared.Configuration;
+using Robust.Shared.Configuration;
 
 namespace Content.Shared.CCVar;
 
@@ -74,4 +74,16 @@ public sealed partial class CCVars
     /// </summary>
     public static readonly CVarDef<bool> DatabaseSynchronous =
         CVarDef.Create("database.sync", false, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Prospect: Added for SSL/TLS support ---
+    /// </summary>
+    public static readonly CVarDef<string> DatabasePgSslMode =
+        CVarDef.Create("database.pg_sslmode", "Disable", CVar.SERVERONLY); // sslmode values: Disable, Require, VerifyCA, VerifyFull.
+
+    public static readonly CVarDef<bool> DatabasePgTrustServerCertificate =
+        CVarDef.Create("database.pg_trust_server_certificate", true, CVar.SERVERONLY);
+    /// <summary>
+    /// End Prospect: Added for SSL/TLS support ---
+    /// </summary>
 }

@@ -1,0 +1,27 @@
+name: "PR: Changelog Validator"
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+jobs:
+  changelog-validator:
+    name: PR Changelog Validator
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Branch
+      uses: actions/checkout@v4.2.2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+
+    - name: Validate Changelog
+      run: |
+        cd "Tools/_PS/changelog"
+        node changelog_validator.js
+      shell: bash

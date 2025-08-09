@@ -1,4 +1,4 @@
-﻿using Robust.Shared.Configuration;
+using Robust.Shared.Configuration;
 
 namespace Content.Shared.CCVar;
 
@@ -84,7 +84,7 @@ public sealed partial class CCVars
         CVarDef.Create("entgc.maximum_time_ms", 5, CVar.SERVERONLY);
 
     public static readonly CVarDef<bool> GatewayGeneratorEnabled =
-        CVarDef.Create("gateway.generator_enabled", false);
+        CVarDef.Create("gateway.generator_enabled", false); // Prospect: true->false
 
     public static readonly CVarDef<string> TippyEntity =
         CVarDef.Create("tippy.entity", "Tippy", CVar.SERVER | CVar.REPLICATED);

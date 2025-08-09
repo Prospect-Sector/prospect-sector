@@ -1,0 +1,28 @@
+name: Publish Changelog
+
+concurrency:
+  group: changelog
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: '0 2 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Main
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+          ref: "${{ vars.CHANGELOG_BRANCH }}"
+
+      - name: Publish changelog (Discord)
+        continue-on-error: true
+        run: Tools/actions_changelogs_since_last_run.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
