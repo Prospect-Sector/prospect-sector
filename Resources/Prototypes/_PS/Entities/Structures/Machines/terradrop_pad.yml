@@ -1,7 +1,7 @@
 ﻿- type: entity
-  id: Expad
-  name: expad
-  description: A teleportation pad that can be used to travel short distances.
+  id: TerradropPad
+  name: terradrop pad
+  description: A terradrop pad that can be used to beam down to the planet below.
   placement:
     mode: SnapgridCenter
   components:
@@ -33,12 +33,12 @@
     radius: 3
     energy: 1
     netsync: false
-  - type: ExpaditionPad
+  - type: TerradropPad
 
 - type: entity
-  id: ExpadReturn
+  id: TerradropReturnMarker
   parent: MarkerBase
-  name: expad return marker
+  name: terradrop return marker
   description: This will mark where players will return to when using the portal back.
   placement:
     mode: SnapgridCenter
@@ -47,5 +47,5 @@
     sprite: Markers/jobs.rsi
     layers:
     - state: green
-  - type: ExpadReturnMarker
+  - type: TerradropReturnMarker
 

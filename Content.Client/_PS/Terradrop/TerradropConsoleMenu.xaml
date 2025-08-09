@@ -1,9 +1,7 @@
 ﻿<controls:FancyWindow xmlns="https://spacestation14.io"
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
-                      xmlns:customControls="clr-namespace:Content.Client.Administration.UI.CustomControls"
-                      xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                       MinSize="1000 500"
-                      Title="{Loc 'expadition-console-menu-title'}">
+                      Title="{Loc 'terradrop-console-menu-title'}">
     <BoxContainer Name="ViewContainer"
                   HorizontalExpand="True"
                   VerticalExpand="True"
@@ -17,16 +15,16 @@
 
             <BoxContainer Orientation="Horizontal"
                           Margin="8">
-                <Label Text="{Loc 'expadition-console-threat-level'}"
+                <Label Text="{Loc 'terradrop-console-threat-level'}"
                        StyleClasses="LabelTitle" />
                 <!-- <Slider Name="LevelSlider" Size="100 40" MinValue="1" MaxValue="100" HorizontalExpand="True" /> -->
                 <!-- <Label Name="LevelLabel" Text="0" StyleClasses="LabelSubText" /> -->
-                <Button Name="StartExpaditionButton"
+                <Button Name="StartTerradropButton"
                         Access="Public"
                         ToolTip=""
                         HorizontalExpand="True"
                         Margin="5 0 5 0"
-                        Text="{Loc 'expadition-console-start-button'}"
+                        Text="{Loc 'terradrop-console-start-button'}"
                         StyleClasses="LabelSubText" />
             </BoxContainer>
 

@@ -10,7 +10,7 @@ using Content.Server.Procedural;
 using Content.Server.Salvage;
 using Content.Server.Salvage.Expeditions;
 using Content.Server.Shuttles.Components;
-using Content.Shared._PS.Expadition;
+using Content.Shared._PS.Terradrop;
 using Content.Shared.Atmos;
 using Content.Shared.Construction.EntitySystems;
 using Content.Shared.Gravity;
@@ -32,9 +32,9 @@ using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
-namespace Content.Server._PS.Expadition;
+namespace Content.Server._PS.Terradrop;
 
-public sealed class SpawnExpaditionJob : Job<bool>
+public sealed class GenerateTerradropJob : Job<bool>
 {
     private readonly IEntityManager _entManager;
     private readonly IGameTiming _timing;
@@ -52,7 +52,7 @@ public sealed class SpawnExpaditionJob : Job<bool>
 
     private readonly Tile _padTile;
 
-    public SpawnExpaditionJob(
+    public GenerateTerradropJob(
         double maxTime,
         IEntityManager entManager,
         IGameTiming timing,
@@ -99,7 +99,7 @@ public sealed class SpawnExpaditionJob : Job<bool>
                 .GetFTLName(_prototypeManager.Index(SalvageSystem.PlanetNames), _missionParams.Seed));
         _entManager.AddComponent<FTLBeaconComponent>(mapUid);
 
-        var dataComponent = _entManager.GetComponent<ExpaditionDataComponent>(Station);
+        var dataComponent = _entManager.GetComponent<TerradropStationComponent>(Station);
         dataComponent.ActiveMissions.Add(mapId, mapUid);
 
         // Setup mission configs
@@ -148,8 +148,8 @@ public sealed class SpawnExpaditionJob : Job<bool>
         _map.InitializeMap(mapId);
         //_map.SetPaused(mapUid, true);
 
-        // Setup the map info for expad
-        var expaditionMapComponent = _entManager.EnsureComponent<ExpaditionMapComponent>(mapUid);
+        // Setup the map info for terradrop
+        var terradropMapComponent = _entManager.EnsureComponent<TerradropMapComponent>(mapUid);
 
 
         // Setup expedition

@@ -5,11 +5,11 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
-namespace Content.Shared._PS.Expadition;
+namespace Content.Shared._PS.Terradrop;
 
 [RegisterComponent]
-[NetworkedComponent, AutoGenerateComponentState(true, fieldDeltas: true), Access(typeof(SharedExpaditionSystem))]
-public sealed partial class ExpaditionPadComponent: Component
+[NetworkedComponent, AutoGenerateComponentState(true, fieldDeltas: true), Access(typeof(SharedTerradropSystem))]
+public sealed partial class TerradropPadComponent: Component
 {
     [DataField("PortalPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string PortalPrototype = "PortalBlue";
@@ -24,9 +24,9 @@ public sealed partial class ExpaditionPadComponent: Component
     public SoundSpecifier ClearPortalSound = new SoundPathSpecifier("/Audio/Machines/button.ogg");
 
     /// <summary>
-    /// The destination map ID for the expadition pad.
+    /// The destination map ID for the terradrop pad.
     /// </summary>
-    [ViewVariables(VVAccess.ReadOnly), Access(typeof(SharedExpaditionSystem), Other = AccessPermissions.ReadExecute)]
+    [ViewVariables(VVAccess.ReadOnly), Access(typeof(SharedTerradropSystem), Other = AccessPermissions.ReadExecute)]
     public MapId TeleportMapId { get; set; }
 
     /// <summary>

@@ -2086,7 +2086,7 @@ entities:
     - type: Transform
       pos: -13.5,3.5
       parent: 4
-- proto: ComputerExpaditionConsole
+- proto: ComputerTerradropConsole
   entities:
   - uid: 240
     components:
@@ -2246,7 +2246,7 @@ entities:
     - type: Transform
       pos: 12.5,1.5
       parent: 4
-- proto: Expad
+- proto: TerradropPad
   entities:
   - uid: 127
     components:
@@ -2254,7 +2254,7 @@ entities:
       rot: 1.5707963267948966 rad
       pos: -5.5,5.5
       parent: 4
-- proto: ExpadReturn
+- proto: TerradropReturnMarker
   entities:
   - uid: 495
     components:

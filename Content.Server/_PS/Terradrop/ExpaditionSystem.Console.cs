@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
-using Content.Shared._PS.Expadition;
+using Content.Shared._PS.Terradrop;
 using Content.Shared.Salvage.Expeditions;
 using Content.Shared.Teleportation.Components;
 using Content.Shared.Teleportation.Systems;
@@ -11,9 +11,9 @@ using Robust.Shared.Map;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
 
-namespace Content.Server._PS.Expadition;
+namespace Content.Server._PS.Terradrop;
 
-public sealed partial class ExpaditionSystem: SharedExpaditionSystem
+public sealed partial class TerradropSystem: SharedTerradropSystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly LinkedEntitySystem _link = default!;
@@ -21,24 +21,24 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
     [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
 
     private readonly JobQueue _salvageQueue = new();
-    private readonly List<(SpawnExpaditionJob Job, CancellationTokenSource CancelToken)> _salvageJobs = new();
+    private readonly List<(GenerateTerradropJob Job, CancellationTokenSource CancelToken)> _salvageJobs = new();
     private const double SalvageJobTime = 0.002;
 
     public void InitializeConsole()
     {
-        SubscribeLocalEvent<ExpaditionConsoleComponent, StartExpaditionMessage>(OnStartExpaditionMessage);
+        SubscribeLocalEvent<TerradropComponent, StartTerradropMessage>(OnStartTerradropMessage);
     }
 
-    private void OnStartExpaditionMessage(EntityUid consoleUid,
-        ExpaditionConsoleComponent component,
-        ref StartExpaditionMessage message)
+    private void OnStartTerradropMessage(EntityUid consoleUid,
+        TerradropComponent component,
+        ref StartTerradropMessage message)
     {
         // Do not allow creating a new portal until current ones are cleared.
         if (_salvageJobs.Count != 0)
             return;
 
 
-        var data = EnsureComp<ExpaditionDataComponent>(consoleUid);
+        var data = EnsureComp<TerradropStationComponent>(consoleUid);
         if (data.Missions.Count == 0)
         {
             GenerateMissions(data);
@@ -62,7 +62,7 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
     private void SpawnMission(SalvageMissionParams missionParams, EntityUid station)
     {
         var cancelToken = new CancellationTokenSource();
-        var job = new SpawnExpaditionJob(
+        var job = new GenerateTerradropJob(
             SalvageJobTime,
             EntityManager,
             _timing,
@@ -82,7 +82,7 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
         _salvageQueue.EnqueueJob(job);
     }
 
-    private void UpdateExpaditions()
+    private void UpdateTerradropJobs()
     {
         _salvageQueue.Process();
 
@@ -93,7 +93,7 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
                 case JobStatus.Finished:
                     _salvageJobs.Remove((job, cancelToken));
 
-                    var dataComponent = EntityManager.GetComponent<ExpaditionDataComponent>(job.Station);
+                    var dataComponent = EntityManager.GetComponent<TerradropStationComponent>(job.Station);
                     var mapId = dataComponent.ActiveMissions.Last().Key;
 
                     var roomMarker = Spawn("MaintsRoomMarker", new MapCoordinates(4f, 0f, mapId));
@@ -101,10 +101,10 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
                     if(TryComp<PortalComponent>(mapPortal, out var mapPortalComponent))
                         mapPortalComponent.CanTeleportToOtherMaps = true;
 
-                    var returnMarker = _entityManager.AllEntities<ExpadReturnMarkerComponent>().FirstOrNull();
+                    var returnMarker = _entityManager.AllEntities<TerradropReturnMarkerComponent>().FirstOrNull();
 
                     // Activate all expedition pads to teleport to the new map.
-                    var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, ExpaditionPadComponent>();
+                    var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, TerradropPadComponent>();
                     while (enumerator.MoveNext(out var uid, out var transform, out var pad))
                     {
                         pad.TeleportMapId = mapId;
@@ -133,7 +133,7 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
 
     private void ClearPadsIfNeeded()
     {
-        var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, ExpaditionPadComponent>();
+        var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, TerradropPadComponent>();
         while (enumerator.MoveNext(out var transform, out var pad))
         {
 
@@ -148,7 +148,7 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
 
     private void ClearAllStationPortalsNow()
     {
-        var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, ExpaditionPadComponent>();
+        var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, TerradropPadComponent>();
         while (enumerator.MoveNext(out var transform, out var pad))
         {
             if (pad.Portal != null && !Deleted(pad.Portal))
@@ -158,7 +158,7 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
         }
     }
 
-    private void GenerateMissions(ExpaditionDataComponent component)
+    private void GenerateMissions(TerradropStationComponent component)
     {
         component.Missions.Clear();
 

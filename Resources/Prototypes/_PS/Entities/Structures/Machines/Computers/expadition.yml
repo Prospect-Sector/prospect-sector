@@ -1,7 +1,7 @@
 ﻿- type: entity
-  name: expadition computer
+  name: terradrop control console
   parent: BaseComputer
-  id: ComputerExpaditionConsole
+  id: ComputerTerradropConsole
   description: Used to beam yourself and your friends to adventure.
   placement:
     mode: SnapgridCenter
@@ -20,13 +20,13 @@
     - map: [ "enum.WiresVisualLayers.MaintenancePanel" ]
       state: generic_panel_open
   - type: ActivatableUI
-    key: enum.ExpaditionConsoleUiKey.Default
+    key: enum.TerradropConsoleUiKey.Default
   - type: UserInterface
     interfaces:
-      enum.ExpaditionConsoleUiKey.Default:
-        type: ExpaditionConsoleBoundUserInterface
+      enum.TerradropConsoleUiKey.Default:
+        type: TerradropConsoleBoundUserInterface
       enum.WiresUiKey.Key:
         type: WiresBoundUserInterface
   - type: Computer
     board: Null
-  - type: ExpaditionConsole
+  - type: TerradropConsole

@@ -6,7 +6,7 @@ using Content.Server.Radio.EntitySystems;
 using Content.Server.Shuttles.Systems;
 using Content.Server.Stack;
 using Content.Server.Station.Systems;
-using Content.Shared._PS.Expadition;
+using Content.Shared._PS.Terradrop;
 using Content.Shared.Construction.EntitySystems;
 using Content.Shared.Labels.EntitySystems;
 using Content.Shared.Popups;
@@ -20,9 +20,9 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
-namespace Content.Server._PS.Expadition;
+namespace Content.Server._PS.Terradrop;
 
-public sealed partial class ExpaditionSystem: SharedExpaditionSystem
+public sealed partial class TerradropSystem: SharedTerradropSystem
 {
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
@@ -60,6 +60,6 @@ public sealed partial class ExpaditionSystem: SharedExpaditionSystem
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
-        UpdateExpaditions();
+        UpdateTerradropJobs();
     }
 }
