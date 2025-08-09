@@ -1,0 +1,32 @@
+﻿- type: entity
+  name: terradrop control console
+  parent: BaseComputer
+  id: ComputerTerradropConsole
+  description: Used to beam yourself and your friends to adventure.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Sprite
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      sprite: Structures/Machines/computers.rsi
+      state: generic
+    - map: ["computerLayerKeys"]
+      state: tech_key
+    - map: [ "enum.WiresVisualLayers.MaintenancePanel" ]
+      state: generic_panel_open
+  - type: ActivatableUI
+    key: enum.TerradropConsoleUiKey.Default
+  - type: UserInterface
+    interfaces:
+      enum.TerradropConsoleUiKey.Default:
+        type: TerradropConsoleBoundUserInterface
+      enum.WiresUiKey.Key:
+        type: WiresBoundUserInterface
+  - type: Computer
+    board: Null
+  - type: TerradropConsole

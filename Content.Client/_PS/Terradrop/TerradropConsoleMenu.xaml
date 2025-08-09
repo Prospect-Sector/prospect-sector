@@ -1,0 +1,40 @@
+﻿<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      MinSize="1000 500"
+                      Title="{Loc 'terradrop-console-menu-title'}">
+    <BoxContainer Name="ViewContainer"
+                  HorizontalExpand="True"
+                  VerticalExpand="True"
+                  Access="Public"
+                  Orientation="Vertical">
+        <BoxContainer Orientation="Vertical"
+                      VerticalExpand="True"
+                      HorizontalExpand="True"
+                      MinSize="50 50"
+                      Margin="8">
+
+            <BoxContainer Orientation="Horizontal"
+                          Margin="8">
+                <Label Text="{Loc 'terradrop-console-threat-level'}"
+                       StyleClasses="LabelTitle" />
+                <!-- <Slider Name="LevelSlider" Size="100 40" MinValue="1" MaxValue="100" HorizontalExpand="True" /> -->
+                <!-- <Label Name="LevelLabel" Text="0" StyleClasses="LabelSubText" /> -->
+                <Button Name="StartTerradropButton"
+                        Access="Public"
+                        ToolTip=""
+                        HorizontalExpand="True"
+                        Margin="5 0 5 0"
+                        Text="{Loc 'terradrop-console-start-button'}"
+                        StyleClasses="LabelSubText" />
+            </BoxContainer>
+
+        </BoxContainer>
+        <BoxContainer Name="ContentFooter" HorizontalExpand="True" SetHeight="28" Margin="1 0 2 1">
+            <controls:StripeBack HasBottomEdge="False" HasMargins="False" HorizontalExpand="True">
+                <Label Text="Robust#OS ™" VerticalAlignment="Center" HorizontalAlignment="Right"
+                       HorizontalExpand="True"
+                       Margin="6 0" StyleClasses="PdaContentFooterText" />
+            </controls:StripeBack>
+        </BoxContainer>
+    </BoxContainer>
+</controls:FancyWindow>

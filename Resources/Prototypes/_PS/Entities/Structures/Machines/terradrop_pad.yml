@@ -1,0 +1,51 @@
+﻿- type: entity
+  id: TerradropPad
+  name: terradrop pad
+  description: A terradrop pad that can be used to beam down to the planet below.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Sprite
+    sprite: _PS/Structures/Tiles/marked_tile.rsi
+    layers:
+    - state: base
+    - state: unshaded
+      shader: unshaded
+  - type: Transform
+    anchored: true
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      portalFixture:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.25,-0.48,0.25,0.48"
+        mask:
+        - FullTileMask
+        layer:
+        - WallLayer
+        hard: false
+  - type: InteractionOutline
+  - type: Clickable
+  - type: PointLight
+    color: SkyBlue
+    radius: 3
+    energy: 1
+    netsync: false
+  - type: TerradropPad
+
+- type: entity
+  id: TerradropReturnMarker
+  parent: MarkerBase
+  name: terradrop return marker
+  description: This will mark where players will return to when using the portal back.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Sprite
+    sprite: Markers/jobs.rsi
+    layers:
+    - state: green
+  - type: TerradropReturnMarker
+
