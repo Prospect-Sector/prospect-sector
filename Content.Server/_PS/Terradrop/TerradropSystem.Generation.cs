@@ -104,7 +104,7 @@ public sealed partial class TerradropSystem
     private void ClearPadsIfNeeded()
     {
         var pads = _entityManager.EntityQuery<TransformComponent, TerradropPadComponent>();
-        foreach (var (transform, pad) in pads)
+        foreach (var (transform, pad) in pads.ToArray())
         {
             if (_timing.CurTime < pad.ActivatedAt + pad.ClearPortalDelay)
                 continue;
