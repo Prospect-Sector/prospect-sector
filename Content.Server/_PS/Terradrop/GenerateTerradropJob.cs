@@ -22,7 +22,6 @@ using Content.Shared.Random;
 using Content.Shared.Salvage;
 using Content.Shared.Salvage.Expeditions;
 using Content.Shared.Salvage.Expeditions.Modifiers;
-using Content.Shared.Shuttles.Components;
 using Robust.Shared.Collections;
 using Robust.Shared.CPUJob.JobQueues;
 using Robust.Shared.Map;

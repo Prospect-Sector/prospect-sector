@@ -8,27 +8,9 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared._PS.Terradrop;
 
 [RegisterComponent]
-[NetworkedComponent, AutoGenerateComponentState(true, fieldDeltas: true), Access(typeof(SharedTerradropSystem))]
-public sealed partial class TerradropPadComponent: Component
+[NetworkedComponent] [AutoGenerateComponentState(true, true)] [Access(typeof(SharedTerradropSystem))]
+public sealed partial class TerradropPadComponent : Component
 {
-    [DataField("PortalPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string PortalPrototype = "PortalBlue";
-
-    [ViewVariables, DataField("Portal")]
-    public EntityUid? Portal;
-
-    [DataField] public SoundSpecifier NewPortalSound =
-        new SoundPathSpecifier("/Audio/Machines/high_tech_confirm.ogg");
-
-    [DataField]
-    public SoundSpecifier ClearPortalSound = new SoundPathSpecifier("/Audio/Machines/button.ogg");
-
-    /// <summary>
-    /// The destination map ID for the terradrop pad.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadOnly), Access(typeof(SharedTerradropSystem), Other = AccessPermissions.ReadExecute)]
-    public MapId TeleportMapId { get; set; }
-
     /// <summary>
     /// The time the pad was activated. This is set after the map is loaded.
     /// </summary>
@@ -41,6 +23,24 @@ public sealed partial class TerradropPadComponent: Component
     /// </summary>
     [DataField]
     public TimeSpan ClearPortalDelay = TimeSpan.FromSeconds(30);
+
+    [DataField]
+    public SoundSpecifier ClearPortalSound = new SoundPathSpecifier("/Audio/Machines/button.ogg");
+
+    [DataField] public SoundSpecifier NewPortalSound =
+        new SoundPathSpecifier("/Audio/Machines/high_tech_confirm.ogg");
+
+    [ViewVariables] [DataField("Portal")]
+    public EntityUid? Portal;
+
+    [DataField("PortalPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string PortalPrototype = "PortalBlue";
+
+    /// <summary>
+    /// The destination map ID for the terradrop pad.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)] [Access(typeof(SharedTerradropSystem), Other = AccessPermissions.ReadExecute)]
+    public MapId TeleportMapId { get; set; }
 }
 
 public class EntityUidSerializer

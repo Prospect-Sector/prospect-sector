@@ -2,8 +2,7 @@
 
 namespace Content.Shared._PS.Terradrop;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StartTerradropMessage : BoundUserInterfaceMessage
 {
 };
-

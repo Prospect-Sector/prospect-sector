@@ -13,16 +13,17 @@ using Robust.Shared.Utility;
 
 namespace Content.Server._PS.Terradrop;
 
-public sealed partial class TerradropSystem: SharedTerradropSystem
+public sealed partial class TerradropSystem : SharedTerradropSystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
+    private const double SalvageJobTime = 0.002;
     [Dependency] private readonly LinkedEntitySystem _link = default!;
-    //[Dependency] private readonly SalvageSystem _salvage = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    private readonly List<(GenerateTerradropJob Job, CancellationTokenSource CancelToken)> _salvageJobs = new();
 
     private readonly JobQueue _salvageQueue = new();
-    private readonly List<(GenerateTerradropJob Job, CancellationTokenSource CancelToken)> _salvageJobs = new();
-    private const double SalvageJobTime = 0.002;
+
+    //[Dependency] private readonly SalvageSystem _salvage = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
 
     public void InitializeConsole()
     {
@@ -40,9 +41,7 @@ public sealed partial class TerradropSystem: SharedTerradropSystem
 
         var data = EnsureComp<TerradropStationComponent>(consoleUid);
         if (data.Missions.Count == 0)
-        {
             GenerateMissions(data);
-        }
 
         _audio.PlayPredicted(component.SuccessSound, consoleUid, null, AudioParams.Default.WithMaxDistance(5f));
 
@@ -56,7 +55,6 @@ public sealed partial class TerradropSystem: SharedTerradropSystem
         //var difficulty = _prototypeManager.Index<SalvageDifficultyPrototype>(missionParams.Difficulty);
         //var mission = _salvage.GetMission(difficulty, missionParams.Seed);
         SpawnMission(missionParams, consoleUid);
-
     }
 
     private void SpawnMission(SalvageMissionParams missionParams, EntityUid station)
@@ -98,20 +96,21 @@ public sealed partial class TerradropSystem: SharedTerradropSystem
 
                     var roomMarker = Spawn("MaintsRoomMarker", new MapCoordinates(4f, 0f, mapId));
                     var mapPortal = Spawn("PortalRed", new MapCoordinates(4f, 0f, mapId));
-                    if(TryComp<PortalComponent>(mapPortal, out var mapPortalComponent))
+                    if (TryComp<PortalComponent>(mapPortal, out var mapPortalComponent))
                         mapPortalComponent.CanTeleportToOtherMaps = true;
 
                     var returnMarker = _entityManager.AllEntities<TerradropReturnMarkerComponent>().FirstOrNull();
 
                     // Activate all expedition pads to teleport to the new map.
-                    var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, TerradropPadComponent>();
+                    var enumerator =
+                        EntityManager.AllEntityQueryEnumerator<TransformComponent, TerradropPadComponent>();
                     while (enumerator.MoveNext(out var uid, out var transform, out var pad))
                     {
                         pad.TeleportMapId = mapId;
                         pad.ActivatedAt = _timing.CurTime;
                         pad.Portal = Spawn(pad.PortalPrototype, transform.Coordinates);
 
-                        if(TryComp<PortalComponent>(pad.Portal, out var portal))
+                        if (TryComp<PortalComponent>(pad.Portal, out var portal))
                             portal.CanTeleportToOtherMaps = true;
 
                         _link.OneWayLink(pad.Portal!.Value, mapPortal);
@@ -123,6 +122,7 @@ public sealed partial class TerradropSystem: SharedTerradropSystem
                         else
                             _link.OneWayLink(mapPortal, uid);
                     }
+
                     break;
             }
         }
@@ -136,7 +136,6 @@ public sealed partial class TerradropSystem: SharedTerradropSystem
         var enumerator = EntityManager.AllEntityQueryEnumerator<TransformComponent, TerradropPadComponent>();
         while (enumerator.MoveNext(out var transform, out var pad))
         {
-
             if (_timing.CurTime < pad.ActivatedAt + pad.ClearPortalDelay)
                 continue;
             if (pad.Portal == null || Deleted(pad.Portal))

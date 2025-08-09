@@ -10,10 +10,10 @@ namespace Content.Shared._PS.Terradrop;
 public sealed partial class TerradropStationComponent : Component
 {
     [ViewVariables]
-    public readonly Dictionary<ushort, SalvageMissionParams> Missions = new();
+    public readonly Dictionary<MapId, EntityUid> ActiveMissions = new();
 
     [ViewVariables]
-    public readonly Dictionary<MapId, EntityUid> ActiveMissions = new();
+    public readonly Dictionary<ushort, SalvageMissionParams> Missions = new();
 
     public ushort NextIndex = 1;
 }
