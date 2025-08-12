@@ -71,7 +71,7 @@ public sealed partial class TerradropSystem
         var mapId = dataComponent.ActiveMissions.Last().Key;
 
         // Spawn the room marker to make a new room where the portal will be.
-        Spawn("MaintsRoomMarker", new MapCoordinates(4f, 0f, mapId));
+        Spawn("TerradropRoomMarker", new MapCoordinates(4f, 0f, mapId));
         var mapPortal = Spawn("PortalRed", new MapCoordinates(4f, 0f, mapId));
         if (TryComp<PortalComponent>(mapPortal, out var mapPortalComponent))
             mapPortalComponent.CanTeleportToOtherMaps = true;

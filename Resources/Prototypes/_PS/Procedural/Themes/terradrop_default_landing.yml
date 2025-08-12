@@ -1,0 +1,18 @@
+﻿- type: dungeonRoom
+  id: Terradrop7x7a
+  size: 7,7
+  atlas: /Maps/_PS/Dungeon/terradrop_default_landing.yml
+  offset: 0,0
+  tags:
+  - TerradropLanding
+
+- type: entity
+  parent: BaseRoomMarker
+  id: TerradropRoomMarker
+  name: Terradrop Landing Marker
+  components:
+  - type: RoomFill
+    clearExisting: true
+    roomWhitelist:
+      tags:
+      - TerradropLanding
