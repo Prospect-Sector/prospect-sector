@@ -31,7 +31,6 @@
         - VendingMachineRestock
       blacklist:
         tags:
-        - Mail
         - Paper
         - Trash
         components:
