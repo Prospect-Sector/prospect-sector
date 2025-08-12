@@ -89,7 +89,7 @@ public sealed class GenerateTerradropJob : Job<bool>
 
     protected override async Task<bool> Process()
     {
-        _sawmill.Debug("salvage", $"Spawning salvage mission with seed {_missionParams.Seed}");
+        _sawmill.Debug("terradrop", $"Spawning terradrop mission with seed {_missionParams.Seed}");
         var mapUid = _map.CreateMap(out var mapId, runMapInit: false);
         MetaDataComponent? metadata = null;
         var grid = _entManager.EnsureComponent<MapGridComponent>(mapUid);
