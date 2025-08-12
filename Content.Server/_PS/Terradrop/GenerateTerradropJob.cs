@@ -45,6 +45,7 @@ public sealed class GenerateTerradropJob : Job<bool>
     private readonly SharedMapSystem _map;
 
     public readonly EntityUid Station;
+    public readonly EntityUid TargetPad;
     private readonly SalvageMissionParams _missionParams;
 
     private readonly ISawmill _sawmill;
@@ -63,6 +64,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         MetaDataSystem metaData,
         SharedMapSystem map,
         EntityUid station,
+        EntityUid targetPad,
         SalvageMissionParams missionParams,
         Tile padTile,
         CancellationToken cancellation = default) : base(maxTime, cancellation)
@@ -76,6 +78,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         _metaData = metaData;
         _map = map;
         Station = station;
+        TargetPad = targetPad;
         _missionParams = missionParams;
         _padTile = padTile;
         _sawmill = logManager.GetSawmill("salvage_job");

@@ -1,9 +1,14 @@
 ﻿using Content.Server.Parallax;
+using Content.Server.Popups;
 using Content.Server.Procedural;
+using Content.Server.Station.Systems;
 using Content.Shared._PS.Terradrop;
 using Content.Shared.Construction.EntitySystems;
+using Content.Shared.Teleportation.Systems;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
 namespace Content.Server._PS.Terradrop;
@@ -20,6 +25,11 @@ public sealed partial class TerradropSystem : SharedTerradropSystem
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly LinkedEntitySystem _link = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
+    [Dependency] private readonly StationSystem _station = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -33,4 +43,5 @@ public sealed partial class TerradropSystem : SharedTerradropSystem
         base.Update(frameTime);
         UpdateTerradropJobs();
     }
+
 }
