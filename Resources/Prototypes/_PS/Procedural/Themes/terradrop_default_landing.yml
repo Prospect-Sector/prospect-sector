@@ -4,7 +4,7 @@
   atlas: /Maps/_PS/Dungeon/terradrop_default_landing.yml
   offset: 0,0
   tags:
-  - TerradropLanding
+  - Terradrop
 
 - type: entity
   parent: BaseRoomMarker
@@ -15,4 +15,4 @@
     clearExisting: true
     roomWhitelist:
       tags:
-      - TerradropLanding
+      - Terradrop
