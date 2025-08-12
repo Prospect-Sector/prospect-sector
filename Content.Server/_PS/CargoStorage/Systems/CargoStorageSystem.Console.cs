@@ -16,7 +16,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server._PS.CargoStorage.Systems;
 
-public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
+public sealed partial class CargoStorageSystem
 {
     [Dependency] private readonly IComponentFactory _componentFactory = default!;
     [Dependency] private readonly SharedMaterialStorageSystem _sharedMaterialStorageSystem = default!;
@@ -43,32 +43,34 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
     private void OnEntitySoldEvent(ref EntitySoldEvent entitySoldEvent)
     {
         var station = _station.GetOwningStation(entitySoldEvent.Station);
-        if (station == null)
+        if (station is null ||
+            !_entityManager.TryGetComponent<CargoStorageDataComponent>(station, out var dataComponent))
+        {
             return;
+        }
 
-        _entityManager.EnsureComponent<CargoMarketDataComponent>(station.Value, out var dataComp);
         foreach (var sold in entitySoldEvent.Sold)
         {
-            UpsertEntity(dataComp, sold);
+            UpsertEntity(dataComponent, sold);
         }
     }
 
     /// <summary>
     /// Recursively updates/inserts an entity and everything it contains into the cargo market.
     /// </summary>
-    /// <param name="market">The cargo storage data set that will store these entities.</param>
+    /// <param name="storage">The cargo storage data set that will store these entities.</param>
     /// <param name="sold">The entity to add.</param>
-    private void UpsertEntity(CargoMarketDataComponent market, EntityUid sold)
+    private void UpsertEntity(CargoStorageDataComponent storage, EntityUid sold)
     {
         // Recurse through other stored/contained entities first.
         if (_entityManager.TryGetComponent<MaterialStorageComponent>(sold, out var materialStorageComponent))
-            UpsertMaterialStorage(market, materialStorageComponent, sold);
+            UpsertMaterialStorage(storage, materialStorageComponent, sold);
         if (_entityManager.TryGetComponent<StorageComponent>(sold, out var storageComponent))
-            UpsertStorage(market, storageComponent);
+            UpsertStorage(storage, storageComponent);
         if (_entityManager.TryGetComponent<EntityStorageComponent>(sold, out var entityStorageComponent))
-            UpsertEntityStorage(market, entityStorageComponent);
+            UpsertEntityStorage(storage, entityStorageComponent);
         if (_entityManager.TryGetComponent<ItemSlotsComponent>(sold, out var itemSlotsComponent))
-            UpsertItemSlots(market, itemSlotsComponent);
+            UpsertItemSlots(storage, itemSlotsComponent);
 
         // Get our prototype for this entity and insert it.
         if (!_entityManager.TryGetComponent<MetaDataComponent>(sold, out var metaDataComponent))
@@ -96,68 +98,68 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
             return;
 
         // Check whitelist/blacklist for particular prototype
-        if (_whitelistSystem.IsWhitelistFail(market.Whitelist, sold) ||
-            _whitelistSystem.IsBlacklistPass(market.Blacklist, sold) &&
-            _whitelistSystem.IsWhitelistFailOrNull(market.WhitelistOverride, sold))
+        if (_whitelistSystem.IsWhitelistFail(storage.Whitelist, sold) ||
+            _whitelistSystem.IsBlacklistPass(storage.Blacklist, sold) &&
+            _whitelistSystem.IsWhitelistFailOrNull(storage.WhitelistOverride, sold))
         {
             return;
         }
 
         // Increase the count in the MarketData for this entity
         // Assuming the quantity to increase is 1 for each sold entity
-        market.CargoStorageDataList.Upsert(entityPrototype.ID, count, stackPrototypeId);
+        storage.CargoStorageDataList.Upsert(entityPrototype.ID, count, stackPrototypeId);
     }
 
     /// <summary>
     /// Recursively updates or inserts cargo storage data for entities contained within an EntityStorageComponent.
     /// </summary>
-    /// <param name="marketDataComponent">The MarketDataComponent to update.</param>
+    /// <param name="storageDataComponent">The MarketDataComponent to update.</param>
     /// <param name="entityStorageComponent">The EntityStorageComponent containing entities to process.</param>
-    private void UpsertEntityStorage(CargoMarketDataComponent marketDataComponent,
+    private void UpsertEntityStorage(CargoStorageDataComponent storageDataComponent,
         EntityStorageComponent entityStorageComponent)
     {
         foreach (var entityUid in entityStorageComponent.Contents.ContainedEntities)
         {
-            UpsertEntity(marketDataComponent, entityUid);
+            UpsertEntity(storageDataComponent, entityUid);
         }
     }
 
     /// <summary>
     /// Recursively updates or inserts cargo storage data for entities contained within an ItemSlotsComponent.
     /// </summary>
-    /// <param name="marketDataComponent">The MarketDataComponent to update.</param>
+    /// <param name="storageDataComponent">The MarketDataComponent to update.</param>
     /// <param name="itemSlotsComponent">The ItemSlotsComponent containing item slots to process.</param>
-    private void UpsertItemSlots(CargoMarketDataComponent marketDataComponent, ItemSlotsComponent itemSlotsComponent)
+    private void UpsertItemSlots(CargoStorageDataComponent storageDataComponent, ItemSlotsComponent itemSlotsComponent)
     {
         foreach (var slot in itemSlotsComponent.Slots.Values)
         {
             if (slot.Item is not { Valid: true } entityUid)
                 continue;
 
-            UpsertEntity(marketDataComponent, entityUid);
+            UpsertEntity(storageDataComponent, entityUid);
         }
     }
 
     /// <summary>
     /// Recursively checks the contents of the storage.
     /// </summary>
-    /// <param name="marketDataComponent"></param>
+    /// <param name="storageDataComponent"></param>
     /// <param name="storageComponent"></param>
-    private void UpsertStorage(CargoMarketDataComponent marketDataComponent, StorageComponent storageComponent)
+    private void UpsertStorage(CargoStorageDataComponent storageDataComponent, StorageComponent storageComponent)
     {
         foreach (var entityUid in storageComponent.Container.ContainedEntities.ToArray())
         {
-            UpsertEntity(marketDataComponent, entityUid);
+            UpsertEntity(storageDataComponent, entityUid);
         }
     }
 
     /// <summary>
     /// Inserts cargo storage data for all materials contained within a MaterialStorageComponent.
     /// </summary>
-    /// <param name="marketDataComponent">The MarketDataComponent to update.</param>
+    /// <param name="storageDataComponent">The MarketDataComponent to update.</param>
     /// <param name="materialStorageComponent">The MaterialStorageComponent containing materials to process.</param>
     /// <param name="sold">The entity that was sold, which contains the materials.</param>
-    private void UpsertMaterialStorage(CargoMarketDataComponent marketDataComponent,
+    private void UpsertMaterialStorage(CargoStorageDataComponent storageDataComponent,
         MaterialStorageComponent materialStorageComponent,
         EntityUid sold)
     {
@@ -191,7 +193,7 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
                 materialStorageComponent);
 
             // Increase the count in the MarketData for this material
-            marketDataComponent.CargoStorageDataList.Upsert(entProto.ID, amountToSpawn, stack.StackTypeId);
+            storageDataComponent.CargoStorageDataList.Upsert(entProto.ID, amountToSpawn, stack.StackTypeId);
         }
     }
 
@@ -271,7 +273,7 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
 
         // No data set for cargo storage data, can't update cart, no data.
         var stationUid = _station.GetOwningStation(consoleUid);
-        if (!TryComp<CargoMarketDataComponent>(stationUid, out var market))
+        if (!TryComp<CargoStorageDataComponent>(stationUid, out var market))
             return;
 
         var cargoStorageData = market.CargoStorageDataList;
@@ -364,7 +366,7 @@ public sealed partial class CargoStorageSystem: SharedCargoStorageSystem
 
         // Get station and the cargo storage data attached to it.
         var consoleStationUid = _station.GetOwningStation(consoleUid);
-        if (TryComp<CargoMarketDataComponent>(consoleStationUid, out var market))
+        if (TryComp<CargoStorageDataComponent>(consoleStationUid, out var market))
         {
             marketData = market.CargoStorageDataList;
         }

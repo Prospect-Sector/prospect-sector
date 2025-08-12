@@ -1,0 +1,56 @@
+﻿- type: entity
+  id: StandardProspectStation
+  parent:
+    - BaseStation
+    - BaseStationNews
+    - BaseStationCargo
+    - BaseStationJobsSpawning
+  categories: [ HideSpawnMenu ]
+  components:
+    - type: CargoStorageData
+      whitelist:
+        tags:
+        - ArtifactFragment
+        - CrystalBlue
+        - CrystalCyan
+        - CrystalGreen
+        - CrystalOrange
+        - CrystalPink
+        - CrystalRed
+        - Ingot
+        - Metal
+        - Ore
+        - RawMaterial
+        - Sheet
+        components:
+        - ComputerBoard
+        - MachineBoard
+        - Material
+        - Seed
+        - ToolRefinable
+        - VendingMachineRestock
+      blacklist:
+        tags:
+        - Mail
+        - Paper
+        - Trash
+        components:
+        - Actor
+        - Ammo
+        - Anchorable # No structures, they won't fit in crates
+        - Body # No corpses
+        - Contraband
+        - Currency # No selling money.
+        - Drink
+        - Explosive
+        - Food
+        - GasTank # Default containers won't be empty
+        - Gun
+        - Mind # Players
+        - MindContainer # Positronic brains
+        - MobPrice # Animals (live or dead) and the like
+        - RCD # Dup charges
+        - SpaceGarbage
+        - Storage # Till fixed
+        - StorageFill # Till fixed
+        - XenoArtifact # Unique, abusable for research points

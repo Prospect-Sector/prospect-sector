@@ -10,7 +10,7 @@ using Content.Shared.Whitelist;
 /// </summary>
 [RegisterComponent]
 [Access(typeof(CargoStorageSystem))]
-public sealed partial class CargoMarketDataComponent : Component
+public sealed partial class CargoStorageDataComponent : Component
 {
     [DataField]
     public List<CargoStorageData> CargoStorageDataList = [];

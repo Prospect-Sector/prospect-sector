@@ -55,7 +55,7 @@ public sealed partial class CargoStorageSystem
         if (!args.NoCrate)
         {
             var stationUid = _station.GetOwningStation(consoleUid);
-            if (!TryComp<CargoMarketDataComponent>(stationUid, out var market))
+            if (!TryComp<CargoStorageDataComponent>(stationUid, out var market))
                 return;
 
             var matchingData = FindCargoStorageDataByPrototype(market.CargoStorageDataList, CartBoxProtoIdString);
