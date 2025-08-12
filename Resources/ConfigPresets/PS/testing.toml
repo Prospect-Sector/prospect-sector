@@ -1,0 +1,21 @@
+# Configuration preset used on Prospect Sector Testing
+
+[game]
+hostname = "[EN][MRP] Prospect Sector (Testing)"
+desc = "Prospect Sector testing server, join us on discord for more info!"
+
+[shuttle]
+emergency_early_launch_allowed = true
+
+[biomass]
+easy_mode = false
+
+[ooc]
+enable_during_round = false
+
+[ic]
+flavor_text = true
+
+[hub]
+tags = "lang:en-US,rp:med,region:me,no_tag_infer"
+hub_urls = "https://hub.spacestation14.com/,https://web.networkgamez.com/,https://hub.singularity14.co.uk/"
