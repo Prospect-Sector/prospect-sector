@@ -4,7 +4,7 @@
   engineVersion: 264.0.0
   forkId: ""
   forkVersion: ""
-  time: 08/06/2025 20:48:32
+  time: 08/12/2025 17:32:26
   entityCount: 700
 maps:
 - 1
@@ -259,7 +259,8 @@ entities:
           -4,1:
             0: 239
           -4,-1:
-            0: 61024
+            0: 28256
+            3: 32768
           -3,0:
             0: 30719
           -3,1:
@@ -356,6 +357,21 @@ entities:
           moles:
           - 0
           - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+        - volume: 2500
+          temperature: 293.14975
+          moles:
+          - 20.078888
+          - 75.53487
           - 0
           - 0
           - 0
@@ -2086,13 +2102,6 @@ entities:
     - type: Transform
       pos: -13.5,3.5
       parent: 4
-- proto: ComputerTerradropConsole
-  entities:
-  - uid: 240
-    components:
-    - type: Transform
-      pos: -6.5,3.5
-      parent: 4
 - proto: ComputerFrame
   entities:
   - uid: 320
@@ -2114,6 +2123,13 @@ entities:
     - type: Transform
       rot: 3.141592653589793 rad
       pos: -7.5,-0.5
+      parent: 4
+- proto: ComputerTerradropConsole
+  entities:
+  - uid: 240
+    components:
+    - type: Transform
+      pos: -6.5,3.5
       parent: 4
 - proto: CrateFunDartsSet
   entities:
@@ -2145,7 +2161,7 @@ entities:
       pos: 3.5,11.5
       parent: 4
     - type: Door
-      secondsUntilStateChange: -2590.076
+      secondsUntilStateChange: -2733.4678
       state: Opening
   - uid: 518
     components:
@@ -2154,7 +2170,7 @@ entities:
       pos: 3.5,10.5
       parent: 4
     - type: Door
-      secondsUntilStateChange: -2589.0093
+      secondsUntilStateChange: -2732.4011
       state: Opening
 - proto: DecalSpawnerBurns
   entities:
@@ -2246,21 +2262,6 @@ entities:
     - type: Transform
       pos: 12.5,1.5
       parent: 4
-- proto: TerradropPad
-  entities:
-  - uid: 127
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: -5.5,5.5
-      parent: 4
-- proto: TerradropReturnMarker
-  entities:
-  - uid: 495
-    components:
-    - type: Transform
-      pos: -5.5,3.5
-      parent: 4
 - proto: FloodlightBroken
   entities:
   - uid: 697
@@ -2279,6 +2280,7 @@ entities:
     - type: GasMixer
       inletTwoConcentration: 0.20999998
       inletOneConcentration: 0.79
+      enabled: True
 - proto: GasPassiveVent
   entities:
   - uid: 587
@@ -2755,6 +2757,8 @@ entities:
       rot: 1.5707963267948966 rad
       pos: -17.5,-2.5
       parent: 4
+    - type: GasPressurePump
+      enabled: True
 - proto: GasValve
   entities:
   - uid: 632
@@ -3088,11 +3092,37 @@ entities:
     - type: Transform
       pos: -12.5,-1.5
       parent: 4
+    - type: AccessReader
+      access: []
+    - type: Lock
+      locked: False
   - uid: 29
     components:
     - type: Transform
       pos: -12.5,-0.5
       parent: 4
+    - type: AccessReader
+      access: []
+    - type: Lock
+      locked: False
+    - type: EntityStorage
+      air:
+        volume: 200
+        immutable: False
+        temperature: 293.14673
+        moles:
+        - 1.7459903
+        - 6.568249
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
 - proto: LockerWallMedicalFilled
   entities:
   - uid: 510
@@ -3107,6 +3137,10 @@ entities:
     - type: Transform
       pos: -13.5,-4.5
       parent: 4
+    - type: AccessReader
+      access: []
+    - type: Lock
+      locked: False
 - proto: MachineFrameDestroyed
   entities:
   - uid: 317
@@ -3689,6 +3723,21 @@ entities:
     - type: Transform
       rot: -1.5707963267948966 rad
       pos: -4.5,-0.5
+      parent: 4
+- proto: TerradropPad
+  entities:
+  - uid: 127
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -5.5,5.5
+      parent: 4
+- proto: TerradropReturnMarker
+  entities:
+  - uid: 495
+    components:
+    - type: Transform
+      pos: -5.5,3.5
       parent: 4
 - proto: ToolboxEmergencyFilled
   entities:
