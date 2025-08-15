@@ -79,25 +79,10 @@ public sealed partial class CCVars
     /// Prospect: Added for SSL/TLS support ---
     /// </summary>
     public static readonly CVarDef<string> DatabasePgSslMode =
-        CVarDef.Create("database.pg_sslmode", "Disable", CVar.SERVERONLY); // sslmode values: Disable, Allow, Prefer, Require, VerifyCA, VerifyFull
+        CVarDef.Create("database.pg_sslmode", "Disable", CVar.SERVERONLY); // sslmode values: Disable, Require, VerifyCA, VerifyFull.
 
     public static readonly CVarDef<bool> DatabasePgTrustServerCertificate =
         CVarDef.Create("database.pg_trust_server_certificate", true, CVar.SERVERONLY);
-
-    public static readonly CVarDef<string> DatabasePgServerCompatibilityMode =
-        CVarDef.Create("database.pg_server_compatibility_mode", "None", CVar.SERVERONLY); // compatibility modes: None, Redshift
-
-    public static readonly CVarDef<bool> DatabasePgCheckCertificateRevocation =
-        CVarDef.Create("database.pg_check_certificate_revocation", false, CVar.SERVERONLY);
-
-    public static readonly CVarDef<int> DatabasePgConnectionTimeout =
-        CVarDef.Create("database.pg_connection_timeout", 30, CVar.SERVERONLY); // Connection timeout in seconds
-
-    public static readonly CVarDef<int> DatabasePgCommandTimeout =
-        CVarDef.Create("database.pg_command_timeout", 30, CVar.SERVERONLY); // Command timeout in seconds
-
-    public static readonly CVarDef<int> DatabasePgKeepAlive =
-        CVarDef.Create("database.pg_keep_alive", 30, CVar.SERVERONLY); // Keep alive interval in seconds
     /// <summary>
     /// End Prospect: Added for SSL/TLS support ---
     /// </summary>

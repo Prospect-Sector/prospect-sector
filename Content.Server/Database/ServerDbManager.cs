@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.IO;
-using System.Linq; // Prospect
 using System.Net;
 using System.Text.Json;
 using System.Threading;
@@ -1148,11 +1147,6 @@ namespace Content.Server.Database
 
             var sslModeString = _cfg.GetCVar(CCVars.DatabasePgSslMode); // Prospect
             var trustServerCert = _cfg.GetCVar(CCVars.DatabasePgTrustServerCertificate); // Prospect
-            var serverCompatibilityMode = _cfg.GetCVar(CCVars.DatabasePgServerCompatibilityMode); // Prospect
-            var checkCertRevocation = _cfg.GetCVar(CCVars.DatabasePgCheckCertificateRevocation); // Prospect
-            var connectionTimeout = _cfg.GetCVar(CCVars.DatabasePgConnectionTimeout); // Prospect
-            var commandTimeout = _cfg.GetCVar(CCVars.DatabasePgCommandTimeout); // Prospect
-            var keepAlive = _cfg.GetCVar(CCVars.DatabasePgKeepAlive); // Prospect
 
             var builder = new DbContextOptionsBuilder<PostgresServerDbContext>();
             var npgBuilder = new NpgsqlConnectionStringBuilder
@@ -1166,144 +1160,18 @@ namespace Content.Server.Database
 
             // Prospect: SSL mode and trust server certificate.
             if (!Enum.TryParse<Npgsql.SslMode>(sslModeString, true, out var sslModeParsed))
-            {
-                _sawmill.Warning($"Invalid SSL mode '{sslModeString}'. Valid values are: {string.Join(", ", Enum.GetNames(typeof(Npgsql.SslMode)))}. Falling back to Disable.");
                 sslModeParsed = Npgsql.SslMode.Disable;
-            }
-            
-            // Server compatibility mode (useful for managed PostgreSQL services)
-            if (!Enum.TryParse<Npgsql.ServerCompatibilityMode>(serverCompatibilityMode, true, out var compatibilityMode))
-            {
-                _sawmill.Warning($"Invalid server compatibility mode '{serverCompatibilityMode}'. Valid values are: {string.Join(", ", Enum.GetNames(typeof(Npgsql.ServerCompatibilityMode)))}. Falling back to None.");
-                compatibilityMode = Npgsql.ServerCompatibilityMode.None;
-            }
-
-            // Proper private network detection and SSL adjustment
-            var isPrivateNetwork = IsPrivateNetworkHost(host);
-            if (isPrivateNetwork)
-            {
-                _sawmill.Info($"Detected private network connection to {host}. Applying optimized SSL settings for managed database services.");
-                
-                // For private networks, adjust SSL settings if using strict modes that might cause issues
-                if (sslModeParsed == Npgsql.SslMode.VerifyFull || sslModeParsed == Npgsql.SslMode.VerifyCA)
-                {
-                    _sawmill.Info($"Adjusting SSL mode from {sslModeParsed} to Require for private network compatibility.");
-                    sslModeParsed = Npgsql.SslMode.Require;
-                }
-                
-                // Ensure TrustServerCertificate is enabled for private networks unless explicitly disabled
-                if (!trustServerCert && sslModeParsed != Npgsql.SslMode.Disable)
-                {
-                    _sawmill.Info("Enabling TrustServerCertificate for private network SSL connection.");
-                    trustServerCert = true;
-                }
-            }
-
-            // Apply SSL configuration
             npgBuilder.SslMode = sslModeParsed;
             npgBuilder.TrustServerCertificate = trustServerCert;
-            npgBuilder.CheckCertificateRevocation = checkCertRevocation;
-            npgBuilder.ServerCompatibilityMode = compatibilityMode;
-
-            // Configurable connection parameters
-            npgBuilder.Timeout = connectionTimeout;
-            npgBuilder.CommandTimeout = commandTimeout;
-            npgBuilder.KeepAlive = keepAlive;
 
             var connectionString = npgBuilder.ConnectionString;
 
-            _sawmill.Debug($"Using Postgres \"{host}:{port}/{db}\" SSLMode={npgBuilder.SslMode} TrustServerCertificate={npgBuilder.TrustServerCertificate} ServerCompatibilityMode={npgBuilder.ServerCompatibilityMode} PrivateNetwork={isPrivateNetwork}");
+            _sawmill.Debug($"Using Postgres \"{host}:{port}/{db}\" SSLMode={npgBuilder.SslMode} TrustServerCertificate={trustServerCert}");
             // End Prospect: SSL mode and trust server certificate.
 
             builder.UseNpgsql(connectionString);
             SetupLogging(builder);
             return (builder.Options, connectionString);
-        }
-
-        /// <summary>
-        /// Prospect: Determines if a host is on a private network using proper IP address parsing and CIDR range checking.
-        /// </summary>
-        /// <param name="host">The hostname or IP address to check</param>
-        /// <returns>True if the host is determined to be on a private network</returns>
-        private bool IsPrivateNetworkHost(string host)
-        {
-            if (string.IsNullOrWhiteSpace(host))
-                return false;
-
-            // Check for private network domain suffixes in hostname
-            if (host.EndsWith(".private", StringComparison.OrdinalIgnoreCase) ||
-                host.EndsWith(".internal", StringComparison.OrdinalIgnoreCase) ||
-                host.EndsWith(".local", StringComparison.OrdinalIgnoreCase) ||
-                host.Contains("private") || // For DigitalOcean private hostnames
-                host.Contains("internal"))
-            {
-                return true;
-            }
-
-            // Try to parse as IP address first
-            if (IPAddress.TryParse(host, out var ipAddress))
-            {
-                return IsPrivateIPAddress(ipAddress);
-            }
-
-            // If it's not an IP address, try to resolve it
-            try
-            {
-                var hostEntry = System.Net.Dns.GetHostEntry(host);
-                var resolvedIp = hostEntry.AddressList.FirstOrDefault(addr => 
-                    addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
-                
-                if (resolvedIp != null)
-                {
-                    _sawmill.Debug($"Resolved {host} to {resolvedIp}");
-                    return IsPrivateIPAddress(resolvedIp);
-                }
-            }
-            catch (Exception ex)
-            {
-                // If DNS resolution fails, we can't determine if it's private
-                // Log the exception for debugging purposes but don't treat as error
-                _sawmill.Debug($"Could not resolve host '{host}' for private network detection: {ex.Message}");
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Prospect: Checks if an IP address is in a private network range according to RFC 1918 and other private ranges.
-        /// </summary>
-        /// <param name="ipAddress">The IP address to check</param>
-        /// <returns>True if the IP address is in a private range</returns>
-        private static bool IsPrivateIPAddress(IPAddress ipAddress)
-        {
-            if (ipAddress.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
-                return false;
-
-            var bytes = ipAddress.GetAddressBytes();
-            
-            // RFC 1918 private ranges:
-            // 10.0.0.0/8 (10.0.0.0 to 10.255.255.255)
-            if (bytes[0] == 10)
-                return true;
-            
-            // 172.16.0.0/12 (172.16.0.0 to 172.31.255.255)
-            if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31)
-                return true;
-            
-            // 192.168.0.0/16 (192.168.0.0 to 192.168.255.255)
-            if (bytes[0] == 192 && bytes[1] == 168)
-                return true;
-            
-            // Additional private/special ranges:
-            // 127.0.0.0/8 (loopback)
-            if (bytes[0] == 127)
-                return true;
-            
-            // 169.254.0.0/16 (link-local)
-            if (bytes[0] == 169 && bytes[1] == 254)
-                return true;
-
-            return false;
         }
 
         private void SetupSqlite(out Func<DbContextOptions<SqliteServerDbContext>> contextFunc, out bool inMemory)
