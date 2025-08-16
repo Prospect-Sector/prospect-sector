@@ -5,7 +5,7 @@
         "y": 32
     },
     "license": "CC-BY-SA-3.0",
-    "copyright": "Taken from https://github.com/ParadiseSS13/Paradise/, edited by @arimah for Frontier Station 14",
+    "copyright": "Taken from https://github.com/new-frontiers-14/frontier-station-14, Originally taken from https://github.com/ParadiseSS13/Paradise/, edited by @arimah for Frontier Station 14",
     "states": [
         {
             "name": "vent_passive"
