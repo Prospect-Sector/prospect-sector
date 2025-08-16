@@ -453,7 +453,7 @@
       - enum.SubfloorLayers.FirstLayer
     - type: Sprite
       drawdepth: FloorObjects
-      sprite: Structures/Piping/Atmospherics/vent.rsi
+      sprite: _PS/Structures/Piping/Atmospherics/vent.rsi # Prospect
       layers:
         - sprite: Structures/Piping/Atmospherics/pipe.rsi
           state: pipeBinaryConnectors
