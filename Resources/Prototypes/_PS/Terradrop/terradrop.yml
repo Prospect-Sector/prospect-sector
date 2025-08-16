@@ -1,0 +1,15 @@
+﻿- type: terradropMap
+  id: GroundZeroTerraDropMap
+  name: terradrop-map-ground-zero
+  color: '#D381C996'
+  icon: CutterMachine
+  mapUnlocks:
+  - GroundOneTerraDropMap
+
+- type: terradropMap
+  id: GroundOneTerraDropMap
+  name: terradrop-map-ground-one
+  color: '#EFB34196'
+  icon: JobIconStationAi
+  mapPrerequisites:
+  - GroundZeroTerraDropMap
