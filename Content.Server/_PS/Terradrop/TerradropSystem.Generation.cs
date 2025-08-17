@@ -84,15 +84,20 @@ public sealed partial class TerradropSystem
         if (TryComp<PortalComponent>(mapPortal, out var mapPortalComponent))
             mapPortalComponent.CanTeleportToOtherMaps = true;
 
-        var returnMarker = _entityManager.AllEntities<TerradropReturnMarkerComponent>().FirstOrNull();
+        dataComponent.ReturnMarker ??= _entityManager.AllEntities<TerradropReturnMarkerComponent>().FirstOrNull();
 
         // Activate the target pad to teleport to the new map.
         OpenPortalToMap(job.TargetPad, missionData);
 
+        if (TryComp<TerradropMapComponent>(job.MapUid, out var mapComponent))
+        {
+            mapComponent.ReturnMarker = dataComponent.ReturnMarker;
+        }
+
 
         // Ensure that if no return marker is found we can still go back to the station.
-        if (returnMarker != null)
-            _link.OneWayLink(mapPortal, returnMarker.Value);
+        if (dataComponent.ReturnMarker != null)
+            _link.OneWayLink(mapPortal, dataComponent.ReturnMarker.Value);
         else
             _link.OneWayLink(mapPortal, job.TargetPad);
 
@@ -134,20 +139,21 @@ public sealed partial class TerradropSystem
         }
     }
 
-    private void GenerateMissions(TerradropStationComponent component)
+    private void GenerateMissionParams(TerradropStationComponent component)
     {
         component.Missions.Clear();
 
-        for (var i = 0; i < MissionLimit; i++)
+        var mapPrototypes = _prototypeManager.EnumeratePrototypes<TerradropMapPrototype>();
+        ushort index = 0;
+        foreach (var terradropMapPrototype in mapPrototypes)
         {
             var mission = new SalvageMissionParams
             {
-                Index = component.NextIndex,
-                Seed = _random.Next(),
-                Difficulty = "Moderate",
+                Index = index++,
+                Seed = terradropMapPrototype.Seed ?? _random.Next(),
+                Difficulty = terradropMapPrototype.SalvageDifficulty,
             };
-
-            component.Missions[component.NextIndex++] = mission;
+            component.Missions[terradropMapPrototype.ID] = mission;
         }
     }
 }

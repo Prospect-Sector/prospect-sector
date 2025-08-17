@@ -53,7 +53,14 @@ public sealed partial class TerradropMapNodeItem : LayoutContainer
         Availability = availability;
         Prototype = proto;
 
-        var primaryColor = proto.Color;
+        var primaryColor = proto.Biome.Id switch
+        {
+            "Grasslands" => Color.LimeGreen,
+            "Snow" => Color.GhostWhite,
+            "Lava" => Color.OrangeRed,
+            "Caves" => Color.Bisque,
+            _ => Color.Azure,
+        };
         var secondaryColor = Color.Aqua;
 
         NodeDisplay.SetPrototype(proto.Icon);

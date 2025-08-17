@@ -10,4 +10,8 @@ public sealed partial class TerradropMapComponent : Component
 
     [NonSerialized]
     public TerradropMapPrototype? MapPrototype = null;
+
+    [NonSerialized]
+    public EntityUid? ReturnMarker = null;
+
 }

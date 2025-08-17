@@ -1,7 +1,7 @@
 ﻿- type: terradropMap
   id: ZeronaPrimeTerraDropMap
   name: terradrop-map-zerona-prime
-  color: '#F05A9BD6'
+  biome: Grasslands
   icon: MobCarpRainbow
   mapUnlocks:
   - VeridiaTerraDropMap
@@ -11,19 +11,19 @@
 - type: terradropMap
   id: VeridiaTerraDropMap
   name: terradrop-map-veridia
-  color: '#E2A83FF2'
+  biome: Grasslands
   icon: MobCarpRainbow
   mapPrerequisites:
   - ZeronaPrimeTerraDropMap
   mapUnlocks:
   - RecharisTerraDropMap
   - ObscyraTerraDropMap
-  position: 5,6
+  position: 4,6
 
 - type: terradropMap
   id: SpironisTerraDropMap
   name: terradrop-map-spironis
-  color: '#D6F26D3D'
+  biome: Grasslands
   icon: MobCarpRainbow
   mapPrerequisites:
   - ZeronaPrimeTerraDropMap
@@ -35,63 +35,55 @@
 - type: terradropMap
   id: RecharisTerraDropMap
   name: terradrop-map-recharis
-  color: '#C4F2B134'
+  biome: Caves
   icon: MobCarpRainbow
   mapPrerequisites:
   - VeridiaTerraDropMap
-  mapUnlocks:
-  - BastaraTerraDropMap
-  position: 4,7
+  position: 3,7
 
 - type: terradropMap
   id: ObscyraTerraDropMap
   name: terradrop-map-obscyra
-  color: '#D9A1E8FF'
+  biome: Snow
   icon: MobCarpRainbow
   mapPrerequisites:
   - VeridiaTerraDropMap
-  mapUnlocks:
-  - BastaraTerraDropMap
-  position: 6,7
+  position: 4,7
 
 - type: terradropMap
   id: EbonisTerraDropMap
   name: terradrop-map-ebonis
-  color: '#E6FF8C42'
+  biome: Lava
   icon: MobCarpRainbow
   mapPrerequisites:
   - SpironisTerraDropMap
-  mapUnlocks:
-  - CrownisTerraDropMap
-  position: 7,7
+  position: 6,7
 
 - type: terradropMap
   id: CrimsonisTerraDropMap
   name: terradrop-map-crimsonis
-  color: '#D4FF4D6A'
+  biome: Snow
   icon: MobCarpRainbow
   mapPrerequisites:
   - SpironisTerraDropMap
-  mapUnlocks:
-  - CrownisTerraDropMap
-  position: 5,7
+  position: 7,7
 
 - type: terradropMap
   id: BastaraTerraDropMap
   name: terradrop-map-bastara
-  color: '#C8A3FFD4'
+  biome: Caves
   icon: MobCarpRainbow
   mapPrerequisites:
   - RecharisTerraDropMap
   - ObscyraTerraDropMap
   mapUnlocks:
   - FerrosTerraDropMap
-  position: 5,8
+  position: 4,8
 
 - type: terradropMap
   id: CrownisTerraDropMap
   name: terradrop-map-crownis
-  color: '#E0FFD166'
+  biome: Lava
   icon: MobCarpRainbow
   mapPrerequisites:
   - EbonisTerraDropMap
@@ -103,9 +95,9 @@
 - type: terradropMap
   id: FerrosTerraDropMap
   name: terradrop-map-ferros
-  color: '#F0A0A0A0'
+  biome: Lava
   icon: MobCarpRainbow
   mapPrerequisites:
   - BastaraTerraDropMap
   - CrownisTerraDropMap
-  position: 6,9
+  position: 5,9

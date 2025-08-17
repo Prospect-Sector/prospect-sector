@@ -15,7 +15,7 @@ public sealed partial class TerradropStationComponent : Component
     public readonly Dictionary<string, TerradropActiveMissionData> ActiveMissions = new();
 
     [ViewVariables]
-    public readonly Dictionary<ushort, SalvageMissionParams> Missions = new();
+    public readonly Dictionary<string, SalvageMissionParams> Missions = new();
 
     /// <summary>
     /// The ids of all the maps which have been unlocked.
@@ -24,5 +24,7 @@ public sealed partial class TerradropStationComponent : Component
     [DataField("unlockedMapNodes", customTypeSerializer: typeof(PrototypeIdListSerializer<TerradropMapPrototype>))]
     public List<string> UnlockedMapNodes = new();
 
-    public ushort NextIndex = 1;
+    [NonSerialized]
+    public EntityUid? ReturnMarker = null;
+
 }

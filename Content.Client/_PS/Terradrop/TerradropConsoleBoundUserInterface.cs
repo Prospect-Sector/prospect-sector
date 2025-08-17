@@ -12,18 +12,13 @@ public sealed class TerradropConsoleBoundUserInterface : BoundUserInterface
 {
     private TerradropConsoleMenu? _consoleMenu;
 
-    private SharedAudioSystem _audioSystem = default!;
     [Dependency] private readonly ILogManager _logManager = default!;
     private ISawmill _sawmill = default!;
-
-    // Sound to play when starting a map node
-    private static readonly SoundPathSpecifier UnlockSound = new("/Audio/_NF/Research/unlock.ogg");
 
     public TerradropConsoleBoundUserInterface(EntityUid owner, Enum uiKey)
         : base(owner, uiKey)
     {
         IoCManager.InjectDependencies(this);
-        _audioSystem = EntMan.System<SharedAudioSystem>();
 
         _sawmill = _logManager.GetSawmill("terradrop.console");
         _sawmill.Debug($"TerradropConsoleBoundUserInterface created for {owner} with key {uiKey}");
@@ -53,9 +48,6 @@ public sealed class TerradropConsoleBoundUserInterface : BoundUserInterface
                 // Create and send the message
                 var message = new StartTerradropMessage(id);
                 SendMessage(message);
-
-                _audioSystem.PlayPvs(UnlockSound, owner, AudioParams.Default); // Play unlock sound - client-side only
-
                 _sawmill.Info($"Sent unlock message for technology: {id}"); // Log success
             }
             catch (Exception ex) // Log any exceptions that occur during message sending

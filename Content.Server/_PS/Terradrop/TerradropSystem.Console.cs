@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Content.Shared._PS.Terradrop;
-using Content.Shared.Salvage.Expeditions;
 using Robust.Shared.Audio;
 using Robust.Shared.Map;
 
@@ -44,14 +43,11 @@ public sealed partial class TerradropSystem
 
         // Generate missions if there are none generated yet.
         if (data.Missions.Count == 0)
-            GenerateMissions(data);
+            GenerateMissionParams(data);
 
-        var missionParams = new SalvageMissionParams
-        {
-            Index = 0,
-            Seed = _random.Next(),
-            Difficulty = "Moderate",
-        };
+        var mapProto = _prototypeManager.Index<TerradropMapPrototype>(message.TerradropMapId);
+
+        var missionParams = data.Missions[message.TerradropMapId];
         var landingPadTile = new Tile(_tileDefinitionManager[consoleComponent.LandingPadTileName].TileId);
 
         // Find the nearest available pad.
@@ -70,8 +66,6 @@ public sealed partial class TerradropSystem
                     OpenPortalToMap(uid, mission);
                     return;
                 }
-
-                var mapProto = _prototypeManager.Index<TerradropMapPrototype>(message.TerradropMapId);
 
                 // Found a pad to use.
                 CreateNewTerradropJob(

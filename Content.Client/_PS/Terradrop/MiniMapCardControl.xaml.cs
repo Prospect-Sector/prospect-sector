@@ -16,7 +16,6 @@ public sealed partial class MiniMapCardControl : Control
     public MiniMapCardControl(TerradropMapPrototype mapProto, FormattedMessage description)
     {
         RobustXamlLoader.Load(this);
-        Background.ModulateSelfOverride = mapProto.Color;
         MapDisplay.SetPrototype(mapProto.Icon);
         NameLabel.SetMessage(Loc.GetString(mapProto.Name));
 

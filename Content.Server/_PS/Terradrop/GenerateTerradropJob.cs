@@ -109,8 +109,7 @@ public sealed class GenerateTerradropJob : Job<bool>
 
         // Setup mission configs
         // As we go through the config the rating will deplete so we'll go for most important to least important.
-        var difficultyId = "Moderate";
-        var difficultyProto = _prototypeManager.Index<SalvageDifficultyPrototype>(difficultyId);
+        var difficultyProto = _prototypeManager.Index(MapPrototype.SalvageDifficulty);
 
         var mission = _entManager.System<SharedSalvageSystem>()
             .GetMission(difficultyProto, _missionParams.Seed);
@@ -123,7 +122,7 @@ public sealed class GenerateTerradropJob : Job<bool>
             var biomeSystem = _entManager.System<BiomeSystem>();
             biomeSystem.SetTemplate(MapUid,
                 biome,
-                _prototypeManager.Index<BiomeTemplatePrototype>(missionBiome.BiomePrototype));
+                _prototypeManager.Index<BiomeTemplatePrototype>(MapPrototype.Biome));
             biomeSystem.SetSeed(MapUid, biome, mission.Seed);
             _entManager.Dirty(MapUid, biome);
 
@@ -133,14 +132,19 @@ public sealed class GenerateTerradropJob : Job<bool>
             _entManager.Dirty(MapUid, gravity, metadata);
 
             // Atmos
-            var air = _prototypeManager.Index<SalvageAirMod>(mission.Air);
+            var atmosphere = _prototypeManager.Index(MapPrototype.Atmosphere);
             // copy into a new array since the yml deserialization discards the fixed length
             var moles = new float[Atmospherics.AdjustedNumberOfGases];
-            air.Gases.CopyTo(moles, 0);
+            atmosphere.Gases.CopyTo(moles, 0);
             var atmos = _entManager.EnsureComponent<MapAtmosphereComponent>(MapUid);
-            _entManager.System<AtmosphereSystem>().SetMapSpace(MapUid, air.Space, atmos);
+
+            // If the proto cannot be found use RoomTemp as a fallback.
+            var temperature = _prototypeManager.TryIndex(MapPrototype.Temperature, out var tempProto)
+                ? tempProto
+                : _prototypeManager.Index<SalvageTemperatureMod>("RoomTemp");
+            _entManager.System<AtmosphereSystem>().SetMapSpace(MapUid, atmosphere.Space, atmos);
             _entManager.System<AtmosphereSystem>()
-                .SetMapGasMixture(MapUid, new GasMixture(moles, mission.Temperature), atmos);
+                .SetMapGasMixture(MapUid, new GasMixture(moles, temperature.Temperature), atmos);
 
             if (mission.Color != null)
             {
@@ -151,7 +155,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         }
 
         _map.InitializeMap(mapId);
-        //_map.SetPaused(mapUid, true);
+        //_map.SetPaused(MapUid, true);
 
         // Setup the map info for terradrop
         var terradropMapComponent = _entManager.EnsureComponent<TerradropMapComponent>(MapUid);
