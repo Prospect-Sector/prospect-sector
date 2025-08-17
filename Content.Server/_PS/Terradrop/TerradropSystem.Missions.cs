@@ -68,7 +68,6 @@ public sealed partial class TerradropSystem
                             damageable,
                             new DamageSpecifier(prototype, FixedPoint2.New(mapComponent.MapPrototype.ReturnDamageAmount))
                         );
-                        _damageableSystem.SetAllDamage(playerUid, damageable, mapComponent.MapPrototype.ReturnDamageAmount);
                     }
                 }
 
