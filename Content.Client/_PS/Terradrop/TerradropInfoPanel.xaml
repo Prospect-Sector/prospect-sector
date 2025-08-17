@@ -34,8 +34,10 @@
             <Label Name="NodeNameLabel"
                     StyleClasses="LabelKeyText"
                     HorizontalExpand="True"/>
+            <Label Name="NodeStatusLabel"
+                   HorizontalExpand="True"/>
             <Button Name="StartButton"
-                    Text="{Loc 'terradrop-console-start-button'}"
+                    Text="{Loc 'terradrop-start-generic'}"
                     HorizontalAlignment="Left"
                     Margin="0 4 0 0"/>
         </BoxContainer>
@@ -47,7 +49,7 @@
             <BoxContainer Name="PrereqsContainer"
                           Orientation="Vertical"
                           Margin="5">
-                <Label Text="{Loc 'research-console-required-text'}"
+                <Label Text="{Loc 'terradrop-console-required-text'}"
                         HorizontalAlignment="Center"/>
                 <customControls:HSeparator StyleClasses="LowDivider"
                         Margin="0 0 0 10"/>
@@ -58,7 +60,7 @@
                     <BoxContainer
                         Name="RequiredTechContainer"
                         Orientation="Vertical">
-                        <RichTextLabel Name="NoPrereqLabel" HorizontalAlignment="Center" Text="{Loc 'research-console-no-tech-requirements'}" Visible="True"/>
+                        <RichTextLabel Name="NoPrereqLabel" HorizontalAlignment="Center" Text="{Loc 'terradrop-console-no-requirements'}" Visible="True"/>
                     </BoxContainer>
                 </PanelContainer>
             </BoxContainer>
@@ -68,7 +70,7 @@
                 VerticalExpand="True"
                 SizeFlagsStretchRatio="1"
                 Margin="5">
-                <Label Text="{Loc 'research-console-unlocks-text'}"
+                <Label Text="{Loc 'terradrop-console-unlocks-text'}"
                         HorizontalAlignment="Center"/>
                 <customControls:HSeparator StyleClasses="LowDivider"
                         Margin="0 0 0 10"/>

@@ -16,30 +16,44 @@ public sealed partial class TerradropInfoPanel : Control
     [Dependency] private readonly ILogManager _logManager = default!;
 
     private ISawmill _sawmill = default!;
-    public TerradropMapPrototype Prototype;
     public Action<TerradropMapPrototype>? StartAction;
 
-    public TerradropInfoPanel(TerradropMapPrototype proto, bool hasAccess, TerradropMapAvailability availability, SpriteSystem sprite)
+    public TerradropInfoPanel(TerradropMapPrototype proto, TerradropMapAvailability availability, SpriteSystem sprite)
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
 
-        _sawmill = _logManager.GetSawmill("terradrop");
+        _sawmill = _logManager.GetSawmill("terradrop.console");
 
-        var terradrop = _ent.System<SharedTerradropSystem>();
-        Prototype = proto;
+        var terradrop = _ent.System<TerradropSystem>();
 
         NodeNameLabel.Text = Loc.GetString(proto.Name);
+        NodeStatusLabel.Text = Loc.GetString(
+            availability switch
+            {
+                TerradropMapAvailability.Unexplored => "terradrop-availability-unexplored",
+                TerradropMapAvailability.Unavailable => "terradrop-availability-unavailable",
+                TerradropMapAvailability.InProgress => "terradrop-availability-in-progress",
+                TerradropMapAvailability.Explored => "terradrop-availability-explored",
+                _ => "terradrop-availability-unknown"
+            }
+        );
+        StartButton.Text = Loc.GetString(
+            availability switch
+            {
+                TerradropMapAvailability.Unavailable => "terradrop-start-unavailable",
+                TerradropMapAvailability.InProgress => "terradrop-start-in-progress",
+                TerradropMapAvailability.Explored => "terradrop-start-explored",
+                _ => "terradrop-start-generic"
+            }
+        );
 
         NodeTexture.SetPrototype(proto.Icon);
 
         InitializePrerequisites(proto, terradrop, sprite);
+        InitializeMapUnlocks(proto, terradrop, sprite);
 
-        StartButton.ToolTip = !hasAccess
-            ? Loc.GetString("research-console-no-access-popup")
-            : null;
-
-        StartButton.Disabled = !hasAccess || availability != TerradropMapAvailability.Unexplored;
+        StartButton.Disabled = availability == TerradropMapAvailability.Unavailable;
 
         // Replace the event handling method to use a simpler approach
         StartButton.OnPressed += _ =>
@@ -59,7 +73,7 @@ public sealed partial class TerradropInfoPanel : Control
         _sawmill.Debug($"Created map panel: {proto.ID}, availability: {availability}, button disabled: {StartButton.Disabled}");
     }
 
-    private void InitializePrerequisites(TerradropMapPrototype proto, SharedTerradropSystem terradrop, SpriteSystem sprite)
+    private void InitializePrerequisites(TerradropMapPrototype proto, TerradropSystem terradrop, SpriteSystem sprite)
     {
         // required techs always visible, label in required techs
         foreach (var child in RequiredTechContainer.Children.ToList())
@@ -69,18 +83,23 @@ public sealed partial class TerradropInfoPanel : Control
         }
 
         NoPrereqLabel.Visible = proto.MapPrerequisites.Count == 0;
-        foreach (var techId in proto.MapPrerequisites)
+        foreach (var mapId in proto.MapPrerequisites)
         {
-            var tech = _proto.Index(techId);
+            var tech = _proto.Index(mapId);
             var description = terradrop.GetMapDescription(tech);
             RequiredTechContainer.AddChild(new MiniMapCardControl(tech, description));
         }
     }
 
-    protected override void ExitedTree()
+    private void InitializeMapUnlocks(TerradropMapPrototype proto, TerradropSystem terradrop, SpriteSystem sprite)
     {
-        base.ExitedTree();
-
-        // No need to explicitly remove handlers as the control is being destroyed
+        UnlocksContainer.RemoveAllChildren();
+        foreach (var mapId in proto.MapUnlocks)
+        {
+            var map = _proto.Index(mapId);
+            var description = terradrop.GetMapDescription(map);
+            UnlocksContainer.AddChild(new MiniMapCardControl(map, description));
+        }
     }
+
 }

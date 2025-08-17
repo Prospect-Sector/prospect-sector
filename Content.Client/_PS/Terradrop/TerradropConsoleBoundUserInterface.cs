@@ -1,32 +1,113 @@
-﻿using Content.Shared._PS.Terradrop;
+﻿using System.Linq;
+using Content.Shared._PS.Terradrop;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
+using Robust.Shared.Prototypes;
 
 namespace Content.Client._PS.Terradrop;
 
 public sealed class TerradropConsoleBoundUserInterface : BoundUserInterface
 {
-    private TerradropConsoleMenu? _menu;
+    private TerradropConsoleMenu? _consoleMenu;
+
+    private SharedAudioSystem _audioSystem = default!;
+    [Dependency] private readonly ILogManager _logManager = default!;
+    private ISawmill _sawmill = default!;
+
+    // Sound to play when starting a map node
+    private static readonly SoundPathSpecifier UnlockSound = new("/Audio/_NF/Research/unlock.ogg");
 
     public TerradropConsoleBoundUserInterface(EntityUid owner, Enum uiKey)
         : base(owner, uiKey)
     {
+        IoCManager.InjectDependencies(this);
+        _audioSystem = EntMan.System<SharedAudioSystem>();
+
+        _sawmill = _logManager.GetSawmill("terradrop.console");
+        _sawmill.Debug($"TerradropConsoleBoundUserInterface created for {owner} with key {uiKey}");
     }
 
     protected override void Open()
     {
         base.Open();
 
-        if (_menu != null)
+        var owner = Owner;
+        _sawmill.Debug($"Opening UI for {owner}");
+
+        if (_consoleMenu != null)
             return;
 
-        _menu = this.CreateWindow<TerradropConsoleMenu>();
-        _menu.OnStartButtonPressed += SendStartTerradropMessage;
+        _consoleMenu = this.CreateWindow<TerradropConsoleMenu>();
+        _consoleMenu.SetEntity(owner);
+        _consoleMenu.OnClose += () => _consoleMenu = null;
+
+        // Set up technology unlock handler
+        _consoleMenu.OnStartTerradropPressed += id =>
+        {
+            try
+            {
+                _sawmill.Debug($"Sending ConsoleUnlockTechnologyMessage for tech ID: {id}");
+
+                // Create and send the message
+                var message = new StartTerradropMessage(id);
+                SendMessage(message);
+
+                _audioSystem.PlayPvs(UnlockSound, owner, AudioParams.Default); // Play unlock sound - client-side only
+
+                _sawmill.Info($"Sent unlock message for technology: {id}"); // Log success
+            }
+            catch (Exception ex) // Log any exceptions that occur during message sending
+            {
+                _sawmill.Error($"Error sending technology unlock message for {id}: {ex}");
+            }
+        };
     }
 
-    private void SendStartTerradropMessage(BaseButton.ButtonEventArgs args)
+    public override void OnProtoReload(PrototypesReloadedEventArgs args)
     {
-        SendMessage(new StartTerradropMessage());
-        Close();
+        base.OnProtoReload(args);
+
+        if (!args.WasModified<TerradropMapPrototype>())
+            return;
+
+        if (State is not TerradropConsoleBoundInterfaceState rState)
+            return;
+
+        _sawmill.Debug("Reloading prototypes in UI");
+        _consoleMenu?.UpdatePanels(rState.MapNodes);
+        _consoleMenu?.UpdateInformationPanel();
+    }
+
+    protected override void UpdateState(BoundUserInterfaceState state)
+    {
+        base.UpdateState(state);
+
+        if (state is not TerradropConsoleBoundInterfaceState castState)
+        {
+            _sawmill.Warning("Received non-ResearchConsoleBoundInterfaceState state");
+            return;
+        }
+
+        // Thats for avoiding refresh spam when only points are updated
+        if (_consoleMenu == null)
+        {
+            _sawmill.Warning("Console menu is null during state update");
+            return;
+        }
+
+        _sawmill.Debug($"Updating UI state with {castState.MapNodes.Count} terradrop map nodes.");
+
+        var availableTechs = castState.MapNodes.Count(t => t.Value == TerradropMapAvailability.Unexplored);
+        _sawmill.Debug($"New maps to explore: {availableTechs}");
+
+        if (!_consoleMenu.List.SequenceEqual(castState.MapNodes))
+        {
+            _sawmill.Debug("Map node list changed, updating panels");
+            _consoleMenu.UpdatePanels(castState.MapNodes);
+        }
+
+        _consoleMenu.UpdateInformationPanel(); // always update panel
     }
 }

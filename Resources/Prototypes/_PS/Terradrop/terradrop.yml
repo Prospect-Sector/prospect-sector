@@ -1,15 +1,111 @@
 ﻿- type: terradropMap
-  id: GroundZeroTerraDropMap
-  name: terradrop-map-ground-zero
-  color: '#D381C996'
-  icon: CutterMachine
+  id: ZeronaPrimeTerraDropMap
+  name: terradrop-map-zerona-prime
+  color: '#F05A9BD6'
+  icon: MobCarpRainbow
   mapUnlocks:
-  - GroundOneTerraDropMap
+  - VeridiaTerraDropMap
+  - SpironisTerraDropMap
+  position: 5,5
 
 - type: terradropMap
-  id: GroundOneTerraDropMap
-  name: terradrop-map-ground-one
-  color: '#EFB34196'
-  icon: JobIconStationAi
+  id: VeridiaTerraDropMap
+  name: terradrop-map-veridia
+  color: '#E2A83FF2'
+  icon: MobCarpRainbow
   mapPrerequisites:
-  - GroundZeroTerraDropMap
+  - ZeronaPrimeTerraDropMap
+  mapUnlocks:
+  - RecharisTerraDropMap
+  - ObscyraTerraDropMap
+  position: 5,6
+
+- type: terradropMap
+  id: SpironisTerraDropMap
+  name: terradrop-map-spironis
+  color: '#D6F26D3D'
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - ZeronaPrimeTerraDropMap
+  mapUnlocks:
+  - EbonisTerraDropMap
+  - CrimsonisTerraDropMap
+  position: 6,6
+
+- type: terradropMap
+  id: RecharisTerraDropMap
+  name: terradrop-map-recharis
+  color: '#C4F2B134'
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - VeridiaTerraDropMap
+  mapUnlocks:
+  - BastaraTerraDropMap
+  position: 4,7
+
+- type: terradropMap
+  id: ObscyraTerraDropMap
+  name: terradrop-map-obscyra
+  color: '#D9A1E8FF'
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - VeridiaTerraDropMap
+  mapUnlocks:
+  - BastaraTerraDropMap
+  position: 6,7
+
+- type: terradropMap
+  id: EbonisTerraDropMap
+  name: terradrop-map-ebonis
+  color: '#E6FF8C42'
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - SpironisTerraDropMap
+  mapUnlocks:
+  - CrownisTerraDropMap
+  position: 7,7
+
+- type: terradropMap
+  id: CrimsonisTerraDropMap
+  name: terradrop-map-crimsonis
+  color: '#D4FF4D6A'
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - SpironisTerraDropMap
+  mapUnlocks:
+  - CrownisTerraDropMap
+  position: 5,7
+
+- type: terradropMap
+  id: BastaraTerraDropMap
+  name: terradrop-map-bastara
+  color: '#C8A3FFD4'
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - RecharisTerraDropMap
+  - ObscyraTerraDropMap
+  mapUnlocks:
+  - FerrosTerraDropMap
+  position: 5,8
+
+- type: terradropMap
+  id: CrownisTerraDropMap
+  name: terradrop-map-crownis
+  color: '#E0FFD166'
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - EbonisTerraDropMap
+  - CrimsonisTerraDropMap
+  mapUnlocks:
+  - FerrosTerraDropMap
+  position: 6,8
+
+- type: terradropMap
+  id: FerrosTerraDropMap
+  name: terradrop-map-ferros
+  color: '#F0A0A0A0'
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - BastaraTerraDropMap
+  - CrownisTerraDropMap
+  position: 6,9

@@ -9,7 +9,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Client._PS.Terradrop;
 
 [GenerateTypedNameReferences]
-public sealed partial class TerradropNodeItem : LayoutContainer
+public sealed partial class TerradropMapNodeItem : LayoutContainer
 {
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
@@ -45,7 +45,7 @@ public sealed partial class TerradropNodeItem : LayoutContainer
         }
     }
 
-    public TerradropNodeItem(TerradropMapPrototype proto, SpriteSystem sprite, TerradropMapAvailability availability)
+    public TerradropMapNodeItem(TerradropMapPrototype proto, SpriteSystem sprite, TerradropMapAvailability availability)
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);

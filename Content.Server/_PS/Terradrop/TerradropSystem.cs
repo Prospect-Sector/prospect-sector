@@ -5,6 +5,7 @@ using Content.Server.Station.Systems;
 using Content.Shared._PS.Terradrop;
 using Content.Shared.Construction.EntitySystems;
 using Content.Shared.Teleportation.Systems;
+using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
@@ -30,6 +31,7 @@ public sealed partial class TerradropSystem : SharedTerradropSystem
     [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
 
     public override void Initialize()
     {

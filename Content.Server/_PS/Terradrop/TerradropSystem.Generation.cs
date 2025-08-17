@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading;
-using Content.Server.Salvage.JobBoard;
 using Content.Shared._PS.Terradrop;
 using Content.Shared.Salvage.Expeditions;
 using Content.Shared.Teleportation.Components;
@@ -18,6 +17,7 @@ public sealed partial class TerradropSystem
     private readonly JobQueue _jobQueue = new();
 
     private void CreateNewTerradropJob(
+        TerradropMapPrototype mapPrototype,
         SalvageMissionParams missionParams,
         EntityUid station,
         EntityUid targetPad,
@@ -38,6 +38,7 @@ public sealed partial class TerradropSystem
             _mapSystem,
             station,
             targetPad,
+            mapPrototype,
             missionParams,
             landingPadTile,
             cancelToken.Token);
@@ -68,36 +69,54 @@ public sealed partial class TerradropSystem
     private void OnJobCompleted(GenerateTerradropJob job)
     {
         var dataComponent = EntityManager.GetComponent<TerradropStationComponent>(job.Station);
-        var mapId = dataComponent.ActiveMissions.Last().Key;
 
         // Spawn the room marker to make a new room where the portal will be.
-        Spawn("TerradropRoomMarker", new MapCoordinates(4f, 0f, mapId));
-        var mapPortal = Spawn("PortalRed", new MapCoordinates(4f, 0f, mapId));
+        Spawn("TerradropRoomMarker", new MapCoordinates(4f, 0f, job.MapId));
+        var mapPortal = Spawn("PortalRed", new MapCoordinates(4f, 0f, job.MapId));
+
+        var missionData = new TerradropActiveMissionData(
+            job.MapUid,
+            job.MapId,
+            mapPortal
+        );
+        dataComponent.ActiveMissions.Add(job.MapPrototype.ID, missionData);
+
         if (TryComp<PortalComponent>(mapPortal, out var mapPortalComponent))
             mapPortalComponent.CanTeleportToOtherMaps = true;
 
         var returnMarker = _entityManager.AllEntities<TerradropReturnMarkerComponent>().FirstOrNull();
 
         // Activate the target pad to teleport to the new map.
-        if (!TryComp<TerradropPadComponent>(job.TargetPad, out var padComponent))
-            return;
-        var padTransform = Transform(job.TargetPad);
+        OpenPortalToMap(job.TargetPad, missionData);
 
-        padComponent.TeleportMapId = mapId;
-        padComponent.ActivatedAt = _timing.CurTime;
-        padComponent.Portal = Spawn(padComponent.PortalPrototype, padTransform.Coordinates);
-
-        if (TryComp<PortalComponent>(padComponent.Portal, out var portal))
-            portal.CanTeleportToOtherMaps = true;
-
-        _link.OneWayLink(padComponent.Portal!.Value, mapPortal);
-        _audio.PlayPvs(padComponent.NewPortalSound, padTransform.Coordinates);
 
         // Ensure that if no return marker is found we can still go back to the station.
         if (returnMarker != null)
             _link.OneWayLink(mapPortal, returnMarker.Value);
         else
             _link.OneWayLink(mapPortal, job.TargetPad);
+
+    }
+
+    /// <summary>
+    /// Only opens the portal TO the map, not the return portal.
+    /// This is used when the player wants to open a portal to a existing map.
+    /// </summary>
+    private void OpenPortalToMap(EntityUid stationPadUid, TerradropActiveMissionData data)
+    {
+        if (!TryComp<TerradropPadComponent>(stationPadUid, out var padComponent))
+            return;
+        var padTransform = Transform(stationPadUid);
+
+        padComponent.TeleportMapId = data.MapId;
+        padComponent.ActivatedAt = _timing.CurTime;
+        padComponent.Portal = Spawn(padComponent.PortalPrototype, padTransform.Coordinates);
+
+        if (TryComp<PortalComponent>(padComponent.Portal, out var portal))
+            portal.CanTeleportToOtherMaps = true;
+
+        _link.OneWayLink(padComponent.Portal!.Value, data.MapPortalUid);
+        _audio.PlayPvs(padComponent.NewPortalSound, padTransform.Coordinates);
 
     }
 

@@ -21,15 +21,15 @@ public sealed class TerradropContainerPanel : LayoutContainer
     {
         foreach (var child in Children)
         {
-            if (child is not TerradropNodeItem dependentItem)
+            if (child is not TerradropMapNodeItem dependentItem)
                 continue;
 
             if (dependentItem.Prototype.MapPrerequisites.Count <= 0)
                 continue;
 
-            var prerequisiteItems = Children.Where(x => x is TerradropNodeItem second &&
+            var prerequisiteItems = Children.Where(x => x is TerradropMapNodeItem second &&
                 dependentItem.Prototype.MapPrerequisites.Contains(second.Prototype.ID))
-                .Cast<TerradropNodeItem>().ToList();
+                .Cast<TerradropMapNodeItem>().ToList();
 
             // Special handling for Tree line type - draw all prerequisites as a unified tree
             // if (dependentItem.Prototype.PrerequisiteLineType == PrerequisiteLineType.Tree && prerequisiteItems.Count > 1)
@@ -76,7 +76,7 @@ public sealed class TerradropContainerPanel : LayoutContainer
     /// <summary>
     /// Draw tree-style connections where multiple prerequisites branch into a single trunk
     /// </summary>
-    private void DrawTreeConnections(DrawingHandleScreen handle, List<TerradropNodeItem> prerequisites, TerradropNodeItem dependent, Color color)
+    private void DrawTreeConnections(DrawingHandleScreen handle, List<TerradropMapNodeItem> prerequisites, TerradropMapNodeItem dependent, Color color)
     {
         if (prerequisites.Count == 0)
             return;
@@ -127,7 +127,7 @@ public sealed class TerradropContainerPanel : LayoutContainer
     /// <summary>
     /// Draw spread connections for multiple prerequisites with intelligent anti-overlap routing
     /// </summary>
-    private void DrawSpreadConnections(DrawingHandleScreen handle, List<TerradropNodeItem> prerequisites, TerradropNodeItem dependent, Color color)
+    private void DrawSpreadConnections(DrawingHandleScreen handle, List<TerradropMapNodeItem> prerequisites, TerradropMapNodeItem dependent, Color color)
     {
         if (prerequisites.Count == 0)
             return;
@@ -286,7 +286,7 @@ public sealed class TerradropContainerPanel : LayoutContainer
     /// <summary>
     /// Get the center point of a tech item
     /// </summary>
-    private Vector2 GetTechCenter(TerradropNodeItem tech)
+    private Vector2 GetTechCenter(TerradropMapNodeItem tech)
     {
         var techRect = GetTechRect(tech);
         return techRect.Center;
@@ -295,7 +295,7 @@ public sealed class TerradropContainerPanel : LayoutContainer
     /// <summary>
     /// Get connection point on the side-middle of a tech item facing toward another tech
     /// </summary>
-    private Vector2 GetTechSideConnection(TerradropNodeItem fromTech, TerradropNodeItem toTech)
+    private Vector2 GetTechSideConnection(TerradropMapNodeItem fromTech, TerradropMapNodeItem toTech)
     {
         var fromRect = GetTechRect(fromTech);
         var toRect = GetTechRect(toTech);
@@ -458,7 +458,7 @@ public sealed class TerradropContainerPanel : LayoutContainer
     /// <summary>
     /// Get the visual rectangle of a tech item
     /// </summary>
-    private UIBox2 GetTechRect(TerradropNodeItem tech)
+    private UIBox2 GetTechRect(TerradropMapNodeItem tech)
     {
         var position = new Vector2(tech.PixelPosition.X, tech.PixelPosition.Y);
         var size = new Vector2(tech.PixelWidth, tech.PixelHeight);
@@ -475,7 +475,7 @@ public sealed class TerradropContainerPanel : LayoutContainer
     /// <summary>
     /// Determine connection color based on availability
     /// </summary>
-    private Color GetRefinedConnectionColor(TerradropNodeItem prerequisite, TerradropNodeItem dependent)
+    private Color GetRefinedConnectionColor(TerradropMapNodeItem prerequisite, TerradropMapNodeItem dependent)
     {
         return TerradropColorScheme.GetConnectionColor(dependent.Availability);
     }

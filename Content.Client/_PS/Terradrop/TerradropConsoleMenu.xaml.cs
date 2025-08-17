@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Linq;
+using System.Numerics;
 using Content.Client.Parallax;
 using Content.Client.Research;
 using Content.Client.UserInterface.Controls;
@@ -18,40 +19,29 @@ namespace Content.Client._PS.Terradrop;
 [GenerateTypedNameReferences]
 public sealed partial class TerradropConsoleMenu : FancyWindow
 {
+    private const string DefaultFirstMapId = "ZeronaPrimeTerraDropMap";
+
     public Action<string>? OnStartTerradropPressed;
-    public event Action<BaseButton.ButtonEventArgs>? OnStartButtonPressed;
 
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
 
     private readonly SpriteSystem _sprite;
-    private readonly AccessReaderSystem _accessReader;
-    private ParallaxControl _parallaxControl;
 
     /// <summary>
     /// The parallax prototype to use for the background. Configurable.
     /// </summary>
     public string ParallaxPrototype { get; set; } = "Default";
 
-    /// <summary>
-    /// Updates the parallax background to use a different prototype
-    /// </summary>
-    /// <param name="parallaxPrototype">The new parallax prototype to use</param>
-    public void SetParallaxPrototype(string parallaxPrototype)
-    {
-        ParallaxPrototype = parallaxPrototype;
-        _parallaxControl.ParallaxPrototype = parallaxPrototype;
-
-    }
-
     public EntityUid Entity;
 
-    public ProtoId<TerradropMapPrototype>? CurrentMap;
+    public ProtoId<TerradropMapPrototype>? CurrentMapNode;
     private bool _draggin;
     private const int GridSize = 90;
     private const int CardSize = 64;
     private static readonly Vector2i DefaultPosition = Vector2i.Zero;
+    public Dictionary<string, TerradropMapAvailability> List = new();
 
     private Box2i _bounds = new(DefaultPosition, DefaultPosition);
 
@@ -60,27 +50,147 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
         _sprite = _entity.System<SpriteSystem>();
-        _accessReader = _entity.System<AccessReaderSystem>();
 
-        MapScrollContainer.ScrollSpeedX = 100;
-        MapScrollContainer.ScrollSpeedY = 100;
-        MapScrollContainer.HScrollEnabled = false;
-        MapScrollContainer.VScrollEnabled = true;
+        MapNodesScrollContainer.ScrollSpeedX = 100;
+        MapNodesScrollContainer.ScrollSpeedY = 100;
+        MapNodesScrollContainer.HScrollEnabled = false;
+        MapNodesScrollContainer.VScrollEnabled = true;
 
-        _parallaxControl = new ParallaxControl
+        ParallaxControl parrallaxControl = new ParallaxControl
         {
             ParallaxPrototype = ParallaxPrototype,
             HorizontalExpand = true,
             VerticalExpand = true,
         };
 
+        MapNodesContainer.AddChild(parrallaxControl);
+        parrallaxControl.SetPositionInParent(0);
+        MapNodesScrollContainer.SetPositionInParent(1);
 
-
-        StartTerradropButton.OnPressed += args => OnStartButtonPressed?.Invoke(args);
         DragContainer.OnKeyBindDown += OnKeybindDown;
         DragContainer.OnKeyBindUp += OnKeybindUp;
         RecenterButton.OnPressed += _ => Recenter();
+
+        UpdatePanels(List);
     }
+
+    public void UpdatePanels(Dictionary<string, TerradropMapAvailability> dict)
+    {
+        // Clear existing items
+        DragContainer.RemoveAllChildren();
+
+        List = dict;
+        var bounds = new Box2i();
+        var boundsSet = false;
+
+        // Calculate bounds
+        foreach (var map in List)
+        {
+            var proto = _prototype.Index<TerradropMapPrototype>(map.Key);
+            var position = DefaultPosition + (GridSize * proto.Position.X, GridSize * proto.Position.Y);
+
+            if (!boundsSet)
+            {
+                bounds.BottomLeft = position;
+                bounds.TopRight = position;
+                boundsSet = true;
+            }
+            else
+            {
+                bounds.Left = int.Min(position.X, bounds.Left);
+                bounds.Bottom = int.Min(position.Y, bounds.Bottom);
+                bounds.Right = int.Max(position.X, bounds.Right);
+                bounds.Top = int.Max(position.Y, bounds.Top);
+            }
+        }
+
+        if (boundsSet)
+        {
+            _bounds = bounds;
+
+            // Set container size with padding
+            var padding = 200;
+            var totalWidth = _bounds.Width + CardSize + padding;
+            var totalHeight = _bounds.Height + CardSize + padding;
+
+            DragContainer.SetWidth = Math.Max(totalWidth, 1000);
+            DragContainer.SetHeight = Math.Max(totalHeight, 1000);
+        }
+
+        // Add map node items
+        foreach (var map in List)
+        {
+            var proto = _prototype.Index<TerradropMapPrototype>(map.Key);
+            var control = new TerradropMapNodeItem(proto, _sprite, map.Value);
+
+            DragContainer.AddChild(control);
+
+            // Position the tech item
+            var leftPadding = 20;
+            var topPadding = 20;
+            var uiPosition = new Vector2(
+                proto.Position.X * GridSize - _bounds.Left + leftPadding,
+                proto.Position.Y * GridSize - _bounds.Bottom + topPadding
+            );
+
+            LayoutContainer.SetPosition(control, uiPosition);
+            control.SelectAction += SelectMapNode;
+            control.IsSelected = map.Key == CurrentMapNode;
+        }
+
+        // Select the GroundZeroMapId node if none is selected.
+        // This is the default map node that should always be available.
+        if (CurrentMapNode == null && List.Count > 0)
+        {
+            var zeroMapProto = _prototype.Index<TerradropMapPrototype>(DefaultFirstMapId);
+
+            // Get the availability of the GroundZeroMapId node
+            // This may be Explored, Unexplored, or In Progress.
+            var availability = List.TryGetValue(DefaultFirstMapId, out var avail)
+                ? avail
+                : TerradropMapAvailability.Unexplored;
+
+            SelectMapNode(zeroMapProto, availability);
+        }
+    }
+    public void UpdateInformationPanel()
+    {
+        // TODO: Display threat level and other map details
+
+        // if (!_entity.TryGetComponent(Entity, out TechnologyDatabaseComponent? database))
+        //     return;
+
+        // ThreatLevelDisplayContainer.RemoveAllChildren();
+        // foreach (var disciplineId in database.SupportedDisciplines)
+        // {
+        //     var discipline = _prototype.Index<TechDisciplinePrototype>(disciplineId);
+        //     var threatLevel = 1; // TODO;
+        //
+        //     var texture = new TextureRect
+        //     {
+        //         TextureScale = new Vector2(2, 2),
+        //         VerticalAlignment = VAlignment.Center
+        //     };
+        //     var label = new RichTextLabel();
+        //     texture.Texture = _sprite.Frame0(discipline.Icon);
+        //     label.SetMessage(Loc.GetString("research-console-tier-percentage", ("perc", threatLevel)));
+        //
+        //     var control = new BoxContainer
+        //     {
+        //         Children =
+        //         {
+        //             texture,
+        //             label,
+        //             new Control
+        //             {
+        //                 MinWidth = 10
+        //             }
+        //         }
+        //     };
+        //     ThreatLevelDisplayContainer.AddChild(control);
+        // }
+    }
+
 
     protected override void MouseMove(GUIMouseMoveEventArgs args)
     {
@@ -91,7 +201,7 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
 
         // Adjust scroll position with drag
         var scrollSpeed = 2.0f;
-        MapScrollContainer.VScrollTarget -= args.Relative.Y * scrollSpeed;
+        MapNodesScrollContainer.VScrollTarget -= args.Relative.Y * scrollSpeed;
     }
 
     /// <summary>
@@ -118,26 +228,26 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
     public void SetEntity(EntityUid entity)
         => Entity = entity;
 
-    public void SelectTech(TerradropMapPrototype proto, TerradropMapAvailability availability)
+    public void SelectMapNode(TerradropMapPrototype proto, TerradropMapAvailability availability)
     {
         InfoContainer.RemoveAllChildren();
         if (!_player.LocalEntity.HasValue)
             return;
 
         // Update selection
-        CurrentMap = proto.ID;
+        CurrentMapNode = proto.ID;
 
         // Update visual selection state
         foreach (var child in DragContainer.Children)
         {
-            if (child is TerradropNodeItem techItem)
+            if (child is TerradropMapNodeItem techItem)
             {
-                techItem.IsSelected = techItem.Prototype.ID == CurrentMap;
+                techItem.IsSelected = techItem.Prototype.ID == CurrentMapNode;
             }
         }
 
         // Create and add info panel
-        var control = new TerradropInfoPanel(proto, _accessReader.IsAllowed(_player.LocalEntity.Value, Entity), availability, _sprite);
+        var control = new TerradropInfoPanel(proto, availability, _sprite);
         control.StartAction += args => OnStartTerradropPressed?.Invoke(args.ID);
         InfoContainer.AddChild(control);
     }
@@ -146,7 +256,7 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
     public void Recenter()
     {
         // Reset scroll position
-        MapScrollContainer.VScrollTarget = 0;
+        MapNodesScrollContainer.VScrollTarget = 0;
     }
 
     public override void Close()

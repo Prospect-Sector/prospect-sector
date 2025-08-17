@@ -45,3 +45,17 @@ public enum TerradropConsoleUiKey : byte
 {
     Default,
 }
+
+[Serializable, NetSerializable]
+public sealed class TerradropConsoleBoundInterfaceState : BoundUserInterfaceState
+{
+    /// <summary>
+    /// All terradrop map nodes and their availabilities
+    /// </summary>
+    public Dictionary<string, TerradropMapAvailability> MapNodes;
+
+    public TerradropConsoleBoundInterfaceState(Dictionary<string, TerradropMapAvailability> mapNodes) // Frontier R&D console rework = researches field
+    {
+        MapNodes = mapNodes;
+    }
+}

@@ -1,5 +1,4 @@
 ﻿using Robust.Shared.Prototypes;
-using Robust.Shared.Utility;
 
 namespace Content.Shared._PS.Terradrop;
 
@@ -37,5 +36,12 @@ public sealed class TerradropMapPrototype: IPrototype
 
     [DataField]
     public List<ProtoId<TerradropMapPrototype>> MapUnlocks = new();
+
+    /// <summary>
+    /// Position of this tech in console menu
+    /// </summary>
+    [DataField("position", required: true)]
+    public Vector2i Position { get; private set; }
+
 }
 
