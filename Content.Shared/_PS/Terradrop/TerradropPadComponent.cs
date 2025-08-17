@@ -8,7 +8,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared._PS.Terradrop;
 
 [RegisterComponent]
-[NetworkedComponent, AutoGenerateComponentState(true, true), Access(typeof(SharedTerradropSystem))]
+[NetworkedComponent, AutoGenerateComponentState(true, true), Access(typeof(SharedTerradropSystem), Other = AccessPermissions.ReadWriteExecute)]
 public sealed partial class TerradropPadComponent : Component
 {
     /// <summary>
