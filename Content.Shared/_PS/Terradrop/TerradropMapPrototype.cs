@@ -85,5 +85,8 @@ public sealed class TerradropMapPrototype: IPrototype
 
     [DataField("returnDamageAmount")]
     public int ReturnDamageAmount = 200;
+
+    [DataField("unlockedByDefault")]
+    public bool UnlockedByDefault = false;
 }
 
