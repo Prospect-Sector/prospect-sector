@@ -143,7 +143,7 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
             var defaultSelected = _prototype.EnumeratePrototypes<TerradropMapPrototype>().FirstOrDefault(x => x.UnlockedByDefault);
             if (defaultSelected != null)
             {
-                // Get the availability of the GroundZeroMapId node
+                // Get the availability of the default-selected map node (the first prototype with UnlockedByDefault)
                 // This may be Explored, Unexplored, or In Progress.
                 var availability = List.TryGetValue(defaultSelected.ID, out var avail)
                     ? avail
