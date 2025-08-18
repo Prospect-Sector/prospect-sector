@@ -50,7 +50,7 @@ public sealed partial class TerradropSystem
             if (xform.MapUid == uid)
             {
                 // mostly just for vehicles
-                _buckle.TryUnbuckle(uid, uid, true);
+                _buckle.TryUnbuckle(playerUid, playerUid, true);
 
                 // Kill the player
                 if (TryComp<MobStateComponent>(playerUid, out var mobState) &&
