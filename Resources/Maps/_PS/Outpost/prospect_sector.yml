@@ -4,8 +4,8 @@
   engineVersion: 265.0.0
   forkId: ""
   forkVersion: ""
-  time: 08/16/2025 17:57:50
-  entityCount: 832
+  time: 08/18/2025 17:21:08
+  entityCount: 828
 maps:
 - 1
 grids:
@@ -1732,44 +1732,6 @@ entities:
     - type: Transform
       pos: 6.5,14.5
       parent: 4
-- proto: BenchComfy
-  entities:
-  - uid: 672
-    components:
-    - type: Transform
-      rot: 3.141592653589793 rad
-      pos: 2.5,-0.5
-      parent: 4
-  - uid: 673
-    components:
-    - type: Transform
-      rot: 3.141592653589793 rad
-      pos: 3.5,-0.5
-      parent: 4
-  - uid: 674
-    components:
-    - type: Transform
-      rot: 3.141592653589793 rad
-      pos: 4.5,-0.5
-      parent: 4
-  - uid: 675
-    components:
-    - type: Transform
-      rot: 3.141592653589793 rad
-      pos: -1.5,-0.5
-      parent: 4
-  - uid: 676
-    components:
-    - type: Transform
-      rot: 3.141592653589793 rad
-      pos: -0.5,-0.5
-      parent: 4
-  - uid: 677
-    components:
-    - type: Transform
-      rot: 3.141592653589793 rad
-      pos: 0.5,-0.5
-      parent: 4
 - proto: BoxBottle
   entities:
   - uid: 520
@@ -2585,18 +2547,6 @@ entities:
     - type: Transform
       pos: -13.5,5.5
       parent: 4
-- proto: CargoTelepad
-  entities:
-  - uid: 120
-    components:
-    - type: Transform
-      pos: -11.5,5.5
-      parent: 4
-  - uid: 128
-    components:
-    - type: Transform
-      pos: -11.5,4.5
-      parent: 4
 - proto: CarpetBlue
   entities:
   - uid: 544
@@ -2680,15 +2630,6 @@ entities:
     - type: Transform
       pos: -14.513798,-0.3820923
       parent: 4
-- proto: ComputerCargoOrders
-  entities:
-  - uid: 126
-    components:
-    - type: Transform
-      pos: -11.5,3.5
-      parent: 4
-    - type: AccessReader
-      access: []
 - proto: ComputerCargoStorageConsole
   entities:
   - uid: 123
@@ -2788,6 +2729,11 @@ entities:
     components:
     - type: Transform
       pos: 2.5,7.5
+      parent: 4
+  - uid: 673
+    components:
+    - type: Transform
+      pos: -3.5,16.5
       parent: 4
   - uid: 819
     components:
@@ -3803,6 +3749,11 @@ entities:
       parent: 4
 - proto: PottedPlantRandom
   entities:
+  - uid: 126
+    components:
+    - type: Transform
+      pos: 0.5,17.5
+      parent: 4
   - uid: 506
     components:
     - type: Transform
@@ -3919,6 +3870,11 @@ entities:
       parent: 4
 - proto: RandomPosterAny
   entities:
+  - uid: 128
+    components:
+    - type: Transform
+      pos: -3.5,18.5
+      parent: 4
   - uid: 553
     components:
     - type: Transform
@@ -3929,8 +3885,18 @@ entities:
     - type: Transform
       pos: -6.5,7.5
       parent: 4
+  - uid: 672
+    components:
+    - type: Transform
+      pos: 1.5,17.5
+      parent: 4
 - proto: RandomSpawner
   entities:
+  - uid: 120
+    components:
+    - type: Transform
+      pos: -2.5,17.5
+      parent: 4
   - uid: 359
     components:
     - type: Transform
