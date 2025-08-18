@@ -1,0 +1,103 @@
+﻿- type: terradropMap
+  id: ZeronaPrimeTerraDropMap
+  name: terradrop-map-zerona-prime
+  biome: Grasslands
+  icon: MobCarpRainbow
+  mapUnlocks:
+  - VeridiaTerraDropMap
+  - SpironisTerraDropMap
+  position: 5,5
+
+- type: terradropMap
+  id: VeridiaTerraDropMap
+  name: terradrop-map-veridia
+  biome: Grasslands
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - ZeronaPrimeTerraDropMap
+  mapUnlocks:
+  - RecharisTerraDropMap
+  - ObscyraTerraDropMap
+  position: 4,6
+
+- type: terradropMap
+  id: SpironisTerraDropMap
+  name: terradrop-map-spironis
+  biome: Grasslands
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - ZeronaPrimeTerraDropMap
+  mapUnlocks:
+  - EbonisTerraDropMap
+  - CrimsonisTerraDropMap
+  position: 6,6
+
+- type: terradropMap
+  id: RecharisTerraDropMap
+  name: terradrop-map-recharis
+  biome: Caves
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - VeridiaTerraDropMap
+  position: 3,7
+
+- type: terradropMap
+  id: ObscyraTerraDropMap
+  name: terradrop-map-obscyra
+  biome: Snow
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - VeridiaTerraDropMap
+  position: 4,7
+
+- type: terradropMap
+  id: EbonisTerraDropMap
+  name: terradrop-map-ebonis
+  biome: Lava
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - SpironisTerraDropMap
+  position: 6,7
+
+- type: terradropMap
+  id: CrimsonisTerraDropMap
+  name: terradrop-map-crimsonis
+  biome: Snow
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - SpironisTerraDropMap
+  position: 7,7
+
+- type: terradropMap
+  id: BastaraTerraDropMap
+  name: terradrop-map-bastara
+  biome: Caves
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - RecharisTerraDropMap
+  - ObscyraTerraDropMap
+  mapUnlocks:
+  - FerrosTerraDropMap
+  position: 4,8
+
+- type: terradropMap
+  id: CrownisTerraDropMap
+  name: terradrop-map-crownis
+  biome: Lava
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - EbonisTerraDropMap
+  - CrimsonisTerraDropMap
+  mapUnlocks:
+  - FerrosTerraDropMap
+  position: 6,8
+
+- type: terradropMap
+  id: FerrosTerraDropMap
+  name: terradrop-map-ferros
+  biome: Lava
+  icon: MobCarpRainbow
+  mapPrerequisites:
+  - BastaraTerraDropMap
+  - CrownisTerraDropMap
+  position: 5,9
