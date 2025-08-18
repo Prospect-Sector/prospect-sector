@@ -60,7 +60,7 @@ public sealed partial class TerradropSystem
                     {
                         if (!_prototypeManager.TryIndex(mapComponent.MapPrototype.ReturnDamageType, out var prototype))
                         {
-                            return;
+                            continue;
                         }
 
                         _damageableSystem.SetDamage(

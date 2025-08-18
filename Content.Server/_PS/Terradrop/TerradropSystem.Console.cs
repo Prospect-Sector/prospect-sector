@@ -105,7 +105,7 @@ public sealed partial class TerradropSystem
                     return TerradropMapAvailability.InProgress;
 
                 // First map is always available.
-                if (proto.Position == Vector2i.Zero)
+                if (proto.UnlockedByDefault)
                     return TerradropMapAvailability.Unexplored;
 
                 if (unlockedMaps.Contains(proto.ID))

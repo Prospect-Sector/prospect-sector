@@ -19,8 +19,6 @@ namespace Content.Client._PS.Terradrop;
 [GenerateTypedNameReferences]
 public sealed partial class TerradropConsoleMenu : FancyWindow
 {
-    private const string DefaultFirstMapId = "ZeronaPrimeTerraDropMap";
-
     public Action<string>? OnStartTerradropPressed;
 
     [Dependency] private readonly IEntityManager _entity = default!;
@@ -138,19 +136,20 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
             control.IsSelected = map.Key == CurrentMapNode;
         }
 
-        // Select the GroundZeroMapId node if none is selected.
+        // Select the first prototype with defaultSelected true if none is selected.
         // This is the default map node that should always be available.
         if (CurrentMapNode == null && List.Count > 0)
         {
-            var zeroMapProto = _prototype.Index<TerradropMapPrototype>(DefaultFirstMapId);
-
-            // Get the availability of the GroundZeroMapId node
-            // This may be Explored, Unexplored, or In Progress.
-            var availability = List.TryGetValue(DefaultFirstMapId, out var avail)
-                ? avail
-                : TerradropMapAvailability.Unexplored;
-
-            SelectMapNode(zeroMapProto, availability);
+            var defaultSelected = _prototype.EnumeratePrototypes<TerradropMapPrototype>().FirstOrDefault(x => x.UnlockedByDefault);
+            if (defaultSelected != null)
+            {
+                // Get the availability of the GroundZeroMapId node
+                // This may be Explored, Unexplored, or In Progress.
+                var availability = List.TryGetValue(defaultSelected.ID, out var avail)
+                    ? avail
+                    : TerradropMapAvailability.Unexplored;
+                SelectMapNode(defaultSelected, availability);
+            }
         }
     }
     public void UpdateInformationPanel()
