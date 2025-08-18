@@ -136,7 +136,7 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
             control.IsSelected = map.Key == CurrentMapNode;
         }
 
-        // Select the first prototype with defaultSelected true if none is selected.
+        // Select the first prototype with UnlockedByDefault true if none is selected.
         // This is the default map node that should always be available.
         if (CurrentMapNode == null && List.Count > 0)
         {
