@@ -1,0 +1,53 @@
+- type: guideEntry
+  id: PSSpecies
+  name: guide-entry-species
+  text: "/ServerInfo/_PS/Guidebook/Mobs/Species.xml"
+  children:
+    - PSArachnid
+    - PSDiona
+    - PSDwarf
+    - PSHuman
+    - PSMoth
+    - PSReptilian
+    - PSSlimePerson
+    - PSVox
+
+- type: guideEntry
+  id: PSArachnid
+  name: species-name-arachnid
+  text: "/ServerInfo/_PS/Guidebook/Mobs/Arachnid.xml"
+
+- type: guideEntry
+  id: PSDiona
+  name: species-name-diona
+  text: "/ServerInfo/_PS/Guidebook/Mobs/Diona.xml"
+
+- type: guideEntry
+  id: PSDwarf
+  name: species-name-dwarf
+  text: "/ServerInfo/_PS/Guidebook/Mobs/Dwarf.xml"
+
+- type: guideEntry
+  id: PSHuman
+  name: species-name-human
+  text: "/ServerInfo/_PS/Guidebook/Mobs/Human.xml"
+
+- type: guideEntry
+  id: PSMoth
+  name: species-name-moth
+  text: "/ServerInfo/_PS/Guidebook/Mobs/Moth.xml"
+
+- type: guideEntry
+  id: PSReptilian
+  name: species-name-reptilian
+  text: "/ServerInfo/_PS/Guidebook/Mobs/Reptilian.xml"
+
+- type: guideEntry
+  id: PSSlimePerson
+  name: species-name-slime
+  text: "/ServerInfo/_PS/Guidebook/Mobs/SlimePerson.xml"
+
+- type: guideEntry
+  id: PSVox
+  name: species-name-vox
+  text: "/ServerInfo/_PS/Guidebook/Mobs/Vox.xml"

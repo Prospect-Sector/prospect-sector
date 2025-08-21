@@ -1,0 +1,70 @@
+- type: guideEntry
+  id: PSChemicals
+  name: guide-entry-chemicals
+  text: "/ServerInfo/_PS/Guidebook/Chemicals.xml"
+  children:
+  - PSElements
+  - PSMedicine
+  - PSNarcotics
+  - PSPyrotechnic
+  - PSToxins
+  - PSFoods
+  - PSBotanical
+  - PSBiological
+  - PSSpecial
+  - PSOthers
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSElements
+  name: guide-entry-elements
+  text: "/ServerInfo/_PS/Guidebook/ChemicalTabs/Elements.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSNarcotics
+  name: guide-entry-narcotics
+  text: "/ServerInfo/_PS/Guidebook/ChemicalTabs/Narcotics.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSPyrotechnic
+  name: guide-entry-pyrotechnics
+  text: "/ServerInfo/_PS/Guidebook/ChemicalTabs/Pyrotechnic.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSToxins
+  name: guide-entry-toxins
+  text: "/ServerInfo/_PS/Guidebook/ChemicalTabs/Toxins.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSFoods
+  name: guide-entry-foods
+  text: "/ServerInfo/_PS/Guidebook/ChemicalTabs/Foods.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSBotanical
+  name: guide-entry-botanical
+  text: "/ServerInfo/_PS/Guidebook/Medical/Botanicals.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSBiological
+  name: guide-entry-biological
+  text: "/ServerInfo/_PS/Guidebook/ChemicalTabs/Biological.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSSpecial
+  name: guide-entry-special
+  text: "/ServerInfo/_PS/Guidebook/ChemicalTabs/Special.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSOthers
+  name: guide-entry-others
+  text: "/ServerInfo/_PS/Guidebook/ChemicalTabs/Other.xml"
+  filterEnabled: True

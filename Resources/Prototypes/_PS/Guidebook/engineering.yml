@@ -1,0 +1,355 @@
+﻿- type: guideEntry
+  id: PSEngineering
+  name: guide-entry-engineering
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Engineering.xml"
+  children:
+  - PSConstruction
+  - PSPower
+  - PSAtmospherics
+  - PSShuttleCraft
+  - PSNetworking
+
+- type: guideEntry
+  id: PSConstruction
+  name: guide-entry-construction
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Construction.xml"
+  children:
+  - PSAirlocks
+  - PSExpandingRepairingStation
+  - PSWirePanels
+
+- type: guideEntry
+  id: PSExpandingRepairingStation
+  name: guide-entry-expandingrepairingstation
+  text: "/ServerInfo/_PS/Guidebook/Engineering/ExpandingRepairingStation.xml"
+
+- type: guideEntry
+  id: PSAirlocks
+  name: guide-entry-airlocks
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Airlocks.xml"
+  children:
+  - PSAirlockSecurity
+
+- type: guideEntry
+  id: PSWirePanels
+  name: guide-entry-wirepanels
+  text: "/ServerInfo/_PS/Guidebook/Engineering/WirePanels.xml"
+
+- type: guideEntry
+  id: PSAirlockSecurity
+  name: guide-entry-airlock-security
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AirlockSecurity.xml"
+
+- type: guideEntry
+  id: PSAtmospherics
+  name: guide-entry-atmospherics
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Atmospherics.xml"
+  children:
+  - PSGasManipulation
+  - PSAtmosphericsSystems
+  - PSAtmosphericUpsets
+  - PSAtmosTools
+  - PSGasses
+
+- type: guideEntry
+  id: PSGasManipulation
+  name: guide-entry-gasmanipulation
+  text: "/ServerInfo/_PS/Guidebook/Engineering/GasManipulation.xml"
+  children:
+  - PSAtmosphereInOut
+  - PSPipes
+  - PSPumps
+  - PSValves
+  - PSMixingAndFiltering
+  - PSGasCanisters
+  - PSThermomachines
+  - PSGasCondensing
+
+- type: guideEntry
+  id: PSPipes
+  name: guide-entry-pipes
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Pipes.xml"
+
+- type: guideEntry
+  id: PSPumps
+  name: guide-entry-pumps
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Pumps.xml"
+
+- type: guideEntry
+  id: PSAtmosphereInOut
+  name: guide-entry-atmosphereinout
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AtmosphereInOut.xml"
+  children:
+  - PSAirVent
+  - PSPassiveVent
+  - PSAirInjector
+  - PSAirScrubber
+  - PSPortableScrubber
+
+- type: guideEntry
+  id: PSAirVent
+  name: guide-entry-airvent
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AirVent.xml"
+
+- type: guideEntry
+  id: PSPassiveVent
+  name: guide-entry-passivevent
+  text: "/ServerInfo/_PS/Guidebook/Engineering/PassiveVent.xml"
+
+- type: guideEntry
+  id: PSAirInjector
+  name: guide-entry-airinjector
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AirInjector.xml"
+
+- type: guideEntry
+  id: PSAirScrubber
+  name: guide-entry-airscrubber
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AirScrubber.xml"
+
+- type: guideEntry
+  id: PSPortableScrubber
+  name: guide-entry-portablescrubber
+  text: "/ServerInfo/_PS/Guidebook/Engineering/PortableScrubber.xml"
+
+- type: guideEntry
+  id: PSValves
+  name: guide-entry-valves
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Valves.xml"
+  children:
+  - PSManualValve
+  - PSSignalValve
+  - PSPneumaticValve
+  - PSPassiveGate
+  - PSPressureRegulator
+
+- type: guideEntry
+  id: PSManualValve
+  name: guide-entry-manualvalve
+  text: "/ServerInfo/_PS/Guidebook/Engineering/ManualValve.xml"
+
+- type: guideEntry
+  id: PSSignalValve
+  name: guide-entry-signalvalve
+  text: "/ServerInfo/_PS/Guidebook/Engineering/SignalValve.xml"
+
+- type: guideEntry
+  id: PSPneumaticValve
+  name: guide-entry-pneumaticvalve
+  text: "/ServerInfo/_PS/Guidebook/Engineering/PneumaticValve.xml"
+
+- type: guideEntry
+  id: PSPassiveGate
+  name: guide-entry-passivegate
+  text: "/ServerInfo/_PS/Guidebook/Engineering/PassiveGate.xml"
+
+- type: guideEntry
+  id: PSPressureRegulator
+  name: guide-entry-ressureregulator
+  text: "/ServerInfo/_PS/Guidebook/Engineering/PressureRegulator.xml"
+
+- type: guideEntry
+  id: PSMixingAndFiltering
+  name: guide-entry-mixingandfiltering
+  text: "/ServerInfo/_PS/Guidebook/Engineering/MixingAndFiltering.xml"
+
+- type: guideEntry
+  id: PSGasCanisters
+  name: guide-entry-gascanisters
+  text: "/ServerInfo/_PS/Guidebook/Engineering/GasCanisters.xml"
+
+- type: guideEntry
+  id: PSThermomachines
+  name: guide-entry-thermomachines
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Thermomachines.xml"
+  children:
+  - PSRadiators
+
+- type: guideEntry
+  id: PSGasCondensing
+  name: guide-entry-gascondensing
+  text: "/ServerInfo/_PS/Guidebook/Engineering/GasCondensing.xml"
+
+- type: guideEntry
+  id: PSRadiators
+  name: guide-entry-radiators
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Radiators.xml"
+
+- type: guideEntry
+  id: PSAtmosphericsSystems
+  name: guide-entry-atmosphericssystems
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AtmosphericsSystems.xml"
+  children:
+  - PSPipeNetworks
+  - PSDeviceMonitoringAndControl
+  - PSFireAndGasControl
+  - PSGasMiningAndStorage
+
+- type: guideEntry
+  id: PSPipeNetworks
+  name: guide-entry-pipenetworks
+  text: "/ServerInfo/_PS/Guidebook/Engineering/PipeNetworks.xml"
+
+- type: guideEntry
+  id: PSDeviceMonitoringAndControl
+  name: guide-entry-devicemonitoringandcontrol
+  text: "/ServerInfo/_PS/Guidebook/Engineering/DeviceMonitoringAndControl.xml"
+  children:
+  - PSAirAlarms
+  - PSAtmosphericAlertsComputer
+  - PSAtmosphericNetworkMonitor
+
+- type: guideEntry
+  id: PSAirAlarms
+  name: guide-entry-airalarms
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AirAlarms.xml"
+
+- type: guideEntry
+  id: PSAtmosphericAlertsComputer
+  name: guide-entry-atmosphericalertscomputer
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AtmosphericAlertsComputer.xml"
+
+- type: guideEntry
+  id: PSAtmosphericNetworkMonitor
+  name: guide-entry-atmosphericnetworkmonitor
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AtmosphericNetworkMonitor.xml"
+
+- type: guideEntry
+  id: PSFireAndGasControl
+  name: guide-entry-fireandgascontrol
+  text: "/ServerInfo/_PS/Guidebook/Engineering/FireAndGasControl.xml"
+
+- type: guideEntry
+  id: PSGasMiningAndStorage
+  name: guide-entry-gasminingandstorage
+  text: "/ServerInfo/_PS/Guidebook/Engineering/GasMiningAndStorage.xml"
+
+- type: guideEntry
+  id: PSAtmosphericUpsets
+  name: guide-entry-atmosphericupsets
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AtmosphericUpsets.xml"
+  children:
+  - PSFires
+  - PSSpacing
+
+- type: guideEntry
+  id: PSFires
+  name: guide-entry-fires
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Fires.xml"
+
+- type: guideEntry
+  id: PSSpacing
+  name: guide-entry-spacing
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Spacing.xml"
+
+- type: guideEntry
+  id: PSAtmosTools
+  name: guide-entry-atmostools
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AtmosTools.xml"
+
+- type: guideEntry
+  id: PSGasses
+  name: guide-entry-gasses
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Gasses.xml"
+
+- type: guideEntry
+  id: PSShuttleCraft
+  name: guide-entry-shuttle-craft
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Shuttlecraft.xml"
+
+- type: guideEntry
+  id: PSNetworking
+  name: guide-entry-networking
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Networking.xml"
+  children:
+  - PSAccessConfigurator
+
+- type: guideEntry
+  id: PSAccessConfigurator
+  name: guide-entry-access-configurator
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AccessConfigurator.xml"
+
+- type: guideEntry
+  id: PSPower
+  name: guide-entry-power
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Power.xml"
+  children:
+    - PSGenerators
+    - PSInspectingPower
+    - PSPowerStorage
+    - PSRamping
+    - PSVoltageNetworks
+
+- type: guideEntry
+  id: PSInspectingPower
+  name: guide-entry-inspectingpower
+  text: "/ServerInfo/_PS/Guidebook/Engineering/InspectingPower.xml"
+
+- type: guideEntry
+  id: PSPowerStorage
+  name: guide-entry-powerstorage
+  text: "/ServerInfo/_PS/Guidebook/Engineering/PowerStorage.xml"
+
+- type: guideEntry
+  id: PSRamping
+  name: guide-entry-ramping
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Ramping.xml"
+
+- type: guideEntry
+  id: PSVoltageNetworks
+  name: guide-entry-voltagenetworks
+  text: "/ServerInfo/_PS/Guidebook/Engineering/VoltageNetworks.xml"
+
+- type: guideEntry
+  id: PSGenerators
+  name: guide-entry-generators
+  text: "/ServerInfo/_PS/Guidebook/Engineering/Generators.xml"
+  children:
+  - PSPortableGenerator
+  - PSAME
+  - PSSingularityTeslaEngine
+  - PSTEG
+  - PSRTG
+  - PSSolarPanels
+
+- type: guideEntry
+  id: PSAME
+  name: guide-entry-ame
+  text: "/ServerInfo/_PS/Guidebook/Engineering/AME.xml"
+
+- type: guideEntry
+  id: PSSingularityTeslaEngine
+  name: guide-entry-singularityteslaengine
+  text: "/ServerInfo/_PS/Guidebook/Engineering/SingularityTeslaEngine.xml"
+  children:
+  - PSSingularityEngine
+  - PSTeslaEngine
+
+- type: guideEntry
+  id: PSSingularityEngine
+  name: guide-entry-singularityengine
+  text: "/ServerInfo/_PS/Guidebook/Engineering/SingularityEngine.xml"
+
+- type: guideEntry
+  id: PSTeslaEngine
+  name: guide-entry-teslaengine
+  text: "/ServerInfo/_PS/Guidebook/Engineering/TeslaEngine.xml"
+
+- type: guideEntry
+  id: PSTEG
+  name: guide-entry-teg
+  text: "/ServerInfo/_PS/Guidebook/Engineering/TEG.xml"
+
+- type: guideEntry
+  id: PSRTG
+  name: guide-entry-rtg
+  text: "/ServerInfo/_PS/Guidebook/Engineering/RTG.xml"
+
+- type: guideEntry
+  id: PSPortableGenerator
+  name: guide-entry-portable-generator
+  text: "/ServerInfo/_PS/Guidebook/Engineering/PortableGenerator.xml"
+
+- type: guideEntry
+  id: PSSolarPanels
+  name: guide-entry-solarpanels
+  text: "/ServerInfo/_PS/Guidebook/Engineering/SolarPanels.xml"

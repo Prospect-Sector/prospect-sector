@@ -1,0 +1,52 @@
+- type: guideEntry
+  id: PSMedical
+  name: guide-entry-medical
+  text: "/ServerInfo/_PS/Guidebook/Medical/Medical.xml"
+  children:
+  - PSMedicalDoctor
+  - PSChemist
+  - PSCloning
+  - PSCryogenics
+
+- type: guideEntry
+  id: PSMedicalDoctor
+  name: guide-entry-medicaldoctor
+  text: "/ServerInfo/_PS/Guidebook/Medical/MedicalDoctor.xml"
+
+- type: guideEntry
+  id: PSCloning
+  name: guide-entry-cloning
+  text: "/ServerInfo/_PS/Guidebook/Medical/Cloning.xml"
+
+- type: guideEntry
+  id: PSCryogenics
+  name: guide-entry-cryogenics
+  text: "/ServerInfo/_PS/Guidebook/Medical/Cryogenics.xml"
+
+- type: guideEntry
+  id: PSChemist
+  name: guide-entry-chemist
+  text: "/ServerInfo/_PS/Guidebook/Medical/Chemist.xml"
+  children:
+  # - Medicine
+  # Duplicate guide entries are currently not supported
+  # TODO GUIDEBOOK Maybe allow duplicate entries?
+  - PSBotanicals
+  - PSAdvancedBrute
+
+- type: guideEntry
+  id: PSMedicine
+  name: guide-entry-medicine
+  text: "/ServerInfo/_PS/Guidebook/Medical/Medicine.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSBotanicals
+  name: guide-entry-botanicals
+  text: "/ServerInfo/_PS/Guidebook/Medical/Botanicals.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSAdvancedBrute
+  name: guide-entry-brute
+  text: "/ServerInfo/_PS/Guidebook/Medical/AdvancedBrute.xml"

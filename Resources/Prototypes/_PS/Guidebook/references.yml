@@ -1,0 +1,135 @@
+- type: guideEntry
+  id: PSReferences
+  name: guide-entry-references
+  priority: 30
+  text: "/ServerInfo/_PS/Guidebook/References.xml"
+  children:
+  - PSChemicals
+  - PSDrinks
+  - PSFoodRecipes
+  - PSWriting
+
+- type: guideEntry
+  id: PSDrinks
+  name: guide-entry-drinks
+  text: "/ServerInfo/_PS/Guidebook/ReferenceTables/Drinks.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSFoodRecipes
+  name: guide-entry-foodrecipes
+  text: "/ServerInfo/_PS/Guidebook/Service/FoodRecipes.xml"
+  filterEnabled: True
+  children:
+  - PSPizzaRecipes
+  - PSSavoryRecipes
+  - PSBreadRecipes
+  - PSBreakfastRecipes
+  - PSMothRecipes
+  - PSPastaRecipes
+  - PSDessertRecipes
+  - PSSoupRecipes
+  - PSPieRecipes
+  - PSBarsAndCookiesRecipes
+  - PSCakeRecipes
+  - PSSaladRecipes
+  - PSOtherRecipes
+  - PSMedicinalRecipes
+  - PSSecretRecipes
+
+- type: guideEntry
+  id: PSPizzaRecipes
+  name: guide-entry-pizza-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/PizzaRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSSavoryRecipes
+  name: guide-entry-savory-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/SavoryRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSBreadRecipes
+  name: guide-entry-bread-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/BreadRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSBreakfastRecipes
+  name: guide-entry-breakfast-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/BreakfastRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSMothRecipes
+  name: guide-entry-moth-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/MothRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSPastaRecipes
+  name: guide-entry-pasta-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/PastaRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSDessertRecipes
+  name: guide-entry-dessert-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/DessertRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSSoupRecipes
+  name: guide-entry-soup-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/SoupRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSPieRecipes
+  name: guide-entry-pie-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/PieRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSBarsAndCookiesRecipes
+  name: guide-entry-barsandcookies-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/BarsAndCookiesRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSCakeRecipes
+  name: guide-entry-cake-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/CakeRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSSaladRecipes
+  name: guide-entry-salad-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/SaladRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSOtherRecipes
+  name: guide-entry-other-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/OtherRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSMedicinalRecipes
+  name: guide-entry-medicinal-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/MedicinalRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSSecretRecipes
+  name: guide-entry-secret-recipes
+  text: "/ServerInfo/_PS/Guidebook/Service/SecretRecipes.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSWriting
+  name: guide-entry-writing
+  text: "/ServerInfo/_PS/Guidebook/Writing.xml"
+
+
