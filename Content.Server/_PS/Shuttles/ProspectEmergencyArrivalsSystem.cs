@@ -99,7 +99,7 @@ public sealed class ProspectEmergencyArrivalsSystem : SharedProspectEmergencyArr
         var possiblePositions = new List<EntityCoordinates>();
         while (points.MoveNext(out var uid, out var spawnPoint, out var xform))
         {
-            if (spawnPoint.SpawnType != SpawnPointType.LateJoin || xform.MapID != mapId)
+            if (xform.MapID != mapId)
                 continue;
 
             possiblePositions.Add(xform.Coordinates);

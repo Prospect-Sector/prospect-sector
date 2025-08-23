@@ -4,8 +4,8 @@
   engineVersion: 265.0.0
   forkId: ""
   forkVersion: ""
-  time: 08/23/2025 17:08:50
-  entityCount: 315
+  time: 08/23/2025 17:33:15
+  entityCount: 325
 maps: []
 grids:
 - 292
@@ -252,7 +252,7 @@ entities:
       pos: 3.5,-2.5
       parent: 292
     - type: Door
-      secondsUntilStateChange: -3912.635
+      secondsUntilStateChange: -4128.1533
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -269,7 +269,7 @@ entities:
       pos: 3.5,4.5
       parent: 292
     - type: Door
-      secondsUntilStateChange: -3914.3684
+      secondsUntilStateChange: -4129.8867
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -286,7 +286,7 @@ entities:
       pos: -4.5,4.5
       parent: 292
     - type: Door
-      secondsUntilStateChange: -3908.835
+      secondsUntilStateChange: -4124.353
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -303,7 +303,7 @@ entities:
       pos: -4.5,-2.5
       parent: 292
     - type: Door
-      secondsUntilStateChange: -3910.735
+      secondsUntilStateChange: -4126.2534
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -2657,6 +2657,60 @@ entities:
     - Anchorable
     - Construction
     - Destructible
+- proto: SpawnPointLatejoin
+  entities:
+  - uid: 316
+    components:
+    - type: Transform
+      pos: 1.5,5.5
+      parent: 292
+  - uid: 317
+    components:
+    - type: Transform
+      pos: -1.5,2.5
+      parent: 292
+  - uid: 318
+    components:
+    - type: Transform
+      pos: 0.5,0.5
+      parent: 292
+  - uid: 319
+    components:
+    - type: Transform
+      pos: -1.5,0.5
+      parent: 292
+  - uid: 321
+    components:
+    - type: Transform
+      pos: -2.5,1.5
+      parent: 292
+  - uid: 322
+    components:
+    - type: Transform
+      pos: 1.5,3.5
+      parent: 292
+  - uid: 323
+    components:
+    - type: Transform
+      pos: 1.5,-0.5
+      parent: 292
+  - uid: 324
+    components:
+    - type: Transform
+      pos: -1.5,-2.5
+      parent: 292
+  - uid: 325
+    components:
+    - type: Transform
+      pos: -2.5,4.5
+      parent: 292
+- proto: SpawnPointObserver
+  entities:
+  - uid: 320
+    components:
+    - type: Transform
+      pos: -0.5,4.5
+      parent: 292
 - proto: SubstationWallBasic
   entities:
   - uid: 77
