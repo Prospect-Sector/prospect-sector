@@ -1,5 +1,0 @@
-﻿- type: entity
-  id: BaseStationEmergencyShuttleTarget
-  abstract: true
-  components:
-  - type: ProspectEmergencyArrivalsShuttleTarget

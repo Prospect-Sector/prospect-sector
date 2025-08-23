@@ -45,11 +45,11 @@ public sealed class ProspectEmergencyArrivalsSystem : SharedProspectEmergencyArr
             before: [typeof(SpawnPointSystem)],
             after: [typeof(ContainerSpawnPointSystem)]
         );
-        SubscribeLocalEvent<ProspectEmergencyArrivalsShuttleTargetComponent, StationPostInitEvent>(OnStationPostInit);
+        SubscribeLocalEvent<ProspectEmergencyArrivalsShuttleTargetComponent, ComponentInit>(OnStationPostInit);
         Enabled = _cfgManager.GetCVar(CCVars.EmergencyArrivalsShuttle);
     }
 
-    private void OnStationPostInit(EntityUid uid, ProspectEmergencyArrivalsShuttleTargetComponent component, ref StationPostInitEvent args)
+    private void OnStationPostInit(EntityUid uid, ProspectEmergencyArrivalsShuttleTargetComponent component, ref ComponentInit args)
     {
         if (!Enabled)
             return;
@@ -63,15 +63,14 @@ public sealed class ProspectEmergencyArrivalsSystem : SharedProspectEmergencyArr
 
         var dummpMapEntity = _mapSystem.CreateMap(out var dummyMapId);
 
-        if (TryGetArrivals(out var arrivals) &&
-            _loader.TryLoadGrid(dummyMapId, component.ShuttlePath, out var shuttle))
+        if (_loader.TryLoadGrid(dummyMapId, component.ShuttlePath, out var shuttle))
         {
             component.Shuttle = shuttle.Value;
             var shuttleComp = Comp<ShuttleComponent>(component.Shuttle);
             var arrivalsComp = EnsureComp<ProspectEmergencyShuttleComponent>(component.Shuttle);
             arrivalsComp.Station = uid;
             EnsureComp<ProtectedGridComponent>(component.Shuttle);
-            _shuttles.FTLToDock(component.Shuttle, shuttleComp, arrivals, hyperspaceTime: RoundStartFTLDuration);
+            _shuttles.FTLToDock(component.Shuttle, shuttleComp, uid, hyperspaceTime: RoundStartFTLDuration);
         }
 
         // Don't start the arrivals shuttle immediately docked so power has a time to stabilise?
@@ -90,9 +89,9 @@ public sealed class ProspectEmergencyArrivalsSystem : SharedProspectEmergencyArr
         if (!HasComp<ProspectEmergencyShuttleComponent>(ev.Station))
             return;
 
-        if (!TryGetArrivals(out var arrivals) || !TryComp(arrivals, out TransformComponent? arrivalsXform))
+        if (!TryGetShuttle(out var shuttle) || !TryComp(shuttle, out TransformComponent? shuttleXform))
             return;
-        var mapId = arrivalsXform.MapID;
+        var mapId = shuttleXform.MapID;
         var points = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
 
         var possiblePositions = new List<EntityCoordinates>();
@@ -119,9 +118,9 @@ public sealed class ProspectEmergencyArrivalsSystem : SharedProspectEmergencyArr
 
     }
 
-    private bool TryGetArrivals(out EntityUid uid)
+    private bool TryGetShuttle(out EntityUid uid)
     {
-        var arrivalsQuery = EntityQueryEnumerator<ProspectEmergencyArrivalsShuttleTargetComponent>();
+        var arrivalsQuery = EntityQueryEnumerator<ProspectEmergencyShuttleComponent>();
 
         while (arrivalsQuery.MoveNext(out uid, out _))
         {
