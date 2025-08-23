@@ -8,5 +8,5 @@ public sealed partial class ProspectEmergencyArrivalsShuttleTargetComponent: Com
     [DataField("shuttle")]
     public EntityUid Shuttle;
 
-    [DataField("shuttlePath")] public ResPath ShuttlePath = new("/Maps/Shuttles/arrivals.yml");
+    [DataField("shuttlePath")] public ResPath ShuttlePath = new("/Maps/_PS/Shuttles/emercryo_8925.yml");
 }

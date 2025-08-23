@@ -86,11 +86,13 @@ public sealed class ProspectEmergencyArrivalsSystem : SharedProspectEmergencyArr
         if (!Enabled)
             return;
 
-        if (!HasComp<ProspectEmergencyShuttleComponent>(ev.Station))
+        if (!TryGetShuttleTarget(out var station))
+            return;
+        if (!TryComp<ProspectEmergencyArrivalsShuttleTargetComponent>(station, out var shuttleTargetComp))
+            return;
+        if (!TryComp(shuttleTargetComp.Shuttle, out TransformComponent? shuttleXform))
             return;
 
-        if (!TryGetShuttle(out var shuttle) || !TryComp(shuttle, out TransformComponent? shuttleXform))
-            return;
         var mapId = shuttleXform.MapID;
         var points = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
 
@@ -118,9 +120,9 @@ public sealed class ProspectEmergencyArrivalsSystem : SharedProspectEmergencyArr
 
     }
 
-    private bool TryGetShuttle(out EntityUid uid)
+    private bool TryGetShuttleTarget(out EntityUid uid)
     {
-        var arrivalsQuery = EntityQueryEnumerator<ProspectEmergencyShuttleComponent>();
+        var arrivalsQuery = EntityQueryEnumerator<ProspectEmergencyArrivalsShuttleTargetComponent>();
 
         while (arrivalsQuery.MoveNext(out uid, out _))
         {
