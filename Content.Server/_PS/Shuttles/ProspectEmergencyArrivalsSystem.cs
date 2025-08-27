@@ -116,8 +116,6 @@ public sealed class ProspectEmergencyArrivalsSystem : SharedProspectEmergencyArr
             ev.Station);
 
         EnsureComp<AutoOrientComponent>(ev.SpawnResult.Value);
-
-
     }
 
     private bool TryGetShuttleTarget(out EntityUid uid)
