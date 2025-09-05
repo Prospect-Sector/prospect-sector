@@ -1,10 +1,15 @@
-﻿using Content.Server.Parallax;
+﻿using Content.Server.GameTicking;
+using Content.Server.Parallax;
 using Content.Server.Popups;
 using Content.Server.Procedural;
 using Content.Server.Station.Systems;
+using Content.Server.Storage.EntitySystems;
 using Content.Shared._PS.Terradrop;
+using Content.Shared.Buckle;
 using Content.Shared.Construction.EntitySystems;
+using Content.Shared.Damage;
 using Content.Shared.Teleportation.Systems;
+using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
@@ -30,12 +35,19 @@ public sealed partial class TerradropSystem : SharedTerradropSystem
     [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
+    [Dependency] private readonly GameTicker _gameTicker = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly EntityStorageSystem _entityStorageSystem = default!;
+    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
+    [Dependency] private readonly SharedBuckleSystem _buckle = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         InitializeConsole();
+        InitializeMissionHandling();
     }
 
     public override void Update(float frameTime)

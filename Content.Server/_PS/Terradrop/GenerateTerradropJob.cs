@@ -46,6 +46,9 @@ public sealed class GenerateTerradropJob : Job<bool>
 
     public readonly EntityUid Station;
     public readonly EntityUid TargetPad;
+    public readonly TerradropMapPrototype MapPrototype;
+    public MapId MapId;
+    public EntityUid MapUid;
     private readonly SalvageMissionParams _missionParams;
 
     private readonly ISawmill _sawmill;
@@ -65,6 +68,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         SharedMapSystem map,
         EntityUid station,
         EntityUid targetPad,
+        TerradropMapPrototype terradropMapPrototype,
         SalvageMissionParams missionParams,
         Tile padTile,
         CancellationToken cancellation = default) : base(maxTime, cancellation)
@@ -79,6 +83,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         _map = map;
         Station = station;
         TargetPad = targetPad;
+        MapPrototype = terradropMapPrototype;
         _missionParams = missionParams;
         _padTile = padTile;
         _sawmill = logManager.GetSawmill("salvage_job");
@@ -90,24 +95,21 @@ public sealed class GenerateTerradropJob : Job<bool>
     protected override async Task<bool> Process()
     {
         _sawmill.Debug("terradrop", $"Spawning terradrop mission with seed {_missionParams.Seed}");
-        var mapUid = _map.CreateMap(out var mapId, runMapInit: false);
+        MapUid = _map.CreateMap(out var mapId, runMapInit: false);
+        MapId = mapId;
         MetaDataComponent? metadata = null;
-        var grid = _entManager.EnsureComponent<MapGridComponent>(mapUid);
+        var grid = _entManager.EnsureComponent<MapGridComponent>(MapUid);
         var random = new Random(_missionParams.Seed);
 
         _metaData.SetEntityName(
-            mapUid,
+            MapUid,
             _entManager.System<SharedSalvageSystem>()
                 .GetFTLName(_prototypeManager.Index(SalvageSystem.PlanetNames), _missionParams.Seed));
-        _entManager.AddComponent<FTLBeaconComponent>(mapUid);
-
-        var dataComponent = _entManager.GetComponent<TerradropStationComponent>(Station);
-        dataComponent.ActiveMissions.Add(mapId, mapUid);
+        _entManager.AddComponent<FTLBeaconComponent>(MapUid);
 
         // Setup mission configs
         // As we go through the config the rating will deplete so we'll go for most important to least important.
-        var difficultyId = "Moderate";
-        var difficultyProto = _prototypeManager.Index<SalvageDifficultyPrototype>(difficultyId);
+        var difficultyProto = _prototypeManager.Index(MapPrototype.SalvageDifficulty);
 
         var mission = _entManager.System<SharedSalvageSystem>()
             .GetMission(difficultyProto, _missionParams.Seed);
@@ -116,46 +118,52 @@ public sealed class GenerateTerradropJob : Job<bool>
 
         if (missionBiome.BiomePrototype != null)
         {
-            var biome = _entManager.AddComponent<BiomeComponent>(mapUid);
+            var biome = _entManager.AddComponent<BiomeComponent>(MapUid);
             var biomeSystem = _entManager.System<BiomeSystem>();
-            biomeSystem.SetTemplate(mapUid,
+            biomeSystem.SetTemplate(MapUid,
                 biome,
-                _prototypeManager.Index<BiomeTemplatePrototype>(missionBiome.BiomePrototype));
-            biomeSystem.SetSeed(mapUid, biome, mission.Seed);
-            _entManager.Dirty(mapUid, biome);
+                _prototypeManager.Index<BiomeTemplatePrototype>(MapPrototype.Biome));
+            biomeSystem.SetSeed(MapUid, biome, mission.Seed);
+            _entManager.Dirty(MapUid, biome);
 
             // Gravity
-            var gravity = _entManager.EnsureComponent<GravityComponent>(mapUid);
+            var gravity = _entManager.EnsureComponent<GravityComponent>(MapUid);
             gravity.Enabled = true;
-            _entManager.Dirty(mapUid, gravity, metadata);
+            _entManager.Dirty(MapUid, gravity, metadata);
 
             // Atmos
-            var air = _prototypeManager.Index<SalvageAirMod>(mission.Air);
+            var atmosphere = _prototypeManager.Index(MapPrototype.Atmosphere);
             // copy into a new array since the yml deserialization discards the fixed length
             var moles = new float[Atmospherics.AdjustedNumberOfGases];
-            air.Gases.CopyTo(moles, 0);
-            var atmos = _entManager.EnsureComponent<MapAtmosphereComponent>(mapUid);
-            _entManager.System<AtmosphereSystem>().SetMapSpace(mapUid, air.Space, atmos);
+            atmosphere.Gases.CopyTo(moles, 0);
+            var atmos = _entManager.EnsureComponent<MapAtmosphereComponent>(MapUid);
+
+            // If the proto cannot be found use RoomTemp as a fallback.
+            var temperature = _prototypeManager.TryIndex(MapPrototype.Temperature, out var tempProto)
+                ? tempProto
+                : _prototypeManager.Index<SalvageTemperatureMod>("RoomTemp");
+            _entManager.System<AtmosphereSystem>().SetMapSpace(MapUid, atmosphere.Space, atmos);
             _entManager.System<AtmosphereSystem>()
-                .SetMapGasMixture(mapUid, new GasMixture(moles, mission.Temperature), atmos);
+                .SetMapGasMixture(MapUid, new GasMixture(moles, temperature.Temperature), atmos);
 
             if (mission.Color != null)
             {
-                var lighting = _entManager.EnsureComponent<MapLightComponent>(mapUid);
+                var lighting = _entManager.EnsureComponent<MapLightComponent>(MapUid);
                 lighting.AmbientLightColor = mission.Color.Value;
-                _entManager.Dirty(mapUid, lighting);
+                _entManager.Dirty(MapUid, lighting);
             }
         }
 
         _map.InitializeMap(mapId);
-        //_map.SetPaused(mapUid, true);
+        //_map.SetPaused(MapUid, true);
 
         // Setup the map info for terradrop
-        var terradropMapComponent = _entManager.EnsureComponent<TerradropMapComponent>(mapUid);
-
+        var terradropMapComponent = _entManager.EnsureComponent<TerradropMapComponent>(MapUid);
+        terradropMapComponent.StationUid = Station;
+        terradropMapComponent.MapPrototype = MapPrototype;
 
         // Setup expedition
-        var expedition = _entManager.AddComponent<SalvageExpeditionComponent>(mapUid);
+        var expedition = _entManager.AddComponent<SalvageExpeditionComponent>(MapUid);
         expedition.Station = Station;
         expedition.EndTime = _timing.CurTime + mission.Duration;
         expedition.MissionParams = _missionParams;
@@ -175,7 +183,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         var dungeons = await WaitAsyncTask(
             _dungeon.GenerateDungeonAsync(
                 dungeonConfig,
-                mapUid,
+                MapUid,
                 grid,
                 (Vector2i)dungeonOffset,
                 _missionParams.Seed
@@ -201,9 +209,9 @@ public sealed class GenerateTerradropJob : Job<bool>
         // Set the tiles themselves
         var landingTile = _padTile;
 
-        foreach (var tile in _map.GetTilesIntersecting(mapUid, grid, new Circle(Vector2.Zero, landingPadRadius), false))
+        foreach (var tile in _map.GetTilesIntersecting(MapUid, grid, new Circle(Vector2.Zero, landingPadRadius), false))
         {
-            if (!_biome.TryGetBiomeTile(mapUid, grid, tile.GridIndices, out _))
+            if (!_biome.TryGetBiomeTile(MapUid, grid, tile.GridIndices, out _))
                 continue;
 
             tiles.Add((tile.GridIndices, landingTile));
@@ -227,7 +235,7 @@ public sealed class GenerateTerradropJob : Job<bool>
 
             try
             {
-                await SpawnDungeonLoot(lootProto, mapUid);
+                await SpawnDungeonLoot(lootProto, MapUid);
             }
             catch (Exception e)
             {
@@ -256,7 +264,7 @@ public sealed class GenerateTerradropJob : Job<bool>
 
             try
             {
-                await SpawnRandomEntry((mapUid, grid), entry, dungeon, random);
+                await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
             }
             catch (Exception e)
             {
@@ -288,7 +296,7 @@ public sealed class GenerateTerradropJob : Job<bool>
                             break;
 
                         _sawmill.Debug($"Spawning dungeon loot {entry.Proto}");
-                        await SpawnRandomEntry((mapUid, grid), entry, dungeon, random);
+                        await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
                     }
 
                     break;
