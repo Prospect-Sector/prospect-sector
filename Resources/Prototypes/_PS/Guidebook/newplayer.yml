@@ -1,0 +1,33 @@
+- type: guideEntry
+  id: PSNewPlayer
+  name: guide-entry-newplayer
+  priority: 0
+  text: "/ServerInfo/_PS/Guidebook/NewPlayer/NewPlayer.xml"
+  children:
+  - PSControls
+  - PSCharacterCreation
+
+- type: guideEntry
+  id: PSControls
+  name: guide-entry-controls
+  text: "/ServerInfo/_PS/Guidebook/NewPlayer/Controls/Controls.xml"
+  children:
+  - PSRadio
+
+- type: guideEntry
+  id: PSRadio
+  name: guide-entry-radio
+  text: "/ServerInfo/_PS/Guidebook/NewPlayer/Controls/Radio.xml"
+
+- type: guideEntry
+  id: PSCharacterCreation
+  name: guide-entry-charactercreation
+  text: "/ServerInfo/_PS/Guidebook/NewPlayer/CharacterCreation.xml"
+  children:
+  - PSYourFirstCharacter
+  - PSSpecies
+
+- type: guideEntry
+  id: PSYourFirstCharacter
+  name: guide-entry-yourfirstcharacter
+  text: "/ServerInfo/_PS/Guidebook/NewPlayer/YourFirstCharacter.xml"
