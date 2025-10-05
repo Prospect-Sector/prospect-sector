@@ -4,6 +4,7 @@ lobbyenabled = false
 # Dev map for faster loading & convenience
 map = "Prospect" # Prospect: Dev<Prospect
 role_timers = false
+role_loadout_timers = false
 
 [events]
 enabled = false

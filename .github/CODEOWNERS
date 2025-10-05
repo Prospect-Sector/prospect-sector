@@ -1,4 +1,4 @@
-# Last match in file takes precedence.
+﻿# Last match in file takes precedence.
 
 # Sorting by path instead of by who added it one day :(
 # this isn't how codeowners rules work pls read the first comment instead of trying to force a sorting order
