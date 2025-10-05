@@ -12,6 +12,7 @@ using Content.Shared._PS.CargoStorage.BUI;
 using Content.Shared._PS.CargoStorage.Data;
 using Content.Shared._PS.CargoStorage.Events;
 using Content.Shared._PS.CargoStorage.Systems;
+using Content.Shared.Storage.Components;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._PS.CargoStorage.Systems;
