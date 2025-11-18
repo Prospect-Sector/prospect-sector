@@ -3,7 +3,6 @@
   name: guide-entry-cargo
   text: "/ServerInfo/_PS/Guidebook/Cargo/Cargo.xml"
   children:
-  - PSCargoBounties
   - PSSalvage
 
 - type: guideEntry

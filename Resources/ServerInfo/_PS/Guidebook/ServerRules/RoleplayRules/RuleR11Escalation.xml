@@ -1,70 +1,58 @@
 ﻿<Document>
-  # Roleplay Rule 11 - Follow reasonable escalation
-  Antagonists are fully exempt from escalation rules. Non-antagonists who are in a conflict with antagonists are not exempt. Escalation should typically follow steps or a pattern of conflict types similar to:
+  # Roleplay Rule 11 – Follow Reasonable Escalation
+
+  Prospect Sector is a **cooperative progression game**, not a PvP environment.
+  Conflicts may happen through RP, but escalation must always be **proportional, justified, and controlled**.
+
+  All conflicts should begin at the **lowest appropriate level** and escalate only if the other party escalates first.
+  You may match their level of escalation, but you should not jump ahead without cause.
+
+  Escalation steps:
   - Verbal
   - Non-harmful
   - Non-lethal
   - Lethal
-  - Permanently lethal
+  - Permanently lethal (almost never justified)
 
-  All new conflicts should start at the first step. A player should not escalate a conflict across steps without some escalation from the other party involved in the conflict. Players can skip steps to match the level of escalation that the other person is at, but should almost always not skip steps other than that. Players who attempt to deescalate conflicts will be given more leniency in escalating if the other party continues to escalate despite the attempt at de-escalation. You do not have to try to deescalate conflicts, but someone who watches you over the entire round, or over multiple rounds, should not feel that your goal is generally to escalate conflicts.
+  Players who genuinely attempt to de-escalate will be given more leniency.
+  Someone observing you over multiple rounds should not feel like your character constantly seeks escalation.
 
-  Conflicts or escalation can be indirect. When someone steals someone else's ID, the theft is a direct part of the conflict, but if the victim becomes trapped as a result of not having their ID to open a door, that is also considered part of the conflict and escalation. Do not randomly steal IDs from people.
-
-  Escalation does not have to be directed at a specific player to enter them into a conflict. Nuclear operatives who are trying to destroy the station are considered to be at the permanently lethal level of conflict with all crew on the station. Someone who kills a station pet has started some degree of conflict with all crewmembers. Someone who kills a mouse that a chef was caring for has started some degree of conflict with that chef.
-
-  You will be considered to be violating this rule if you escalate a conflict based on a poor or unreasonable assumption.
-
-  Conflicts should almost never reach the "permanently lethal" stage. Conflicts should only reach this stage if the other party brought it to the stage, or if the same conflict escalated to the lethal stage multiple times in the round.
-
-  If a party in the conflict goes into crit or dies, the party responsible should take them to get treatment or to security. For the conflict, this should be considered saving someone from dying and should deescalate the conflict. If the conflict is deescalated in this way, both parties need to re-escalate to lethal for the conflict to return to that stage. If the conflict is not deescalated in this way, then only the party who defeated the other would need to re-escalate for the conflict to return to the lethal stage.
-
-  Security can immediately escalate to non-lethal force if it is necessary to arrest someone.
-
-  People using or brandishing Syndicate items can typically be presumed to have lethal intent. Someone with lethal intent can typically be immediately escalated against at a lethal level, a notable exception is if you have the tools to safely detain them.
-
-  ## Escalation Involving Animals
-  See [textlink="Escalation Involving Animals" link="RuleR11-1"].
-
-  ## Exemptions
-  Escalation rules aren't enforced against non-players, but players will be held responsible for rule violations even if they don't realize that a character or animal was controlled by another player. Characters who are disconnected are still considered players. Characters who have purple text upon being examined saying "recovery is impossible" are considered non-players.
+  ## Additional Guidelines
+  - Indirect escalation (such as stealing an ID that traps someone) counts as escalation.
+  - Conflicts rarely justify lethal force, and **almost never** justify permanently lethal actions.
+  - If someone enters crit or dies, you should take them for medical care unless there is clear IC justification not to. Doing so de-escalates the conflict.
+  - You may not escalate based on unreasonable assumptions or flimsy justification.
+  - Hostile mobs, dangerous anomalies, and similar non-player threats are exempt—but **you** are still responsible if you break rules attacking them or using them as tools.
 
   ## MRP Amendment
-  Escalation rules are enforced even against non-players.
+  Escalation rules apply even when the opposing entity is a non-player, unless clearly designated by admins.
 
   ## Examples of Conflict Types
   See [textlink="Examples of Conflict Types" link="RuleR11-2"].
 
+  ## Escalation Involving Animals
+  See [textlink="Escalation Involving Animals" link="RuleR11-1"].
+
   ## Example Scenarios
-  These examples assume that you are not an antagonist.
+  These examples assume normal cooperative gameplay.
 
-  Acceptable:
-  - A player starts punching you, so you start punching back until they stop. If they go into crit, you stop attacking them and take them to security or to get medical attention.
-  - You make fun of a clown, who then throws a pie at you and steals your shoes. You slip the clown and steal their mask.
-  - You are a security officer and tell someone to stop, so you can question them. They run away, so you use your disabler to stun and cuff them.
-  - You are a security officer and see someone wearing a syndicate hardsuit, so you shoot them to crit, cuff them, then take them to security.
-  - You are a crewmember and see a nuclear operative, so you kill them.
-  - An unauthorized person enters a high risk area of the station, like the armory or atmospherics, so you attack them until they leave.
-  - Minorly inconveniencing someone for your own benefit.
-  - As an antagonist, killing someone who got in your way.
-  - As an antagonist, killing someone who didn't give you what you want.
-  - A chef and bartender reach the lethal level of conflict through appropriate escalation. The chef crits the bartender and does not take them to medbay or security. The bartender immediately tries to crit the chef next time they run into each other.
-  - A chef and bartender reach the lethal level of conflict through appropriate escalation. The chef crits the bartender and does not take them to medbay or security. The chef insults the bartender next time they see them.
-  - A cargo technician gets a cargo bounty for a brain. After receiving a body from Medical with the purple examine text reading "Any recovery is impossible.", the cargo technician proceeds to permanently destroy the body to get the brain out.
+  ### Acceptable:
+  - Someone punches you; you punch back until they stop, then bring them to medbay.
+  - A clown pies you and steals your shoes; you slip them and take their mask in return.
+  - You use a non-lethal tool to stop someone fleeing during an RP confrontation.
+  - You stop an unauthorized person from entering a hazardous area through reasonable force.
+  - Two players escalate a dispute over time into a fistfight through proper escalation.
+  - Destroying a body only when an examine message indicates recovery is impossible.
 
-  Prohibited:
-  - A player starts punching you, so you gib them.
-  - A clown throws a pie at you and steals your shoes, so you stab them to crit with a screwdriver.
-  - You are a security officer and tell someone to stop, so you can question them. They run away so you use a truncheon to beat them to crit.
-  - An authorized person who you unreasonably or carelessly think is unauthorized enters a high risk area of the station, like the armory or atmospherics, so you attack them until they leave.
-  - An unauthorized person enters a low risk area of the station, like cargo, and you start attacking them with no other escalation.
-  - Slipping security all round because they are security.
-  - Blocking the head of personnel in their office using walls because they didn't give you what you asked for.
-  - Hiding someone's body because they punched you earlier in the round.
-  - Harassing the bar or bartender by frequently coming in to break their glasses or furniture.
-  - Randomly picking fights with people.
-  - Stealing an ID from a disconnected player as a non-antagonist.
-  - A chef and bartender reach the lethal level of conflict through appropriate escalation. The chef crits the bartender and does not take them to medbay or security. The chef immediately tries to crit the bartender next time they run into each other.
-  - A chef and bartender reach the lethal level of conflict through appropriate escalation. The chef crits the bartender and takes them to the medbay or security. The bartender immediately tries to crit the chef next time they run into each other.
-  - A cargo technician gets a cargo bounty for a brain. After finding a dead passenger in a hallway, without the body's examine text reading "Any recovery is impossible.", the cargo technician proceeds to permanently destroy the body to get the brain out.
+  ### Prohibited:
+  - Someone punches you once; you gib them.
+  - Responding to a prank or annoyance (pie, shove, insult) with stabbing or lethal force.
+  - Using lethal weapons to stop someone fleeing a conversation.
+  - Attacking someone for entering a low-risk area without escalation.
+  - Harassing a department repeatedly (breaking glasses, furniture, tools).
+  - Escalating based on bad assumptions (thinking someone is trespassing when they aren’t).
+  - Hiding or spacing bodies over minor disputes.
+  - Stealing IDs from disconnected players.
+  - Immediately restarting a lethal conflict after the other party brought you to medbay.
+
 </Document>

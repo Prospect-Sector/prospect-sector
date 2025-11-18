@@ -1,26 +1,35 @@
 <Document>
-  # Roleplay Rule 13 - Stick to your role
-  Requesting job changes is not prohibited by this rule. This rule is loosened if the station is understaffed or if there is a significant threat to you.
+  # Roleplay Rule 13 – Stick to Your Role
 
-  Don't perform other people's jobs, especially where the relevance to you personally is low. This also covers performing the role of security.
+  Each job in Prospect Sector exists to support **station progression** or **expedition gameplay**.
+  While helping others is encouraged, you should not **take over another department’s responsibilities** unless there is a clear need.
 
-  ## MRP Amendment
-  This is enforced more strictly on MRP.
+  Requesting a job change is allowed.
+  This rule is relaxed if the station is **understaffed**, during **emergencies**, or when defending yourself.
+
+  Do not:
+  - Perform another department’s core duties without reason
+  - Insert yourself into specialized roles you are not trained for
+  - Act as “security” in a game mode that has no formal security
+  - Take over critical jobs simply because you want to
+
+  This rule is enforced **more strictly on MRP**.
 
   ## Examples
-  Acceptable:
-  - As an engineer, helping the bartender remodel the bar.
-  - As a bartender, remodeling the bar.
-  - As a passenger, building a maintenance bar.
-  - As an engineer, reinforcing substations.
-  - As an engineer, increasing the security of airlocks.
-  - As an atmospherics technician, improving atmospheric systems.
-  - As a passenger, fighting nuclear operatives.
-  - As a passenger, fighting or preparing to defend yourself from someone who has been trying to kill you.
-  - As a crewmember on a station with no engineering department, you complete engineering tasks.
 
-  Prohibited:
-  - As a passenger, reinforcing substations.
-  - As a passenger, hunting for antagonists or lawbreakers.
-  - As a passenger, fighting or preparing to defend someone else from someone who has been trying to kill a random crewmember.
+  ### Acceptable:
+  - As an engineer, helping the bartender remodel or reinforce the bar.
+  - As a bartender, renovating your workspace.
+  - As a passenger, building harmless projects with provided materials.
+  - As an engineer, reinforcing substations or improving airlock security.
+  - As an atmos tech, improving atmospheric pipelines and systems.
+  - As a passenger, defending yourself from someone who is attacking you.
+  - As crew on an understaffed station, performing engineering tasks because no engineers exist.
+
+  ### Prohibited:
+  - As a passenger, reinforcing electrical infrastructure without engineering involvement.
+  - As a passenger, acting as station law enforcement or “security.”
+  - As a passenger, fighting on behalf of someone else in a situation unrelated to you.
+  - Taking over essential department work while trained staff are present and available.
+
 </Document>

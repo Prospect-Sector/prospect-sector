@@ -1,22 +1,112 @@
 ﻿<Document>
-  # Role Types
+  # Role Types (WIP)
+  Role types define how players are expected to behave within a round of Prospect Sector. They are not “good vs. evil” designations, but mechanical responsibility tags that clarify expectations, freedoms, and boundaries. The game is cooperative by design, solo-friendly, and progression-driven, so these categories exist to reduce confusion and grief, and to help players understand what they should or should not do.
 
-  ## Crew Aligned/Non-antagonist
-  In most rounds, a majority of players will be non-antagonists, meaning that they are crew aligned. This is the "default" role, if the game doesn't tell you that you are one of the other roles defined here, then you are a non-antagonist. Overall, non-antagonists are intended to work towards a net positive effect on the round.
 
-  ## Solo Antagonist
-  Certain roles are intended to cause problems for the round or for non-antagonists. You are only a solo antagonist if the game clearly and explicitly tells you that you are a solo antagonist. Antagonists are exempt from many but not all roleplay rules.
+  ## Core crew roles
+  Core Crew Roles are the standard round-to-round jobs. They include roles like Engineer, Cargo Tech, Botanist, Chef, Chaplain, Scientist, Medic, and Command positions such as QM and HoP.
 
-  ## Team Antagonist
-  Team antagonists are like solo antagonists but they have other antagonists who they are expected to not hinder, and who they may be expected to help. You are only a team antagonist if the game clearly and explicitly tells you that you are a team antagonist.
+  Expectations:
+  Work toward overall station progression and survivability.
+  Maintain or improve the station, produce goods, support expeditions, or run expeditions depending on your assignment.
+  Follow general rules and station RP expectations.
+  May participate in expeditions unless their job is explicitly needed on station (engineering upkeep, atmos stability, etc.).
 
-  ## Free Agent
-  Certain roles are free to choose if they want to behave as an antagonist or as a non-antagonist, and may change their mind whenever they'd like. You are only free agent if the game clearly and explicitly tells you that you are a free agent.
+  Core Crew roles are not “good guys,” but they default to cooperative play. Their actions should move the station toward higher expedition levels, better infrastructure, and better payout.
 
-  ## Familiar
-  Familiars are considered non-antagonists, but have instructions to obey someone. They must obey this person even if it causes them to violate roleplay rules or die. You are only a familiar if the game clearly and explicitly tells you that you are a familiar. You are only the familiar of the person the game tells you.
 
-  ## Silicon / Altered Silicon
-  Silicons have a set of laws that they must follow above all else except the core rules. You are only silicon if the game clearly and explicitly tells you that you are a silicon.
-  Altered Silicons are functionally identical, this role is used to highlight law-sets that have been hacked, corrupted or are otherwise considered non-standard or dangerous.
+  ## Station Support Specialists
+  These are roles whose mechanical purpose is to enhance station-side progression. They typically do not need to enter expeditions at all, though they may if the situation allows.
+
+  Examples:
+  Engineer, Atmos Tech, Cargo Tech, Quartermaster, Science Staff, Chef, Botanist, Musician, Chaplain.
+
+  Expectations:
+  Maintain vital systems such as power, atmos, construction, and production lines.
+  Provide consumables, upgrades, gear enhancement, food buffs, materials, and research that improve the expedition team.
+  React to station events (meteors, damage, fires, power outages).
+  Their absence can visibly weaken the station’s ability to progress.
+
+  These roles have high responsibility, but not increased authority. They simply matter mechanically.
+
+
+  ## Expedition Roles
+  These roles are built primarily for expedition gameplay and are expected to leave the station regularly.
+
+  Examples:
+  Miner, Salvager, Explorer, Security-adjacent expedition combat roles (if added later).
+
+  Expectations:
+  Participate in expeditions, obtain loot, secure materials, and increase the global difficulty unlocks.
+  Understand expedition tiering and survivability.
+  Cooperate with the station team by returning loot to cargo storage and distributing gear fairly.
+
+  Expeditions are capped at short sessions (up to ~15 minutes), so they may rotate between station duties and expeds.
+  Expedition roles progress the run by unlocking stronger drops and expanding the station’s capabilities.
+
+
+  ## Command Roles
+  Command Roles guide the flow of the round, but do not have unchecked authority.
+
+  Examples:
+  Head of Personnel, Quartermaster, Captain.
+
+  Expectations:
+  Coordinate departments, set bounties, and decide priorities for expansion, repairs, and materials.
+  Manage the bounty pool responsibly (not for personal enrichment).
+  Practice leadership rather than micromanagement.
+  Provide clear directives for crews rebuilding the station.
+
+  Command roles exist to enable the station, not dominate it.
+
+
+  ## Free-Roam / Utility Roles
+  These roles have no single required gameplay loop and can freely shift between station work and expeditions.
+
+  Examples:
+  Assistant, Maintenance Worker, Hobbyist roles (Clown, Mime, Musician).
+
+  Expectations:
+  May contribute anywhere: hauling, small repairs, minor production, or joining expeditions.
+  Should not obstruct core station functions (e.g., blocking engineering).
+  Not required to specialize, but expected to participate meaningfully in some form.
+
+  Utility roles are great for new players, solo players, or people who want variety.
+
+
+  ## Bound Roles
+  Bound Roles are mechanically restricted by a system or another player and cannot freely deviate from it.
+
+  Examples:
+  AI-equivalent roles (Silicon) if added: must obey their lawset.
+  Familiars or bonded companions (if implemented): must obey their designated player.
+
+  Expectations:
+  Follow their binding without exception unless it breaks core game rules.
+  Cannot ignore their constraints for personal convenience.
+
+  These roles exist to create unique playstyles, not power imbalance.
+
+
+  ## Disruptive Roles (Scripted, Not Player-Assigned)
+  Prospect Sector does not use traitors, grief roles, or antagonist slots. Any hostile force comes from:
+
+  environmental events,
+  AI malfunctions (if coded as an NPC effect),
+  hostile fauna in expeditions,
+  random damage to the derelict station.
+
+  Players are never assigned a role whose purpose is to destroy gameplay for others.
+
+  ## Solo Mode Roles
+  When playing without other players, any role becomes effectively “Solo Mode.”
+
+  Expectations:
+  No RP or mechanical restrictions apply—solo players may access any system since they must progress alone.
+
+  All job roles are purely functional in this mode.
+
+  This ensures the game remains fully playable even with only one person online.
+
+
 </Document>

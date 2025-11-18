@@ -13,21 +13,14 @@
   name: guide-entry-rules-core-only
   ruleEntry: true
   priority: 10
-  text: "/ServerInfo/_PS/Guidebook/ServerRules/WizDenCoreOnlyRules.xml"
-
-- type: guideEntry
-  id: PSStandardRuleset
-  name: guide-entry-rules-lrp
-  ruleEntry: true
-  priority: 10
-  text: "/ServerInfo/_PS/Guidebook/ServerRules/WizDenLRPRules.xml"
+  text: "/ServerInfo/_PS/Guidebook/ServerRules/ProspectCoreOnlyRules.xml"
 
 - type: guideEntry
   id: PSMRPRuleset
   name: guide-entry-rules-mrp
   ruleEntry: true
   priority: 10
-  text: "/ServerInfo/_PS/Guidebook/ServerRules/WizDenMRPRules.xml"
+  text: "/ServerInfo/_PS/Guidebook/ServerRules/ProspectMRPRules.xml"
 
 - type: guideEntry
   id: PSRoleTypes
