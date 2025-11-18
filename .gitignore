@@ -306,3 +306,6 @@ Resources/MapImages
 
 # Direnv stuff
 .direnv/
+
+# Prospect: Ignore codeowners file to stop getting merge conflicts
+.github/CODEOWNERS

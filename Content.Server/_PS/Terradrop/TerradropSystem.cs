@@ -7,7 +7,7 @@ using Content.Server.Storage.EntitySystems;
 using Content.Shared._PS.Terradrop;
 using Content.Shared.Buckle;
 using Content.Shared.Construction.EntitySystems;
-using Content.Shared.Damage;
+using Content.Shared.Damage.Systems;
 using Content.Shared.Teleportation.Systems;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;

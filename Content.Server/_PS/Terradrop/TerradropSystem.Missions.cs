@@ -2,6 +2,7 @@
 using Content.Server.Salvage.Expeditions;
 using Content.Shared._PS.Terradrop;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Components;
 using Content.Shared.FixedPoint;
 using Content.Shared.Ghost;
 using Content.Shared.Humanoid;
@@ -54,7 +55,7 @@ public sealed partial class TerradropSystem
 
                 // Kill the player
                 if (TryComp<MobStateComponent>(playerUid, out var mobState) &&
-                    TryComp<DamageableComponent>(playerUid, out var damageable))
+                    TryComp<DamageableComponent>(playerUid, out _))
                 {
                     if (mobState.CurrentState != MobState.Dead)
                     {
@@ -65,7 +66,6 @@ public sealed partial class TerradropSystem
 
                         _damageableSystem.SetDamage(
                             playerUid,
-                            damageable,
                             new DamageSpecifier(prototype, FixedPoint2.New(mapComponent.MapPrototype.ReturnDamageAmount))
                         );
                     }
