@@ -1,0 +1,136 @@
+<Document>
+  # Cargo
+
+  The Supply department — commonly referred to as [color=cyan]Cargo[/color] — is responsible for keeping the station supplied with **raw materials**, **processed goods**, and **printed components**.
+  Cargo works closely with Salvage to ensure the station always has the resources needed for construction, repairs, research, and everyday crew needs.
+
+  Unlike traditional stations, this facility does **not** use currency, bounties, or sales systems.
+  Cargo’s value comes from **resource management**, **logistics**, and **material processing**.
+
+  -------------------------------------------------------------
+
+  ## Personnel
+
+  Cargo consists of:
+  - [color=cyan]Cargo Technicians[/color] — logistics, storage, printing, processing
+  - [color=cyan]Salvage Specialists[/color] — wreck recovery, material acquisition
+  - Led by the [color=cyan]Quartermaster[/color] — department management &amp; supply oversight
+
+  <Box>
+    <GuideEntityEmbed Entity="ToyFigurineCargoTech" Caption="Cargo Tech"/>
+    <GuideEntityEmbed Entity="ToyFigurineSalvage" Caption="Salvage"/>
+    <GuideEntityEmbed Entity="ToyFigurineQuartermaster" Caption="Quartermaster"/>
+  </Box>
+
+  -------------------------------------------------------------
+
+  ## What Cargo Does
+
+  Cargo has three core responsibilities:
+
+  ### [color=cyan]1. Acquire Raw Materials[/color]
+  Cargo gathers resources primarily by:
+  - Using the **salvage magnet** to pull in wrecks
+  - Recovering debris, scrap, and ore during salvage expeditions
+
+  <Box>
+    <GuideEntityEmbed Entity="SalvageMagnet"/>
+    <GuideEntityEmbed Entity="OreBox"/>
+    <GuideEntityEmbed Entity="OreBag"/>
+    <GuideEntityEmbed Entity="OreIron"/>
+  </Box>
+
+  ### [color=cyan]2. Process Materials[/color]
+  Once raw materials are collected, Cargo converts them into usable forms using:
+  - The **material processor**
+  - The **lathe** (for sheets, rods, parts, and components)
+
+  Cargo ensures the entire station has access to:
+  - Metal &amp; glass sheets
+  - Plasteel
+  - Electronics
+  - Machine parts
+  - Tools &amp; structural materials
+
+  <Box>
+    <GuideEntityEmbed Entity="Autolathe"/>
+    <GuideEntityEmbed Entity="SheetSteel"/>
+    <GuideEntityEmbed Entity="SheetPlasteel"/>
+  </Box>
+
+  ### [color=cyan]3. Print &amp; Deliver Components[/color]
+  Cargo prints parts and components requested by station departments.
+  Cargo Technicians must:
+  - Keep lathes stocked
+  - Process ore quickly
+  - Deliver printed items and materials
+  - Maintain a healthy reserve of raw resources
+
+  The Quartermaster may prioritize essential requests during low supply periods.
+
+  -------------------------------------------------------------
+
+  ## Storage System
+
+  Cargo has access to a unique **high-capacity storage system**.
+  This system allows the department to store:
+  - Processed materials
+  - Most raw ores
+  - Common building supplies
+  - Bulk components
+
+  Not everything can be stored, but **raw materials and basic components almost always can**.
+
+  The storage system enables Cargo to:
+  - Stockpile large reserves
+  - Retrieve stored goods during construction spikes
+  - Ensure consistent material availability
+  - Efficiently support engineering, science, and medical fabrication requests
+
+  <Box>
+    <GuideEntityEmbed Entity="CargoStorageUnit"/>
+    <GuideEntityEmbed Entity="StorageConsole"/>
+    <GuideEntityEmbed Entity="CrateGenericPlastic"/>
+  </Box>
+
+  -------------------------------------------------------------
+
+  ## How to Operate Cargo Effectively
+
+  ### Keep the Magnet Busy
+  Regularly pull wrecks to keep supplies flowing. Communicate with Salvage on when to launch recovery.
+
+  ### Process Immediately
+  Ore sitting in a pile helps nobody. Convert it quickly into usable sheets or components.
+
+  ### Maintain Stock Levels
+  Ensure the station never runs out of:
+  - Metal
+  - Glass
+  - Plastic
+  - Electronics
+  - Machine parts
+
+  ### Respond to Crew Needs
+  When someone needs something printed or supplied, Cargo should:
+  - Check the storage system
+  - Print required components
+  - Deliver the items or make them available for pickup
+
+  -------------------------------------------------------------
+
+  ## Cargo’s Purpose
+
+  Cargo’s mission is not profit — it is **support**.
+
+  Cargo ensures:
+  - The station has the materials needed to function
+  - Departments can construct, repair, and fabricate
+  - Salvage can operate efficiently
+  - Engineering always has structural materials
+  - Science and Medical have access to printed components
+  - Crew have the tools and parts needed for their tasks
+
+  A strong Cargo team enables the whole station to thrive.
+
+</Document>

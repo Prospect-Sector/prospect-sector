@@ -1,0 +1,73 @@
+<Document>
+  # Welcome to Space Station 14!
+
+  Your shift has begun aboard an isolated installation in the Prospect Sector.
+  Here, scattered outposts survive on teamwork, routine, and the grit of the crews who keep them running.
+  Every round, you and your fellow crewmates write the story of your station through your choices, teamwork, and problem-solving.
+
+  [bold]Please follow all server rules.[/bold]
+  If you need help or need to report an issue, contact the
+  [color=#EB2D3A][bold]admin team[/bold][/color] through the [bold]Admin Help menu[/bold]
+  ([italic]press [/italic][color=yellow][bold][keybind="OpenAHelp"][/bold][/color]).
+
+  Detailed guides for **jobs**, **departments**, and **mechanics** can be found
+  [textlink="here." link="SS14"/]
+
+  You can reopen this guide at any time using
+  [color=yellow][bold][keybind="OpenGuidebook"][/bold][/color].
+
+  -------------------------------------------------------------
+
+  ## Basic Controls
+  These are the core actions you'll use throughout normal play:
+
+  - Move with
+  [color=yellow][bold][keybind="MoveUp"][keybind="MoveLeft"][keybind="MoveDown"][keybind="MoveRight"][/bold][/color].
+  Hold [color=yellow][bold][keybind="Walk"][/bold][/color] to walk.
+
+  - Examine objects and people with
+  [color=yellow][bold][keybind="ExamineEntity"][/bold][/color].
+
+  - Interact with your surroundings using
+  [color=yellow][bold][keybind="Use"][/bold][/color].
+
+  - Open the **context menu** by hovering over something and pressing
+  [color=yellow][bold][keybind="UseSecondary"][/bold][/color].
+
+  - Swap hands with
+  [color=yellow][bold][keybind="SwapHands"][/bold][/color],
+  and activate the currently held item with
+  [color=yellow][bold][keybind="ActivateItemInHand"][/bold][/color].
+
+  - Drop items with
+  [color=yellow][bold][keybind="Drop"][/bold][/bold][/color]
+  or throw them with
+  [color=yellow][bold][keybind="ThrowItemInHand"][/bold][/color].
+
+  - Pull objects using
+  [color=yellow][bold][keybind="TryPullObject"][/bold][/color]
+  and release them with
+  [color=yellow][bold][keybind="ReleasePulledObject"][/bold][/color].
+
+  A full list of controls can be found on the
+  [textlink="controls" link="Controls"] page.
+
+  -------------------------------------------------------------
+
+  ## Life in the Prospect Sector
+  Space Station 14, in the context of the Prospect Sector, is one of many remote installations operating far from stable supply lines.
+  Stations rely heavily on their crew to maintain systems, gather resources, and adapt to hazards that appear without warning.
+
+  Each shift brings:
+  - New challenges as systems degrade or events unfold
+  - Changing crew needs based on the tasks and threats of the moment
+  - Opportunities to collaborate, specialize, and support your department
+  - A highly simulated environment where small decisions ripple outward
+
+  The game is an [italic]open-source project[/italic] maintained by volunteers and receives
+  [color=lime]frequent updates[/color]. Such rapid development means the game may occasionally be
+  [color=#EB2D3A][bold]unstable.[/bold][/color]
+
+  [italic]If you find bugs or want to contribute to development, join the community Discord and learn how to get involved.[/italic]
+
+</Document>

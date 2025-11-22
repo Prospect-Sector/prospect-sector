@@ -1,0 +1,31 @@
+- type: guideEntry
+  id: PSService
+  name: guide-entry-service
+  text: "/ServerInfo/_PS/Guidebook/Service/Service.xml"
+  filterEnabled: True
+  children:
+  - PSBartender
+  - PSBotany
+  - PSChef
+  - PSJanitorial
+
+- type: guideEntry
+  id: PSBartender
+  name: guide-entry-bartender
+  text: "/ServerInfo/_PS/Guidebook/Service/Bartender.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSBotany
+  name: guide-entry-botany
+  text: "/ServerInfo/_PS/Guidebook/Service/Botany.xml"
+
+- type: guideEntry
+  id: PSChef
+  name: guide-entry-chef
+  text: "/ServerInfo/_PS/Guidebook/Service/Chef.xml"
+
+- type: guideEntry
+  id: PSJanitorial
+  name: guide-entry-janitorial
+  text: "/ServerInfo/_PS/Guidebook/Service/Janitorial.xml"

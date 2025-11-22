@@ -1,0 +1,11 @@
+- type: guideEntry
+  id: PSCargo
+  name: guide-entry-cargo
+  text: "/ServerInfo/_PS/Guidebook/Cargo/Cargo.xml"
+  children:
+  - PSSalvage
+
+- type: guideEntry
+  id: PSSalvage
+  name: guide-entry-salvage
+  text: "/ServerInfo/_PS/Guidebook/Cargo/Salvage.xml"

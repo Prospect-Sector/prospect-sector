@@ -1,0 +1,19 @@
+- type: guideEntry
+  id: PSSS14
+  name: guide-entry-ss14
+  priority: 20
+  text: "/ServerInfo/_PS/Guidebook/SpaceStation14.xml"
+  children:
+  - PSJobs
+  - PSSurvival
+  - PSGlossary
+
+- type: guideEntry
+  id: PSGlossary
+  name: guide-entry-glossary
+  text: "/ServerInfo/_PS/Guidebook/Glossary.xml"
+
+- type: guideEntry
+  id: PSSurvival
+  name: guide-entry-survival
+  text: "/ServerInfo/_PS/Guidebook/Survival.xml"

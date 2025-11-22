@@ -1,0 +1,178 @@
+<Document>
+
+  # Crime Listing (Prospect Sector)
+  These are the only crimes recognized aboard Prospect Sector.
+  They are designed for survival-based gameplay, expedition safety, and maintaining a cooperative environment.
+
+  Crimes are categorized based on severity and type.
+  All punishments remain **non-punitive** (warnings, demotions, confiscation, relocation).
+
+  -------------------------------------------------------------
+  [color=#a4885c]## Violent Crimes[/color]
+  -------------------------------------------------------------
+
+  <box color="#3b1f1f">
+    <header color="#a4885c">1-01: Murder</header>
+    <desc>Killing another player intentionally without valid escalation or self-defense.</desc>
+  </box>
+
+  <box color="#3b1f1f">
+    <header color="#a4885c">1-02: Attempted Murder</header>
+    <desc>Actions clearly intended to kill: multiple lethal attacks, trapping someone in a deadly environment, or using
+      expedition weapons on crew.
+    </desc>
+  </box>
+
+  <box color="#3b1f1f">
+    <header color="#a4885c">1-03: Manslaughter</header>
+    <desc>Causing death through reckless behavior, extreme negligence, or misuse of hazardous equipment.</desc>
+  </box>
+
+  <box color="#3b1f1f">
+    <header color="#a4885c">1-04: Severe Assault</header>
+    <desc>Inflicting major injury with weapons or dangerous tools outside reasonable escalation.</desc>
+  </box>
+
+  -------------------------------------------------------------
+  [color=#a4885c]## Dangerous Equipment Misuse[/color]
+  -------------------------------------------------------------
+
+  <table>
+    <tr>
+      <th color="#a4885c">Crime</th>
+      <th color="#a4885c">Description</th>
+    </tr>
+
+    <tr>
+      <td>2-01</td>
+      <td>
+        <b>Unauthorized Expedition Gear Display:</b>
+        Carrying visible dangerous weapons/armor outside the Terradrop zone without an active emergency.
+      </td>
+    </tr>
+
+    <tr>
+      <td>2-02</td>
+      <td>
+        <b>Reckless Use of Hazardous Tools:</b>
+        Using dangerous equipment in a way that endangers crew or damages station areas.
+      </td>
+    </tr>
+
+    <tr>
+      <td>2-03</td>
+      <td>
+        <b>Unsafe Projectile/Explosive Use:</b>
+        Firing weapons or using explosives in station areas without emergency justification.
+      </td>
+    </tr>
+  </table>
+
+  -------------------------------------------------------------
+  [color=#a4885c]## Tampering, Theft, and Sabotage[/color]
+  -------------------------------------------------------------
+
+  <box color="#212d3b">
+    <header color="#a4885c">3-01: Grand Theft (Expedition Critical)</header>
+    <desc>Theft of essential expedition gear, Terradrop components, reactor systems, medical lifesaving equipment, or
+      major departmental tools.
+    </desc>
+  </box>
+
+  <box color="#212d3b">
+    <header color="#a4885c">3-02: Sabotage of Life-Critical Systems</header>
+    <desc>Disabling atmos, power, Terradrop components, life support, or survival-essential comms.</desc>
+  </box>
+
+  <box color="#212d3b">
+    <header color="#a4885c">3-03: Sabotage of Expedition Operations</header>
+    <desc>Tampering with suits, supplies, Terradrop loading, or gear required for expedition survival.</desc>
+  </box>
+
+  <box color="#212d3b">
+    <header color="#a4885c">3-04: High-Risk Trespass</header>
+    <desc>Entering restricted areas (reactor, atmos, Terradrop internals, command offices) in a way that threatens
+      safety.
+    </desc>
+  </box>
+
+  -------------------------------------------------------------
+  [color=#a4885c]## Kidnapping, Restraint, and Detainment[/color]
+  -------------------------------------------------------------
+
+  <table>
+    <tr>
+      <th color="#a4885c">Crime</th>
+      <th color="#a4885c">Description</th>
+    </tr>
+
+    <tr>
+      <td>4-01</td>
+      <td>
+        <b>Kidnapping / Non-Emergency Detainment:</b>
+        Restricting or isolating someone without escalation, consent, or immediate safety need.
+      </td>
+    </tr>
+
+    <tr>
+      <td>4-02</td>
+      <td>
+        <b>Abuse of Restraints:</b>
+        Keeping someone restrained after the threat has ended.
+      </td>
+    </tr>
+  </table>
+
+  -------------------------------------------------------------
+  [color=#a4885c]## Grave Risk Crimes[/color]
+  -------------------------------------------------------------
+
+  <box color="#3b2a1f">
+    <header color="#a4885c">5-01: Prevention of Revival</header>
+    <desc>Hiding, spacing, or destroying bodies in a way that prevents medical recovery.</desc>
+  </box>
+
+  <box color="#3b2a1f">
+    <header color="#a4885c">5-02: Station-Wide Destruction</header>
+    <desc>Catastrophic harmful actions: large-scale venting, mass power sabotage, or triggering hazardous devices
+      without emergency need.
+    </desc>
+  </box>
+
+  -------------------------------------------------------------
+  [color=#a4885c]## Contraband (Expedition Context Only)[color]
+  -------------------------------------------------------------
+
+  <table>
+    <tr>
+      <th color="#a4885c">Code</th>
+      <th color="#a4885c">Description</th>
+    </tr>
+
+    <tr>
+      <td>6-01</td>
+      <td>
+        <b>Prohibited Hazard Transport:</b>
+        Bringing extremely dangerous expedition items into civilian areas.
+      </td>
+    </tr>
+
+    <tr>
+      <td>6-02</td>
+      <td>
+        <b>Concealed Hazardous Storage:</b>
+        Hiding dangerous gear where untrained crew may find or misuse it.
+      </td>
+    </tr>
+  </table>
+
+  -------------------------------------------------------------
+  [color=#a4885c]## Notes[/color]
+  -------------------------------------------------------------
+  - These crimes are **roleplay tools**, not punishments.
+  - Only temporary containment, demotion, confiscation, or relocation are allowed.
+  - There is no brig, execution, or long-term imprisonment.
+  - Escalation rules and RP context always take priority.
+  - Command determines relevance through IC judgment.
+
+</Document>
