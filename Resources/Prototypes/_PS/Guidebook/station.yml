@@ -6,7 +6,6 @@
   children:
   - PSJobs
   - PSSurvival
-  - PSAntagonists
   - PSGlossary
 
 - type: guideEntry

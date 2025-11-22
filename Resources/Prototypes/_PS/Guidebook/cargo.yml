@@ -6,11 +6,6 @@
   - PSSalvage
 
 - type: guideEntry
-  id: PSCargoBounties
-  name: guide-entry-cargo-bounties
-  text: "/ServerInfo/_PS/Guidebook/Cargo/CargoBounties.xml"
-
-- type: guideEntry
   id: PSSalvage
   name: guide-entry-salvage
   text: "/ServerInfo/_PS/Guidebook/Cargo/Salvage.xml"
