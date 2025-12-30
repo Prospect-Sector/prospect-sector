@@ -1,0 +1,160 @@
+# Item Affixes
+# These can appear on items based on their rarity tier
+
+# Damage affixes
+- type: itemAffix
+  id: MeleeDamage
+  name: affix-melee-damage
+  description: affix-melee-damage-desc
+  effectType: MeleeDamage
+  minValue: 1
+  maxValue: 5
+  validSlots: [gloves]
+  weaponOnly: true
+
+- type: itemAffix
+  id: RangedDamage
+  name: affix-ranged-damage
+  description: affix-ranged-damage-desc
+  effectType: RangedDamage
+  minValue: 1
+  maxValue: 5
+  validSlots: [gloves]
+  weaponOnly: true
+
+- type: itemAffix
+  id: ElementalDamage
+  name: affix-elemental-damage
+  description: affix-elemental-damage-desc
+  effectType: ElementalDamage
+  minValue: 5
+  maxValue: 10
+  validSlots: [gloves]
+  weaponOnly: true
+
+# Defensive affixes
+- type: itemAffix
+  id: Dodge
+  name: affix-dodge
+  description: affix-dodge-desc
+  effectType: Dodge
+  minValue: 1
+  maxValue: 5
+  validSlots: [shoes]
+
+- type: itemAffix
+  id: MoveSpeed
+  name: affix-movespeed
+  description: affix-movespeed-desc
+  effectType: MoveSpeed
+  minValue: 1
+  maxValue: 5
+  validSlots: [shoes]
+
+- type: itemAffix
+  id: BlockChance
+  name: affix-block-chance
+  description: affix-block-chance-desc
+  effectType: BlockChance
+  minValue: 1
+  maxValue: 5
+  validSlots: [belt]  # shields
+
+- type: itemAffix
+  id: Armor
+  name: affix-armor
+  description: affix-armor-desc
+  effectType: Armor
+  minValue: 1
+  maxValue: 5
+  validSlots: [outerClothing, head, gloves, shoes, mask, neck, belt]
+
+# Utility affixes
+- type: itemAffix
+  id: CritChance
+  name: affix-crit-chance
+  description: affix-crit-chance-desc
+  effectType: CritChance
+  minValue: 1
+  maxValue: 5
+  validSlots: [gloves, mask]
+  weaponOnly: true
+
+- type: itemAffix
+  id: LootRarity
+  name: affix-loot-rarity
+  description: affix-loot-rarity-desc
+  effectType: LootRarity
+  minValue: 1
+  maxValue: 5
+  validSlots: [mask, gloves, shoes, neck, head, belt]
+
+- type: itemAffix
+  id: HpThreshold
+  name: affix-hp-threshold
+  description: affix-hp-threshold-desc
+  effectType: HpThreshold
+  minValue: 1
+  maxValue: 3
+  validSlots: [outerClothing, neck, gloves, shoes, mask, belt]
+
+# Stat affixes
+- type: itemAffix
+  id: StrengthBonus
+  name: affix-strength
+  description: affix-strength-desc
+  effectType: StatBonus
+  affectedStat: Strength
+  minValue: 1
+  maxValue: 3
+  validSlots: [outerClothing, gloves, head, shoes, mask, neck]
+
+- type: itemAffix
+  id: DexterityBonus
+  name: affix-dexterity
+  description: affix-dexterity-desc
+  effectType: StatBonus
+  affectedStat: Dexterity
+  minValue: 1
+  maxValue: 3
+  validSlots: [outerClothing, gloves, head, shoes, mask, neck]
+
+- type: itemAffix
+  id: AgilityBonus
+  name: affix-agility
+  description: affix-agility-desc
+  effectType: StatBonus
+  affectedStat: Agility
+  minValue: 1
+  maxValue: 3
+  validSlots: [outerClothing, gloves, head, shoes, mask, neck]
+
+- type: itemAffix
+  id: FortitudeBonus
+  name: affix-fortitude
+  description: affix-fortitude-desc
+  effectType: StatBonus
+  affectedStat: Fortitude
+  minValue: 1
+  maxValue: 3
+  validSlots: [outerClothing, gloves, head, shoes, mask, neck]
+
+- type: itemAffix
+  id: IntelligenceBonus
+  name: affix-intelligence
+  description: affix-intelligence-desc
+  effectType: StatBonus
+  affectedStat: Intelligence
+  minValue: 1
+  maxValue: 3
+  validSlots: [outerClothing, gloves, head, shoes, mask, neck]
+
+- type: itemAffix
+  id: LuckBonus
+  name: affix-luck
+  description: affix-luck-desc
+  effectType: StatBonus
+  affectedStat: Luck
+  minValue: 1
+  maxValue: 3
+  validSlots: [outerClothing, gloves, head, shoes, mask, neck]

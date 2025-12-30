@@ -1,0 +1,211 @@
+# Prospect Sector - Melee Weapons with Stats
+# These weapons use the ItemStats system for rarity and affixes
+
+# Base melee weapon with stats support
+- type: entity
+  id: PSBaseMeleeWeapon
+  parent: BaseItem
+  abstract: true
+  components:
+  - type: Sharp
+  - type: MeleeWeapon
+    wideAnimationRotation: -135
+    damage:
+      types:
+        Slash: 8
+    soundHit:
+      path: /Audio/Weapons/bladeslice.ogg
+  - type: Item
+    size: Normal
+  - type: Sprite
+  - type: ItemStats
+    rarity: Uncommon
+
+# Kitchen Knife - Basic utility knife
+- type: entity
+  id: PSKitchenKnife
+  parent: PSBaseMeleeWeapon
+  name: kitchen knife
+  description: A general purpose knife. Not particularly lethal, but gets the job done.
+  components:
+  - type: Tag
+    tags:
+    - Knife
+    - KitchenKnife
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/kitchen_knife.rsi
+    state: icon
+  - type: Item
+    sprite: Objects/Weapons/Melee/kitchen_knife.rsi
+    size: Small
+  - type: Utensil
+    types:
+    - Knife
+  - type: Tool
+    qualities:
+    - Slicing
+    useSound:
+      path: /Audio/Items/Culinary/chop.ogg
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 6
+  - type: ItemStats
+    rarity: Uncommon
+    weaponDamageMultiplier: 1.0
+    statBonuses:
+      Dexterity: 1
+
+# Combat Knife - Standard issue military knife
+- type: entity
+  id: PSCombatKnife
+  parent: PSBaseMeleeWeapon
+  name: combat knife
+  description: A military-grade combat knife. Balanced for both throwing and close combat.
+  components:
+  - type: Tag
+    tags:
+    - Knife
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/combatknife.rsi
+    state: icon
+  - type: Item
+    sprite: Objects/Weapons/Melee/combatknife.rsi
+    size: Small
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 10
+        Piercing: 2
+  - type: ItemStats
+    rarity: Rare
+    weaponDamageMultiplier: 1.08
+    statBonuses:
+      Strength: 2
+      Dexterity: 1
+    affixes:
+    - affixId: MeleeDamage
+      value: 2.5
+
+# Machete - Heavy slashing weapon
+- type: entity
+  id: PSMachete
+  parent: PSBaseMeleeWeapon
+  name: machete
+  description: A large, heavy blade designed for clearing brush... or enemies.
+  components:
+  - type: Tag
+    tags:
+    - Knife
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/machete.rsi
+    state: icon
+  - type: Item
+    sprite: Objects/Weapons/Melee/machete.rsi
+  - type: MeleeWeapon
+    attackRate: 0.9
+    damage:
+      types:
+        Slash: 14
+  - type: ItemStats
+    rarity: Rare
+    weaponDamageMultiplier: 1.12
+    statBonuses:
+      Strength: 3
+    affixes:
+    - affixId: MeleeDamage
+      value: 3.2
+
+# Claymore - Heavy two-handed sword
+- type: entity
+  id: PSClaymore
+  parent: PSBaseMeleeWeapon
+  name: claymore
+  description: A massive two-handed sword. Slow but devastating.
+  components:
+  - type: Tag
+    tags:
+    - Knife
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/claymore.rsi
+    state: icon
+  - type: Item
+    sprite: Objects/Weapons/Melee/claymore.rsi
+    size: Large
+  - type: MeleeWeapon
+    attackRate: 0.7
+    damage:
+      types:
+        Slash: 20
+  - type: ItemStats
+    rarity: Exotic
+    weaponDamageMultiplier: 1.22
+    statBonuses:
+      Strength: 4
+      Fortitude: 2
+    affixes:
+    - affixId: MeleeDamage
+      value: 4.0
+    - affixId: CritChance
+      value: 2.8
+
+# Katana - Fast precision blade
+- type: entity
+  id: PSKatana
+  parent: PSBaseMeleeWeapon
+  name: katana
+  description: A curved blade designed for quick, precise strikes.
+  components:
+  - type: Tag
+    tags:
+    - Knife
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/katana.rsi
+    state: icon
+  - type: Item
+    sprite: Objects/Weapons/Melee/katana.rsi
+  - type: MeleeWeapon
+    attackRate: 1.3
+    damage:
+      types:
+        Slash: 12
+  - type: ItemStats
+    rarity: Exotic
+    weaponDamageMultiplier: 1.18
+    statBonuses:
+      Dexterity: 4
+      Agility: 2
+    affixes:
+    - affixId: CritChance
+      value: 4.5
+    - affixId: MeleeDamage
+      value: 2.5
+
+# Fire Axe - Heavy utility/combat weapon
+- type: entity
+  id: PSFireAxe
+  parent: PSBaseMeleeWeapon
+  name: fire axe
+  description: A heavy axe used by firefighters. Equally effective against doors and hostiles.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/fireaxe.rsi
+    state: icon
+  - type: Item
+    sprite: Objects/Weapons/Melee/fireaxe.rsi
+    size: Large
+  - type: MeleeWeapon
+    attackRate: 0.8
+    damage:
+      types:
+        Slash: 16
+        Blunt: 4
+  - type: ItemStats
+    rarity: Rare
+    weaponDamageMultiplier: 1.10
+    statBonuses:
+      Strength: 3
+      Fortitude: 1
+    affixes:
+    - affixId: MeleeDamage
+      value: 3.0

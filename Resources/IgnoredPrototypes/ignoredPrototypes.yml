@@ -6,3 +6,7 @@
 #
  - /Prototypes/Guidebook
  - /Prototypes/Catalog/uplink_catalog.yml
+
+# Prospect: PS equipment exists alongside upstream items as stat-enhanced alternatives
+# for the expedition/loot system. We don't ignore upstream equipment to avoid breaking
+# migrations, loadouts, maps, lockers, and other references.

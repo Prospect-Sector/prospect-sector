@@ -1,0 +1,294 @@
+# Prospect Sector - Ranged Weapons with Stats
+# These weapons use the ItemStats system for rarity and affixes
+
+# Base pistol with stats support
+- type: entity
+  id: PSBaseWeaponPistol
+  parent: BaseItem
+  abstract: true
+  components:
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-0
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: Item
+    size: Small
+    shape:
+    - 0,0,1,0
+    - 0,1,0,1
+    storedOffset: 0,-4
+  - type: Tag
+    tags:
+    - Sidearm
+  - type: Clothing
+    quickEquip: false
+    slots:
+    - suitStorage
+    - Belt
+  - type: Gun
+    fireRate: 4
+    selectedMode: SemiAuto
+    availableModes:
+    - SemiAuto
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/pistol.ogg
+  - type: ChamberMagazineAmmoProvider
+    soundRack:
+      path: /Audio/Weapons/Guns/Cock/pistol_cock.ogg
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        name: Magazine
+        startingItem: MagazinePistol
+        insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
+        ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
+        priority: 2
+        whitelist:
+          tags:
+          - MagazinePistol
+        whitelistFailPopup: gun-magazine-whitelist-fail
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        whitelist:
+          tags:
+          - CartridgePistol
+  - type: ContainerContainer
+    containers:
+      gun_magazine: !type:ContainerSlot
+      gun_chamber: !type:ContainerSlot
+  - type: AmmoCounter
+  - type: MagazineVisuals
+    magState: mag
+    steps: 1
+    zeroVisible: true
+  - type: Appearance
+  - type: StaticPrice
+    price: 500
+  - type: ItemStats
+    rarity: Uncommon
+
+# Standard Pistol
+- type: entity
+  id: PSPistolStandard
+  parent: PSBaseWeaponPistol
+  name: standard pistol
+  description: A reliable semi-automatic pistol. Standard issue for security personnel.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
+  - type: Clothing
+    sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
+  - type: Gun
+    fireRate: 4
+  - type: ItemStats
+    rarity: Uncommon
+    weaponDamageMultiplier: 1.02
+    statBonuses:
+      Dexterity: 1
+
+# Combat Pistol - Higher tier
+- type: entity
+  id: PSPistolCombat
+  parent: PSBaseWeaponPistol
+  name: combat pistol
+  description: A military-grade pistol with improved accuracy and stopping power.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Pistols/viper.rsi
+  - type: Clothing
+    sprite: Objects/Weapons/Guns/Pistols/viper.rsi
+  - type: Gun
+    fireRate: 5
+    availableModes:
+    - SemiAuto
+    - FullAuto
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        name: Magazine
+        startingItem: MagazinePistol
+        insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
+        ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
+        priority: 2
+        whitelist:
+          tags:
+          - MagazinePistol
+          - MagazinePistolHighCapacity
+        whitelistFailPopup: gun-magazine-whitelist-fail
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        whitelist:
+          tags:
+          - CartridgePistol
+  - type: ItemStats
+    rarity: Rare
+    weaponDamageMultiplier: 1.10
+    statBonuses:
+      Dexterity: 2
+      Agility: 1
+    affixes:
+    - affixId: RangedDamage
+      value: 3.0
+
+# Base rifle with stats
+- type: entity
+  id: PSBaseWeaponRifle
+  parent: BaseItem
+  abstract: true
+  components:
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-0
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: Item
+    size: Large
+    shape:
+    - 0,0,4,0
+    - 0,1,0,1
+  - type: Clothing
+    quickEquip: false
+    slots:
+    - Back
+  - type: Gun
+    fireRate: 3
+    selectedMode: SemiAuto
+    availableModes:
+    - SemiAuto
+    - FullAuto
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/ltrifle.ogg
+  - type: ChamberMagazineAmmoProvider
+    soundRack:
+      path: /Audio/Weapons/Guns/Cock/ltrifle_cock.ogg
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        name: Magazine
+        startingItem: MagazineLightRifle
+        insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+        ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+        priority: 2
+        whitelist:
+          tags:
+          - MagazineLightRifle
+        whitelistFailPopup: gun-magazine-whitelist-fail
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        whitelist:
+          tags:
+          - CartridgeLightRifle
+  - type: ContainerContainer
+    containers:
+      gun_magazine: !type:ContainerSlot
+      gun_chamber: !type:ContainerSlot
+  - type: AmmoCounter
+  - type: MagazineVisuals
+    magState: mag
+    steps: 1
+    zeroVisible: true
+  - type: Appearance
+  - type: StaticPrice
+    price: 1500
+  - type: ItemStats
+    rarity: Rare
+
+# Assault Rifle
+- type: entity
+  id: PSRifleAssault
+  parent: PSBaseWeaponRifle
+  name: assault rifle
+  description: A versatile assault rifle. Effective at medium range.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Rifles/lecter.rsi
+  - type: Clothing
+    sprite: Objects/Weapons/Guns/Rifles/lecter.rsi
+  - type: Gun
+    fireRate: 5
+  - type: ItemStats
+    rarity: Rare
+    weaponDamageMultiplier: 1.12
+    statBonuses:
+      Dexterity: 3
+      Strength: 1
+    affixes:
+    - affixId: RangedDamage
+      value: 3.5
+
+# Base shotgun with stats
+- type: entity
+  id: PSBaseWeaponShotgun
+  parent: BaseItem
+  abstract: true
+  components:
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-0
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: Item
+    size: Large
+    shape:
+    - 0,0,4,0
+  - type: Clothing
+    quickEquip: false
+    slots:
+    - Back
+  - type: Gun
+    fireRate: 1.5
+    selectedMode: SemiAuto
+    availableModes:
+    - SemiAuto
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
+    soundEmpty:
+      path: /Audio/Weapons/Guns/Empty/empty.ogg
+  - type: BallisticAmmoProvider
+    capacity: 7
+    whitelist:
+      tags:
+      - ShellShotgun
+    soundInsert:
+      path: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
+  - type: ContainerContainer
+    containers:
+      ballistic-ammo: !type:Container
+  - type: AmmoCounter
+  - type: MagazineVisuals
+    magState: mag
+    steps: 8
+    zeroVisible: false
+  - type: Appearance
+  - type: StaticPrice
+    price: 1200
+  - type: ItemStats
+    rarity: Rare
+
+# Pump Shotgun
+- type: entity
+  id: PSShotgunPump
+  parent: PSBaseWeaponShotgun
+  name: pump shotgun
+  description: A reliable pump-action shotgun. Devastating at close range.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
+  - type: Clothing
+    sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
+  - type: ItemStats
+    rarity: Rare
+    weaponDamageMultiplier: 1.15
+    statBonuses:
+      Strength: 3
+      Fortitude: 1
+    affixes:
+    - affixId: RangedDamage
+      value: 4.0
