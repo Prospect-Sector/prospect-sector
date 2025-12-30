@@ -1,5 +1,5 @@
-# Prospect Sector - Ranged Weapons with Stats
-# These weapons use the ItemStats system for rarity and affixes
+# Prospect Sector - Ranged Weapons with Randomized Stats
+# These weapons use the ItemStats system with stat ranges for randomization on spawn
 
 # Base pistol with stats support
 - type: entity
@@ -85,9 +85,13 @@
     fireRate: 4
   - type: ItemStats
     rarity: Uncommon
-    weaponDamageMultiplier: 1.02
-    statBonuses:
-      Dexterity: 1
+    statRanges:
+      Dexterity:
+        min: 0
+        max: 2
+    weaponDamageRange:
+      min: 1.0
+      max: 1.05
 
 # Combat Pistol - Higher tier
 - type: entity
@@ -126,13 +130,20 @@
           - CartridgePistol
   - type: ItemStats
     rarity: Rare
-    weaponDamageMultiplier: 1.10
-    statBonuses:
-      Dexterity: 2
-      Agility: 1
-    affixes:
+    statRanges:
+      Dexterity:
+        min: 1
+        max: 3
+      Agility:
+        min: 0
+        max: 2
+    affixRanges:
     - affixId: RangedDamage
-      value: 3.0
+      min: 1
+      max: 5
+    weaponDamageRange:
+      min: 1.05
+      max: 1.15
 
 # Base rifle with stats
 - type: entity
@@ -214,13 +225,20 @@
     fireRate: 5
   - type: ItemStats
     rarity: Rare
-    weaponDamageMultiplier: 1.12
-    statBonuses:
-      Dexterity: 3
-      Strength: 1
-    affixes:
+    statRanges:
+      Dexterity:
+        min: 2
+        max: 4
+      Strength:
+        min: 0
+        max: 2
+    affixRanges:
     - affixId: RangedDamage
-      value: 3.5
+      min: 2
+      max: 5
+    weaponDamageRange:
+      min: 1.08
+      max: 1.18
 
 # Base shotgun with stats
 - type: entity
@@ -285,10 +303,17 @@
     sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
   - type: ItemStats
     rarity: Rare
-    weaponDamageMultiplier: 1.15
-    statBonuses:
-      Strength: 3
-      Fortitude: 1
-    affixes:
+    statRanges:
+      Strength:
+        min: 2
+        max: 4
+      Fortitude:
+        min: 0
+        max: 2
+    affixRanges:
     - affixId: RangedDamage
-      value: 4.0
+      min: 2
+      max: 5
+    weaponDamageRange:
+      min: 1.10
+      max: 1.22

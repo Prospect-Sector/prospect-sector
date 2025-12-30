@@ -1,5 +1,5 @@
-# Prospect Sector - Melee Weapons with Stats
-# These weapons use the ItemStats system for rarity and affixes
+# Prospect Sector - Melee Weapons with Randomized Stats
+# These weapons use the ItemStats system with stat ranges for randomization on spawn
 
 # Base melee weapon with stats support
 - type: entity
@@ -52,9 +52,13 @@
         Slash: 6
   - type: ItemStats
     rarity: Uncommon
-    weaponDamageMultiplier: 1.0
-    statBonuses:
-      Dexterity: 1
+    statRanges:
+      Dexterity:
+        min: 0
+        max: 2
+    weaponDamageRange:
+      min: 1.0
+      max: 1.03
 
 # Combat Knife - Standard issue military knife
 - type: entity
@@ -79,13 +83,20 @@
         Piercing: 2
   - type: ItemStats
     rarity: Rare
-    weaponDamageMultiplier: 1.08
-    statBonuses:
-      Strength: 2
-      Dexterity: 1
-    affixes:
+    statRanges:
+      Strength:
+        min: 1
+        max: 3
+      Dexterity:
+        min: 1
+        max: 2
+    affixRanges:
     - affixId: MeleeDamage
-      value: 2.5
+      min: 1
+      max: 4
+    weaponDamageRange:
+      min: 1.05
+      max: 1.12
 
 # Machete - Heavy slashing weapon
 - type: entity
@@ -109,12 +120,17 @@
         Slash: 14
   - type: ItemStats
     rarity: Rare
-    weaponDamageMultiplier: 1.12
-    statBonuses:
-      Strength: 3
-    affixes:
+    statRanges:
+      Strength:
+        min: 2
+        max: 4
+    affixRanges:
     - affixId: MeleeDamage
-      value: 3.2
+      min: 2
+      max: 5
+    weaponDamageRange:
+      min: 1.08
+      max: 1.18
 
 # Claymore - Heavy two-handed sword
 - type: entity
@@ -139,15 +155,23 @@
         Slash: 20
   - type: ItemStats
     rarity: Exotic
-    weaponDamageMultiplier: 1.22
-    statBonuses:
-      Strength: 4
-      Fortitude: 2
-    affixes:
+    statRanges:
+      Strength:
+        min: 3
+        max: 5
+      Fortitude:
+        min: 1
+        max: 3
+    affixRanges:
     - affixId: MeleeDamage
-      value: 4.0
+      min: 3
+      max: 5
     - affixId: CritChance
-      value: 2.8
+      min: 1
+      max: 4
+    weaponDamageRange:
+      min: 1.15
+      max: 1.30
 
 # Katana - Fast precision blade
 - type: entity
@@ -171,15 +195,23 @@
         Slash: 12
   - type: ItemStats
     rarity: Exotic
-    weaponDamageMultiplier: 1.18
-    statBonuses:
-      Dexterity: 4
-      Agility: 2
-    affixes:
+    statRanges:
+      Dexterity:
+        min: 3
+        max: 5
+      Agility:
+        min: 1
+        max: 3
+    affixRanges:
     - affixId: CritChance
-      value: 4.5
+      min: 3
+      max: 5
     - affixId: MeleeDamage
-      value: 2.5
+      min: 1
+      max: 4
+    weaponDamageRange:
+      min: 1.12
+      max: 1.25
 
 # Fire Axe - Heavy utility/combat weapon
 - type: entity
@@ -202,10 +234,17 @@
         Blunt: 4
   - type: ItemStats
     rarity: Rare
-    weaponDamageMultiplier: 1.10
-    statBonuses:
-      Strength: 3
-      Fortitude: 1
-    affixes:
+    statRanges:
+      Strength:
+        min: 2
+        max: 4
+      Fortitude:
+        min: 0
+        max: 2
+    affixRanges:
     - affixId: MeleeDamage
-      value: 3.0
+      min: 2
+      max: 4
+    weaponDamageRange:
+      min: 1.05
+      max: 1.15
