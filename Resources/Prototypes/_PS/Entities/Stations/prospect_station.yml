@@ -43,9 +43,8 @@
         - Body # No corpses
         - Contraband
         - Currency # No selling money.
-        - Drink
+        - Edible # Food and Drink merged into Edible
         - Explosive
-        - Food
         - GasTank # Default containers won't be empty
         - Gun
         - Mind # Players
