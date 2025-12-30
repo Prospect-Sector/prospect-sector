@@ -304,8 +304,9 @@ public sealed partial class CargoSystem
         foreach (var ent in toStore)
         {
             // Check whitelist/blacklist if we can store.
+            // Prospect: IsBlacklistPass removed upstream, replaced with IsWhitelistPass
             if (_whitelistSys.IsWhitelistFail(dataComponent.Whitelist, ent) ||
-                _whitelistSys.IsBlacklistPass(dataComponent.Blacklist, ent) &&
+                _whitelistSys.IsWhitelistPass(dataComponent.Blacklist, ent) &&
                 _whitelistSys.IsWhitelistFailOrNull(dataComponent.WhitelistOverride, ent))
             {
                 continue;

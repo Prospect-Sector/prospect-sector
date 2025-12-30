@@ -100,7 +100,7 @@ public sealed partial class CargoStorageSystem
 
         // Check whitelist/blacklist for particular prototype
         if (_whitelistSystem.IsWhitelistFail(storage.Whitelist, sold) ||
-            _whitelistSystem.IsBlacklistPass(storage.Blacklist, sold) &&
+            _whitelistSystem.IsWhitelistPass(storage.Blacklist, sold) &&
             _whitelistSystem.IsWhitelistFailOrNull(storage.WhitelistOverride, sold))
         {
             return;
