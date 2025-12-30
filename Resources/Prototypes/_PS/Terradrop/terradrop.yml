@@ -1,19 +1,27 @@
-﻿- type: terradropMap
+# Terradrop Maps - Players select their own level when starting a mission
+# minLevel is the minimum level required to play this map
+# Level 10 = 10% better stats, Level 50 = 50% better stats, etc.
+
+# Tier 0 - Starting area (no minimum level required)
+- type: terradropMap
   id: ZeronaPrimeTerraDropMap
   name: terradrop-map-zerona-prime
   biome: Grasslands
   icon: MobCarpRainbow
+  minLevel: 0
   mapUnlocks:
   - VeridiaTerraDropMap
   - SpironisTerraDropMap
   position: 5,5
   unlockedByDefault: true
 
+# Tier 1 - First progression
 - type: terradropMap
   id: VeridiaTerraDropMap
   name: terradrop-map-veridia
   biome: Grasslands
   icon: MobCarpRainbow
+  minLevel: 0
   mapPrerequisites:
   - ZeronaPrimeTerraDropMap
   mapUnlocks:
@@ -26,6 +34,7 @@
   name: terradrop-map-spironis
   biome: Grasslands
   icon: MobCarpRainbow
+  minLevel: 0
   mapPrerequisites:
   - ZeronaPrimeTerraDropMap
   mapUnlocks:
@@ -33,11 +42,13 @@
   - CrimsonisTerraDropMap
   position: 6,6
 
+# Tier 2 - Mid-game content
 - type: terradropMap
   id: RecharisTerraDropMap
   name: terradrop-map-recharis
   biome: Caves
   icon: MobCarpRainbow
+  minLevel: 0
   mapPrerequisites:
   - VeridiaTerraDropMap
   position: 3,7
@@ -47,6 +58,7 @@
   name: terradrop-map-obscyra
   biome: Snow
   icon: MobCarpRainbow
+  minLevel: 0
   mapPrerequisites:
   - VeridiaTerraDropMap
   position: 4,7
@@ -56,6 +68,7 @@
   name: terradrop-map-ebonis
   biome: Lava
   icon: MobCarpRainbow
+  minLevel: 0
   mapPrerequisites:
   - SpironisTerraDropMap
   position: 6,7
@@ -65,15 +78,18 @@
   name: terradrop-map-crimsonis
   biome: Snow
   icon: MobCarpRainbow
+  minLevel: 0
   mapPrerequisites:
   - SpironisTerraDropMap
   position: 7,7
 
+# Tier 3 - Late-game content
 - type: terradropMap
   id: BastaraTerraDropMap
   name: terradrop-map-bastara
   biome: Caves
   icon: MobCarpRainbow
+  minLevel: 0
   mapPrerequisites:
   - RecharisTerraDropMap
   - ObscyraTerraDropMap
@@ -86,6 +102,7 @@
   name: terradrop-map-crownis
   biome: Lava
   icon: MobCarpRainbow
+  minLevel: 0
   mapPrerequisites:
   - EbonisTerraDropMap
   - CrimsonisTerraDropMap
@@ -93,11 +110,13 @@
   - FerrosTerraDropMap
   position: 6,8
 
+# Tier 4 - End-game content
 - type: terradropMap
   id: FerrosTerraDropMap
   name: terradrop-map-ferros
   biome: Lava
   icon: MobCarpRainbow
+  minLevel: 0
   mapPrerequisites:
   - BastaraTerraDropMap
   - CrownisTerraDropMap

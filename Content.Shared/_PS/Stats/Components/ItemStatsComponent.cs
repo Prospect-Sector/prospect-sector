@@ -27,6 +27,14 @@ public sealed partial class ItemStatsComponent : Component
     [AutoNetworkedField]
     public bool Initialized { get; set; } = false;
 
+    /// <summary>
+    /// The terradrop level this item was spawned at.
+    /// Higher levels mean better stat rolls.
+    /// </summary>
+    [DataField]
+    [AutoNetworkedField]
+    public int SpawnLevel { get; set; } = 0;
+
     #region Rolled Values (final values after randomization)
 
     /// <summary>

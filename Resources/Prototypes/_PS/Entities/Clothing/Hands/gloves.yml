@@ -1,5 +1,6 @@
 # Prospect Sector - Gloves with Stats
 # These gloves use the ItemStats system for rarity and affixes
+# PS uses ItemStats/Fortitude for damage reduction instead of upstream armor coefficients
 
 # Base combat gloves with stats support
 - type: entity
@@ -12,9 +13,7 @@
   - type: Clothing
     sprite: Clothing/Hands/Gloves/black.rsi
   - type: Armor
-    modifiers:
-      coefficients:
-        Slash: 0.95
+    showArmorOnExamine: false
   - type: ItemStats
     rarity: Uncommon
 
@@ -45,11 +44,6 @@
     sprite: Clothing/Hands/Gloves/combat.rsi
   - type: Clothing
     sprite: Clothing/Hands/Gloves/combat.rsi
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.90
-        Slash: 0.90
   - type: ItemStats
     rarity: Rare
     statBonuses:
@@ -91,12 +85,6 @@
     sprite: Clothing/Hands/Gloves/combat.rsi
   - type: Clothing
     sprite: Clothing/Hands/Gloves/combat.rsi
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.80
-        Slash: 0.80
-        Piercing: 0.90
   - type: ItemStats
     rarity: Exotic
     statBonuses:

@@ -1,5 +1,6 @@
 # Prospect Sector - Armor with Stats
 # These armors use the ItemStats system for rarity and affixes
+# PS uses ItemStats/Fortitude for damage reduction instead of upstream armor coefficients
 
 # Base armor with stats support
 - type: entity
@@ -12,14 +13,9 @@
   - type: Clothing
     sprite: Clothing/OuterClothing/Armor/security.rsi
   - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.80
-        Slash: 0.80
-        Piercing: 0.80
-        Heat: 0.90
+    showArmorOnExamine: false
   - type: ExplosionResistance
-    damageCoefficient: 0.90
+    damageCoefficient: 1.0
   - type: ItemStats
     rarity: Uncommon
 
@@ -34,13 +30,6 @@
     sprite: Clothing/OuterClothing/Armor/security.rsi
   - type: Clothing
     sprite: Clothing/OuterClothing/Armor/security.rsi
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.75
-        Slash: 0.75
-        Piercing: 0.75
-        Heat: 0.85
   - type: ItemStats
     rarity: Uncommon
     softcritBonus: 2
@@ -59,15 +48,6 @@
     sprite: Clothing/OuterClothing/Armor/bulletproof.rsi
   - type: Clothing
     sprite: Clothing/OuterClothing/Armor/bulletproof.rsi
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.85
-        Slash: 0.85
-        Piercing: 0.50
-        Heat: 0.90
-  - type: ExplosionResistance
-    damageCoefficient: 0.85
   - type: ItemStats
     rarity: Rare
     softcritBonus: 4
@@ -90,15 +70,6 @@
     sprite: Clothing/OuterClothing/Armor/captain_carapace.rsi
   - type: Clothing
     sprite: Clothing/OuterClothing/Armor/captain_carapace.rsi
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.65
-        Slash: 0.65
-        Piercing: 0.60
-        Heat: 0.75
-  - type: ExplosionResistance
-    damageCoefficient: 0.75
   - type: ItemStats
     rarity: Exotic
     softcritBonus: 6
@@ -124,15 +95,6 @@
     sprite: Clothing/OuterClothing/Armor/riot.rsi
   - type: Clothing
     sprite: Clothing/OuterClothing/Armor/riot.rsi
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.50
-        Slash: 0.50
-        Piercing: 0.70
-        Heat: 0.80
-  - type: ExplosionResistance
-    damageCoefficient: 0.80
   - type: ClothingSpeedModifier
     walkModifier: 0.9
     sprintModifier: 0.85
@@ -158,13 +120,6 @@
     sprite: Clothing/OuterClothing/Armor/security_slim.rsi
   - type: Clothing
     sprite: Clothing/OuterClothing/Armor/security_slim.rsi
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.80
-        Slash: 0.80
-        Piercing: 0.80
-        Heat: 0.85
   - type: ItemStats
     rarity: Uncommon
     softcritBonus: 2

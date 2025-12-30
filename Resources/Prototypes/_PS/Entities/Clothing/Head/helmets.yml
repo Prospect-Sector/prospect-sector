@@ -1,5 +1,6 @@
 # Prospect Sector - Helmets with Stats
 # These helmets use the ItemStats system for rarity and affixes
+# PS uses ItemStats/Fortitude for damage reduction instead of upstream armor coefficients
 
 # Base helmet with stats support
 - type: entity
@@ -12,12 +13,7 @@
   - type: Clothing
     sprite: Clothing/Head/Helmets/security.rsi
   - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.90
-        Slash: 0.90
-        Piercing: 0.90
-        Heat: 0.95
+    showArmorOnExamine: false
   - type: ItemStats
     rarity: Uncommon
 
@@ -32,12 +28,6 @@
     sprite: Clothing/Head/Helmets/security.rsi
   - type: Clothing
     sprite: Clothing/Head/Helmets/security.rsi
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.85
-        Slash: 0.85
-        Piercing: 0.85
   - type: ItemStats
     rarity: Uncommon
     softcritBonus: 1
@@ -56,12 +46,6 @@
     sprite: Clothing/Head/Helmets/riot.rsi
   - type: Clothing
     sprite: Clothing/Head/Helmets/riot.rsi
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.70
-        Slash: 0.70
-        Piercing: 0.80
   - type: ItemStats
     rarity: Rare
     softcritBonus: 2
@@ -84,12 +68,6 @@
     sprite: Clothing/Head/Helmets/security.rsi
   - type: Clothing
     sprite: Clothing/Head/Helmets/security.rsi
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.75
-        Slash: 0.75
-        Piercing: 0.70
   - type: ItemStats
     rarity: Exotic
     softcritBonus: 3

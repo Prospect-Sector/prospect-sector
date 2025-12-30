@@ -50,6 +50,7 @@ public sealed class GenerateTerradropJob : Job<bool>
     public MapId MapId;
     public EntityUid MapUid;
     private readonly SalvageMissionParams _missionParams;
+    private readonly int _level;
 
     private readonly ISawmill _sawmill;
 
@@ -71,6 +72,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         TerradropMapPrototype terradropMapPrototype,
         SalvageMissionParams missionParams,
         Tile padTile,
+        int level,
         CancellationToken cancellation = default) : base(maxTime, cancellation)
     {
         _entManager = entManager;
@@ -86,6 +88,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         MapPrototype = terradropMapPrototype;
         _missionParams = missionParams;
         _padTile = padTile;
+        _level = level;
         _sawmill = logManager.GetSawmill("salvage_job");
 #if !DEBUG
         _sawmill.Level = LogLevel.Info;
@@ -161,6 +164,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         var terradropMapComponent = _entManager.EnsureComponent<TerradropMapComponent>(MapUid);
         terradropMapComponent.StationUid = Station;
         terradropMapComponent.MapPrototype = MapPrototype;
+        terradropMapComponent.Level = _level;
 
         // Setup expedition
         var expedition = _entManager.AddComponent<SalvageExpeditionComponent>(MapUid);
@@ -178,8 +182,17 @@ public sealed class GenerateTerradropJob : Job<bool>
         var dungeonOffsetDistance = minDungeonOffset + (maxDungeonOffset - minDungeonOffset) * random.NextFloat();
         var dungeonOffset = new Vector2(0f, dungeonOffsetDistance);
         dungeonOffset = dungeonRotation.RotateVec(dungeonOffset);
-        var dungeonMod = _prototypeManager.Index<SalvageDungeonModPrototype>(mission.Dungeon);
-        var dungeonConfig = _prototypeManager.Index(dungeonMod.Proto);
+
+        // Use PS-specific dungeon configs instead of upstream ones with mapped items
+        var biomeId = MapPrototype.Biome.Id;
+        var psDungeonId = biomeId switch
+        {
+            "Caves" => "PSDungeonCaves",
+            "Lava" => "PSDungeonLava",
+            "Snow" => "PSDungeonSnow",
+            _ => "PSDungeonGeneric"
+        };
+        var dungeonConfig = _prototypeManager.Index<DungeonConfigPrototype>(psDungeonId);
         var dungeons = await WaitAsyncTask(
             _dungeon.GenerateDungeonAsync(
                 dungeonConfig,
@@ -272,8 +285,44 @@ public sealed class GenerateTerradropJob : Job<bool>
             }
         }
 
+        // Spawn PS equipment loot with level-scaled stats
+        var psLootBudget = difficultyProto.LootBudget;
+        if (_prototypeManager.TryIndex<SalvageLootPrototype>("PSSalvageLoot", out var psLoot))
+        {
+            foreach (var rule in psLoot.LootRules)
+            {
+                switch (rule)
+                {
+                    case RandomSpawnsLoot randomLoot:
+                        budgetEntries.Clear();
+
+                        foreach (var entry in randomLoot.Entries)
+                        {
+                            budgetEntries.Add(entry);
+                        }
+
+                        probSum = budgetEntries.Sum(x => x.Prob);
+
+                        while (psLootBudget > 0f)
+                        {
+                            var entry = randomSystem.GetBudgetEntry(ref psLootBudget, ref probSum, budgetEntries, random);
+                            if (entry == null)
+                                break;
+
+                            _sawmill.Debug($"Spawning PS loot {entry.Proto} (level {_level})");
+                            await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
+                        }
+
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+        }
+
+        // Also spawn some vanilla loot for variety
         var allLoot = _prototypeManager.Index(SharedSalvageSystem.ExpeditionsLootProto);
-        var lootBudget = difficultyProto.LootBudget;
+        var lootBudget = difficultyProto.LootBudget * 0.5f; // Use half budget for vanilla loot
 
         foreach (var rule in allLoot.LootRules)
         {

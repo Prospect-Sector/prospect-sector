@@ -1,5 +1,6 @@
 # Prospect Sector - Masks with Stats
 # These masks use the ItemStats system for rarity and affixes
+# PS uses ItemStats/Fortitude for damage reduction instead of upstream armor coefficients
 
 # Base combat mask with stats support
 - type: entity
@@ -11,6 +12,8 @@
     sprite: Clothing/Mask/gas.rsi
   - type: Clothing
     sprite: Clothing/Mask/gas.rsi
+  - type: Armor
+    showArmorOnExamine: false
   - type: ItemStats
     rarity: Uncommon
 
@@ -47,11 +50,6 @@
   - type: BreathMask
   - type: IngestionBlocker
   - type: IdentityBlocker
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.95
-        Slash: 0.95
   - type: ItemStats
     rarity: Rare
     statBonuses:
@@ -74,12 +72,6 @@
   - type: BreathMask
   - type: IngestionBlocker
   - type: IdentityBlocker
-  - type: Armor
-    modifiers:
-      coefficients:
-        Blunt: 0.90
-        Slash: 0.90
-        Heat: 0.95
   - type: ItemStats
     rarity: Exotic
     statBonuses:
