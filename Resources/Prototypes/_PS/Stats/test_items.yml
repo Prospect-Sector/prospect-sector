@@ -8,7 +8,7 @@
   description: A test sword with Uncommon (T1) rarity stats.
   components:
   - type: Sprite
-    sprite: Objects/Weapons/Melee/combatknife.rsi
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
     state: icon
   - type: Item
     size: Normal
@@ -29,7 +29,7 @@
   description: A test sword with Rare (T2) rarity stats.
   components:
   - type: Sprite
-    sprite: Objects/Weapons/Melee/combatknife.rsi
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
     state: icon
   - type: Item
     size: Normal
@@ -54,7 +54,7 @@
   description: A test sword with Exotic (T3) rarity stats.
   components:
   - type: Sprite
-    sprite: Objects/Weapons/Melee/combatknife.rsi
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
     state: icon
   - type: Item
     size: Normal
@@ -81,7 +81,7 @@
   description: A test sword with Bluespaced (T4) rarity stats.
   components:
   - type: Sprite
-    sprite: Objects/Weapons/Melee/combatknife.rsi
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
     state: icon
   - type: Item
     size: Normal
@@ -109,7 +109,7 @@
   description: A test sword with Anomalous (T5) rarity stats.
   components:
   - type: Sprite
-    sprite: Objects/Weapons/Melee/combatknife.rsi
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
     state: icon
   - type: Item
     size: Normal

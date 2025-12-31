@@ -109,7 +109,8 @@ namespace Content.Shared.Examine
         /// <summary>
         ///     Either sends the details to a GroupExamineComponent if it finds one, or adds a details examine verb itself.
         /// </summary>
-        public void AddDetailedExamineVerb(GetVerbsEvent<ExamineVerb> verbsEvent, Component component, List<ExamineEntry> entries, string verbText, string iconTexture = DefaultIconTexture, string hoverMessage = "", bool isHoverExamine = false)
+        // Prospect: Added alignRight parameter
+        public void AddDetailedExamineVerb(GetVerbsEvent<ExamineVerb> verbsEvent, Component component, List<ExamineEntry> entries, string verbText, string iconTexture = DefaultIconTexture, string hoverMessage = "", bool isHoverExamine = false, bool alignRight = false)
         {
             // If the entity has the GroupExamineComponent
             if (TryComp<GroupExamineComponent>(verbsEvent.Target, out var groupExamine))
@@ -156,7 +157,8 @@ namespace Content.Shared.Examine
                 Message = hoverMessage,
                 Category = VerbCategory.Examine,
                 Icon = new SpriteSpecifier.Texture(new(iconTexture)),
-                HoverVerb = isHoverExamine
+                HoverVerb = isHoverExamine,
+                AlignRight = alignRight // Prospect
             };
 
             verbsEvent.Verbs.Add(examineVerb);
@@ -165,26 +167,30 @@ namespace Content.Shared.Examine
         /// <summary>
         ///     Either adds a details examine verb, or sends the details to a GroupExamineComponent if it finds one.
         /// </summary>
-        public void AddDetailedExamineVerb(GetVerbsEvent<ExamineVerb> verbsEvent, Component component, ExamineEntry entry, string verbText, string iconTexture = DefaultIconTexture, string hoverMessage = "", bool isHoverExamine = false)
+        // Prospect: Added alignRight parameter
+        public void AddDetailedExamineVerb(GetVerbsEvent<ExamineVerb> verbsEvent, Component component, ExamineEntry entry, string verbText, string iconTexture = DefaultIconTexture, string hoverMessage = "", bool isHoverExamine = false, bool alignRight = false)
         {
-            AddDetailedExamineVerb(verbsEvent, component, new List<ExamineEntry> { entry }, verbText, iconTexture, hoverMessage, isHoverExamine);
+            AddDetailedExamineVerb(verbsEvent, component, new List<ExamineEntry> { entry }, verbText, iconTexture, hoverMessage, isHoverExamine, alignRight);
         }
 
         /// <summary>
         ///     Either adds a details examine verb, or sends the details to a GroupExamineComponent if it finds one.
         /// </summary>
-        public void AddDetailedExamineVerb(GetVerbsEvent<ExamineVerb> verbsEvent, Component component, FormattedMessage message, string verbText, string iconTexture = DefaultIconTexture, string hoverMessage = "", bool isHoverExamine = false)
+        // Prospect: Added alignRight parameter
+        public void AddDetailedExamineVerb(GetVerbsEvent<ExamineVerb> verbsEvent, Component component, FormattedMessage message, string verbText, string iconTexture = DefaultIconTexture, string hoverMessage = "", bool isHoverExamine = false, bool alignRight = false)
         {
             var componentName = Factory.GetComponentName(component.GetType());
-            AddDetailedExamineVerb(verbsEvent, component, new ExamineEntry(componentName, 0f, message), verbText, iconTexture, hoverMessage, isHoverExamine);
+            AddDetailedExamineVerb(verbsEvent, component, new ExamineEntry(componentName, 0f, message), verbText, iconTexture, hoverMessage, isHoverExamine, alignRight);
         }
 
         /// <summary>
-        ///     Adds an icon aligned to the left of examine window that gives you info on hover.
+        ///     Adds an icon to the examine window that gives you info on hover.
+        ///     By default aligned to the left, use alignRight=true to align to the right.
         /// </summary>
-        public void AddHoverExamineVerb(GetVerbsEvent<ExamineVerb> verbsEvent, Component component, string verbText, string hoverMessage, string iconTexture = DefaultIconTexture)
+        // Prospect: Added alignRight parameter
+        public void AddHoverExamineVerb(GetVerbsEvent<ExamineVerb> verbsEvent, Component component, string verbText, string hoverMessage, string iconTexture = DefaultIconTexture, bool alignRight = false)
         {
-            AddDetailedExamineVerb(verbsEvent, component, FormattedMessage.Empty, verbText, iconTexture, hoverMessage, true);
+            AddDetailedExamineVerb(verbsEvent, component, FormattedMessage.Empty, verbText, iconTexture, hoverMessage, true, alignRight);
         }
     }
 }

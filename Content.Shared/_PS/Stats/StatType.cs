@@ -34,7 +34,8 @@ public enum StatType : byte
     Intelligence,
 
     /// <summary>
-    /// Luck/Fortune: Increases dodge chance and loot rarity in expeditions.
+    /// Luck/Fortune: Increases crit chance (0.5% per point), dodge chance (0.3% per point),
+    /// and enhances level bonus scaling (2.5% per point).
     /// </summary>
     Luck
 }

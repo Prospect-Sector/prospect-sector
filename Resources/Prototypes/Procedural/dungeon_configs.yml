@@ -391,3 +391,506 @@
       prob: 0.05
     - id: IntercomScience
       prob: 0.1
+
+#######################
+# Prospect Sector - Dungeon Configurations
+# These dungeons use PS loot spawners instead of upstream mapped items
+# No PrefabDunGen is used - all generation is procedural to avoid spawning illegal weapons/armor
+#######################
+
+# PS Entity Tables
+- type: entityTable
+  id: PSLootClutter
+  table: !type:GroupSelector
+    children:
+    - id: PSSpawnerLootTier1
+    - id: PSSpawnerLootTier2
+      prob: 0.6
+    - id: PSSpawnerLootTier3
+      prob: 0.3
+    - id: PottedPlantRandom
+
+- type: entityTable
+  id: PSCaveClutter
+  table: !type:GroupSelector
+    children:
+    - id: PSSpawnerLootTier1
+    - id: PSSpawnerLootTier2
+      prob: 0.5
+    - id: FloraStalagmite
+    - id: RandomStalagmiteOrCrystal
+
+- type: entityTable
+  id: PSMineshaftClutter
+  table: !type:GroupSelector
+    children:
+    - id: PSSpawnerLootTier1
+    - id: PSSpawnerLootTier2
+      prob: 0.5
+    - id: RandomStalagmiteOrCrystal
+
+- type: entityTable
+  id: PSLabClutter
+  table: !type:GroupSelector
+    children:
+    - id: PSSpawnerLootTier1
+    - id: PSSpawnerLootTier2
+      prob: 0.5
+    - id: PSSpawnerLootTier3
+      prob: 0.25
+    - id: PottedPlantRandom
+
+- type: entityTable
+  id: PSSnowClutter
+  table: !type:GroupSelector
+    children:
+    - id: PSSpawnerLootTier1
+    - id: PSSpawnerLootTier2
+      prob: 0.5
+    - id: PSSpawnerLootTier3
+      prob: 0.25
+    - id: PottedPlantRandom
+
+- type: entityTable
+  id: PSCorridorClutter
+  table: !type:GroupSelector
+    children:
+    - id: PSSpawnerLootTier1
+      prob: 0.3
+    - id: FloraStalagmite
+
+- type: entityTable
+  id: PSBaseAirlock
+  table: !type:GroupSelector
+    children:
+    - id: CableApcExtension
+    - id: AirlockGlass
+
+- type: entityTable
+  id: PSBaseWindow
+  table: !type:GroupSelector
+    children:
+    - id: Grille
+    - id: Window
+
+- type: entityTable
+  id: PSSecurityAirlock
+  table: !type:GroupSelector
+    children:
+    - id: CableApcExtension
+    - id: AirlockSecurityGlassLocked
+
+- type: entityTable
+  id: PSWoodWall
+  table: !type:GroupSelector
+    children:
+    - id: RandomWoodenWall
+
+- type: entityTable
+  id: PSWoodSupport
+  table: !type:GroupSelector
+    children:
+    - id: RandomWoodenSupport
+
+- type: entityTable
+  id: PSWallDecor
+  table: !type:GroupSelector
+    children:
+    - id: RandomPosterLegit
+    - id: ExtinguisherCabinetFilled
+      prob: 0.2
+    - id: RandomPainting
+      prob: 0.05
+    - id: IntercomCommon
+      prob: 0.1
+
+# PS Dungeon Configs
+- type: dungeonConfig
+  id: PSDungeonGeneric
+  layers:
+  - !type:PrefabDunGen
+    roomWhitelist:
+      tags:
+      - SalvageExperiment
+    presets:
+    - Bucket
+    - Wow
+    - SpaceShip
+    - Tall
+
+  - !type:WormCorridorDunGen
+    width: 3
+    tile: FloorSteel
+
+  - !type:DungeonEntranceDunGen
+    count: 2
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:RoomEntranceDunGen
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:EntranceFlankDunGen
+    tile: FloorSteel
+    contents: PSBaseWindow
+
+  - !type:ExternalWindowDunGen
+    tile: FloorSteel
+    contents: PSBaseWindow
+
+  - !type:WallMountDunGen
+    contents: PSWallDecor
+    tile: FloorSteel
+
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: FloorSteel
+
+  - !type:JunctionDunGen
+    width: 1
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:JunctionDunGen
+    width: 3
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:AutoCablingDunGen
+    entity: CableApcExtension
+
+  - !type:CornerClutterDunGen
+    contents: PSLootClutter
+
+  - !type:CorridorDecalSkirtingDunGen
+    cardinalDecals:
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
+    cornerDecals:
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    pocketDecals:
+      SouthWest: BrickTileWhiteInnerSw
+      SouthEast: BrickTileWhiteInnerSe
+      NorthWest: BrickTileWhiteInnerNw
+      NorthEast: BrickTileWhiteInnerNe
+
+- type: dungeonConfig
+  id: PSDungeonCaves
+  layers:
+  - !type:PrefabDunGen
+    roomWhitelist:
+      tags:
+      - Haunted
+    presets:
+    - Bucket
+    - Wow
+    - SpaceShip
+    - Tall
+
+  - !type:WormCorridorDunGen
+    width: 4
+    tile: FloorCave
+
+  - !type:CorridorClutterDunGen
+    contents: PSCorridorClutter
+
+  - !type:BoundaryWallDunGen
+    tile: FloorCave
+    wall: WallRock
+
+  - !type:CornerClutterDunGen
+    contents: PSCaveClutter
+
+- type: dungeonConfig
+  id: PSDungeonLava
+  layers:
+  - !type:PrefabDunGen
+    roomWhitelist:
+      tags:
+      - LavaBrig
+    presets:
+    - Bucket
+    - Wow
+    - SpaceShip
+    - Tall
+
+  - !type:WormCorridorDunGen
+    width: 3
+    tile: FloorDark
+
+  - !type:DungeonEntranceDunGen
+    count: 2
+    tile: FloorDark
+    contents: PSSecurityAirlock
+
+  - !type:RoomEntranceDunGen
+    tile: FloorDark
+    contents: PSBaseAirlock
+
+  - !type:EntranceFlankDunGen
+    tile: FloorDark
+    contents: PSBaseWindow
+
+  - !type:ExternalWindowDunGen
+    tile: FloorDark
+    contents: PSBaseWindow
+
+  - !type:WallMountDunGen
+    contents: PSWallDecor
+    tile: FloorDark
+
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: FloorDark
+
+  - !type:JunctionDunGen
+    width: 1
+    tile: FloorDark
+    contents: PSBaseAirlock
+
+  - !type:JunctionDunGen
+    width: 3
+    tile: FloorDark
+    contents: PSBaseAirlock
+
+  - !type:AutoCablingDunGen
+    entity: CableApcExtension
+
+  - !type:CornerClutterDunGen
+    contents: PSLootClutter
+
+  - !type:CorridorDecalSkirtingDunGen
+    cardinalDecals:
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
+    cornerDecals:
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    pocketDecals:
+      SouthWest: BrickTileWhiteInnerSw
+      SouthEast: BrickTileWhiteInnerSe
+      NorthWest: BrickTileWhiteInnerNw
+      NorthEast: BrickTileWhiteInnerNe
+
+- type: dungeonConfig
+  id: PSDungeonSnow
+  layers:
+  - !type:PrefabDunGen
+    roomWhitelist:
+      tags:
+      - SnowyLabs
+    presets:
+    - Bucket
+    - Wow
+    - SpaceShip
+    - Tall
+
+  - !type:WormCorridorDunGen
+    width: 3
+    tile: FloorSteel
+
+  - !type:DungeonEntranceDunGen
+    count: 2
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:RoomEntranceDunGen
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:EntranceFlankDunGen
+    tile: FloorSteel
+    contents: PSBaseWindow
+
+  - !type:ExternalWindowDunGen
+    tile: FloorSteel
+    contents: PSBaseWindow
+
+  - !type:WallMountDunGen
+    contents: PSWallDecor
+    tile: FloorSteel
+
+  - !type:BoundaryWallDunGen
+    wall: WallSilver
+    tile: FloorSteel
+
+  - !type:JunctionDunGen
+    width: 1
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:JunctionDunGen
+    width: 3
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:AutoCablingDunGen
+    entity: CableApcExtension
+
+  - !type:CornerClutterDunGen
+    contents: PSSnowClutter
+
+- type: dungeonConfig
+  id: PSDungeonMineshaft
+  layers:
+  - !type:PrefabDunGen
+    roomWhitelist:
+      tags:
+      - Mineshaft
+    presets:
+    - Bucket
+    - Wow
+    - SpaceShip
+    - Tall
+
+  - !type:WormCorridorDunGen
+    width: 3
+    tile: FloorCaveDrought
+
+  - !type:DungeonEntranceDunGen
+    count: 2
+    tile: FloorCaveDrought
+    contents: PSWoodWall
+
+  - !type:RoomEntranceDunGen
+    tile: FloorCaveDrought
+    contents: PSWoodWall
+
+  - !type:EntranceFlankDunGen
+    tile: FloorCaveDrought
+    contents: PSWoodWall
+
+  - !type:ExternalWindowDunGen
+    tile: FloorCaveDrought
+    contents: PSWoodWall
+
+  - !type:JunctionDunGen
+    width: 1
+    tile: FloorCaveDrought
+    contents: PSWoodSupport
+
+  - !type:JunctionDunGen
+    width: 3
+    tile: FloorCaveDrought
+    contents: PSWoodSupport
+
+  - !type:AutoCablingDunGen
+    entity: Catwalk
+
+  - !type:CornerClutterDunGen
+    contents: PSMineshaftClutter
+
+- type: dungeonConfig
+  id: PSDungeonLab
+  layers:
+  - !type:PrefabDunGen
+    roomWhitelist:
+      tags:
+      - SalvageExperiment
+    presets:
+    - Bucket
+    - Wow
+    - SpaceShip
+    - Tall
+
+  - !type:WormCorridorDunGen
+    width: 3
+    tile: FloorSteel
+
+  - !type:DungeonEntranceDunGen
+    count: 2
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:RoomEntranceDunGen
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:EntranceFlankDunGen
+    tile: FloorSteel
+    contents: PSBaseWindow
+
+  - !type:ExternalWindowDunGen
+    tile: FloorSteel
+    contents: PSBaseWindow
+
+  - !type:WallMountDunGen
+    contents: PSWallDecor
+    tile: FloorSteel
+
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: FloorSteel
+
+  - !type:JunctionDunGen
+    width: 1
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:JunctionDunGen
+    width: 3
+    tile: FloorSteel
+    contents: PSBaseAirlock
+
+  - !type:AutoCablingDunGen
+    entity: CableApcExtension
+
+  - !type:CornerClutterDunGen
+    contents: PSLabClutter
+
+  - !type:CorridorDecalSkirtingDunGen
+    cardinalDecals:
+      South: BrickTileWhiteLineS
+      East: BrickTileWhiteLineE
+      North: BrickTileWhiteLineN
+      West: BrickTileWhiteLineW
+    cornerDecals:
+      SouthEast: BrickTileWhiteCornerSe
+      SouthWest: BrickTileWhiteCornerSw
+      NorthEast: BrickTileWhiteCornerNe
+      NorthWest: BrickTileWhiteCornerNw
+    pocketDecals:
+      SouthWest: BrickTileWhiteInnerSw
+      SouthEast: BrickTileWhiteInnerSe
+      NorthWest: BrickTileWhiteInnerNw
+      NorthEast: BrickTileWhiteInnerNe
+
+- type: dungeonConfig
+  id: PSDungeonHaunted
+  layers:
+  - !type:PrefabDunGen
+    roomWhitelist:
+      tags:
+      - Haunted
+    presets:
+    - Bucket
+    - Wow
+    - SpaceShip
+    - Tall
+
+  - !type:WormCorridorDunGen
+    width: 3
+    tile: FloorCaveDrought
+
+  - !type:CorridorClutterDunGen
+    contents: PSCorridorClutter
+
+  - !type:BoundaryWallDunGen
+    tile: FloorCaveDrought
+    wall: WallRock
+
+  - !type:CornerClutterDunGen
+    contents: PSCaveClutter

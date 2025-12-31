@@ -71,10 +71,10 @@
     tags:
     - Knife
   - type: Sprite
-    sprite: Objects/Weapons/Melee/combatknife.rsi
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
     state: icon
   - type: Item
-    sprite: Objects/Weapons/Melee/combatknife.rsi
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
     size: Small
   - type: MeleeWeapon
     damage:
@@ -230,8 +230,13 @@
     attackRate: 0.8
     damage:
       types:
-        Slash: 16
+        Slash: 10
         Blunt: 4
+  - type: Wieldable
+  - type: IncreaseDamageOnWield
+    damage:
+      types:
+        Slash: 6
   - type: ItemStats
     rarity: Rare
     statRanges:

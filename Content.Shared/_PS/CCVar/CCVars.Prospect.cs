@@ -15,4 +15,14 @@ public sealed partial class CCVars
     /// </summary>
     public static readonly CVarDef<bool> EmergencyArrivalsShuttle =
         CVarDef.Create("prospect.arrivals", true, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Modifier for how much dungeon level affects item stat rolls.
+    /// Formula: bonusMultiplier = 1 + (level * 0.01 * modifier / 100)
+    /// At 100 (default): level 100 gives 2x stats (current behavior)
+    /// At 900: level 100 gives 10x stats
+    /// At 1: level 100 gives ~1.01x stats (minimal scaling)
+    /// </summary>
+    public static readonly CVarDef<int> TerradropLevelStatModifier =
+        CVarDef.Create("prospect.terradrop_level_stat_modifier", 100, CVar.REPLICATED | CVar.SERVER);
 }

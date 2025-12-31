@@ -1,14 +1,19 @@
 using Content.Shared._PS.Stats.Components;
 using Content.Shared._PS.Stats.Prototypes;
+using Content.Shared.CCVar;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Examine;
 using Content.Shared.Inventory;
 using Content.Shared.Projectiles;
 using Content.Shared.Verbs;
+using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Weapons.Ranged.Systems;
+using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 using Robust.Shared.Utility;
 
 namespace Content.Shared._PS.Stats.Systems;
@@ -22,6 +27,8 @@ public sealed class ItemStatsSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly ExamineSystemShared _examine = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     /// <summary>
     /// Damage bonus per point of Strength for melee attacks (2% per point).
@@ -38,9 +45,34 @@ public sealed class ItemStatsSystem : EntitySystem
     /// </summary>
     private const float FortitudeDamageReduction = 0.015f;
 
+    /// <summary>
+    /// Crit chance per point of Luck (0.5% per point, so 20 Luck = 10% crit).
+    /// </summary>
+    private const float LuckCritChancePerPoint = 0.005f;
+
+    /// <summary>
+    /// Dodge chance per point of Luck (0.3% per point, so 20 Luck = 6% dodge).
+    /// </summary>
+    private const float LuckDodgeChancePerPoint = 0.003f;
+
+    /// <summary>
+    /// Level bonus scaling per point of Luck (2.5% per point).
+    /// Example: Level 50 = 50% bonus, with 10 Luck = 50% × 1.25 = 62.5% bonus.
+    /// </summary>
+    private const float LuckLevelBonusPerPoint = 0.025f;
+
+    /// <summary>
+    /// Crit damage multiplier (2x = double damage).
+    /// </summary>
+    private const float CritDamageMultiplier = 2.0f;
+
+    private int _levelStatModifier = 100;
+
     public override void Initialize()
     {
         base.Initialize();
+
+        Subs.CVar(_cfg, CCVars.TerradropLevelStatModifier, value => _levelStatModifier = value, true);
 
         // Examine tooltip
         SubscribeLocalEvent<ItemStatsComponent, GetVerbsEvent<ExamineVerb>>(OnExamine);
@@ -53,82 +85,131 @@ public sealed class ItemStatsSystem : EntitySystem
 
         // Defensive: Damage reduction (relayed to equipped items)
         SubscribeLocalEvent<ItemStatsComponent, InventoryRelayedEvent<DamageModifyEvent>>(OnDamageModify);
+
+        // Defensive: Dodge chance (checked once per damage event on target)
+        SubscribeLocalEvent<DamageableComponent, DamageModifyEvent>(OnDamageModifyDodge);
     }
 
     #region Damage Interception
 
     /// <summary>
     /// Handles melee damage modification when a weapon with stats is used.
-    /// Applies weapon damage multiplier and user's Strength bonus.
+    /// Uses additive formula: Base × (1 + LevelBonus + WeaponBonus + AffixBonus + StrengthBonus)
+    /// Luck provides: crit chance, better level bonus scaling
     /// </summary>
     private void OnGetMeleeDamage(EntityUid uid, ItemStatsComponent component, ref GetMeleeDamageEvent args)
     {
-        // Apply weapon's damage multiplier
+        // Calculate additive bonus total
+        var totalBonus = 0f;
+
+        // Get user's Luck for level scaling bonus
+        var userLuck = GetTotalStat(args.User, StatType.Luck);
+        var luckLevelMultiplier = 1f + (userLuck * LuckLevelBonusPerPoint);
+
+        // Level bonus (e.g., level 31 = 31% bonus with default modifier), enhanced by Luck
+        var levelBonus = component.SpawnLevel * 0.01f * (_levelStatModifier / 100f) * luckLevelMultiplier;
+        totalBonus += levelBonus;
+
+        // Weapon damage bonus (e.g., 1.10 multiplier = 10% bonus)
         if (component.WeaponDamageMultiplier > 1f)
         {
-            args.Damage *= component.WeaponDamageMultiplier;
+            totalBonus += component.WeaponDamageMultiplier - 1f;
         }
 
-        // Apply MeleeDamage affix bonus from weapon
+        // MeleeDamage affix bonus from weapon
         var meleeDamageBonus = GetAffixValue(component, AffixEffectType.MeleeDamage);
         if (meleeDamageBonus > 0)
         {
-            args.Damage *= 1f + (meleeDamageBonus / 100f);
+            totalBonus += meleeDamageBonus / 100f;
         }
 
-        // Apply user's total Strength bonus from all equipped items
+        // User's total Strength bonus from all equipped items
         var userStrength = GetTotalStat(args.User, StatType.Strength);
         if (userStrength > 0)
         {
-            var strengthBonus = 1f + (userStrength * StrengthMeleeDamageBonus);
-            args.Damage *= strengthBonus;
+            totalBonus += userStrength * StrengthMeleeDamageBonus;
         }
 
-        // Apply user's MeleeDamage affixes from all equipped items
+        // User's MeleeDamage affixes from all equipped items
         var userMeleeBonus = GetTotalAffixValue(args.User, AffixEffectType.MeleeDamage);
         if (userMeleeBonus > 0)
         {
-            args.Damage *= 1f + (userMeleeBonus / 100f);
+            totalBonus += userMeleeBonus / 100f;
+        }
+
+        // Apply total additive bonus
+        if (totalBonus > 0)
+        {
+            args.Damage *= 1f + totalBonus;
+        }
+
+        // Crit chance from Luck and CritChance affix
+        var critChance = userLuck * LuckCritChancePerPoint;
+        critChance += GetTotalAffixValue(args.User, AffixEffectType.CritChance) / 100f;
+        critChance += GetAffixValue(component, AffixEffectType.CritChance) / 100f;
+
+        if (critChance > 0 && _random.Prob((float)Math.Min(critChance, 1.0)))
+        {
+            args.Damage *= CritDamageMultiplier;
         }
     }
 
     /// <summary>
     /// Handles ranged damage modification when a gun with stats fires.
-    /// Applies weapon damage multiplier and user's Dexterity bonus to projectiles.
+    /// Uses additive formula: Base × (1 + LevelBonus + WeaponBonus + AffixBonus + DexterityBonus)
+    /// Luck provides: crit chance, better level bonus scaling
     /// </summary>
     private void OnGunShot(EntityUid uid, ItemStatsComponent component, ref GunShotEvent args)
     {
-        // Calculate total damage multiplier
-        var multiplier = 1f;
+        // Calculate additive bonus total
+        var totalBonus = 0f;
 
-        // Apply weapon's damage multiplier
+        // Get user's Luck for level scaling bonus
+        var userLuck = GetTotalStat(args.User, StatType.Luck);
+        var luckLevelMultiplier = 1f + (userLuck * LuckLevelBonusPerPoint);
+
+        // Level bonus (e.g., level 31 = 31% bonus with default modifier), enhanced by Luck
+        var levelBonus = component.SpawnLevel * 0.01f * (_levelStatModifier / 100f) * luckLevelMultiplier;
+        totalBonus += levelBonus;
+
+        // Weapon damage bonus (e.g., 1.10 multiplier = 10% bonus)
         if (component.WeaponDamageMultiplier > 1f)
         {
-            multiplier *= component.WeaponDamageMultiplier;
+            totalBonus += component.WeaponDamageMultiplier - 1f;
         }
 
-        // Apply RangedDamage affix bonus from weapon
+        // RangedDamage affix bonus from weapon
         var rangedDamageBonus = GetAffixValue(component, AffixEffectType.RangedDamage);
         if (rangedDamageBonus > 0)
         {
-            multiplier *= 1f + (rangedDamageBonus / 100f);
+            totalBonus += rangedDamageBonus / 100f;
         }
 
-        // Apply user's total Dexterity bonus from all equipped items
+        // User's total Dexterity bonus from all equipped items
         var userDexterity = GetTotalStat(args.User, StatType.Dexterity);
         if (userDexterity > 0)
         {
-            multiplier *= 1f + (userDexterity * DexterityRangedDamageBonus);
+            totalBonus += userDexterity * DexterityRangedDamageBonus;
         }
 
-        // Apply user's RangedDamage affixes from all equipped items
+        // User's RangedDamage affixes from all equipped items
         var userRangedBonus = GetTotalAffixValue(args.User, AffixEffectType.RangedDamage);
         if (userRangedBonus > 0)
         {
-            multiplier *= 1f + (userRangedBonus / 100f);
+            totalBonus += userRangedBonus / 100f;
         }
 
-        // Apply multiplier to all fired projectiles
+        // Crit chance from Luck and CritChance affix
+        var critChance = userLuck * LuckCritChancePerPoint;
+        critChance += GetTotalAffixValue(args.User, AffixEffectType.CritChance) / 100f;
+        critChance += GetAffixValue(component, AffixEffectType.CritChance) / 100f;
+        var isCrit = critChance > 0 && _random.Prob((float)Math.Min(critChance, 1.0));
+
+        // Apply total additive bonus to all fired projectiles
+        var multiplier = 1f + totalBonus;
+        if (isCrit)
+            multiplier *= CritDamageMultiplier;
+
         if (multiplier > 1f)
         {
             foreach (var (ammo, _) in args.Ammo)
@@ -162,6 +243,28 @@ public sealed class ItemStatsSystem : EntitySystem
             var reduction = 1f - (armorBonus / 100f);
             reduction = Math.Max(reduction, 0.5f); // Cap at 50% reduction per item
             args.Args.Damage *= reduction;
+        }
+    }
+
+    /// <summary>
+    /// Handles dodge chance from Luck stat.
+    /// Checked once per damage event on the target entity.
+    /// </summary>
+    private void OnDamageModifyDodge(EntityUid uid, DamageableComponent component, DamageModifyEvent args)
+    {
+        // Get total Luck from all equipped items
+        var totalLuck = GetTotalStat(uid, StatType.Luck);
+        if (totalLuck <= 0)
+            return;
+
+        // Calculate dodge chance
+        var dodgeChance = totalLuck * LuckDodgeChancePerPoint;
+
+        // Roll for dodge - if successful, negate all damage
+        if (_random.Prob(Math.Min(dodgeChance, 0.5f))) // Cap at 50% dodge
+        {
+            // Zero out all damage - complete dodge
+            args.Damage *= 0f;
         }
     }
 
@@ -256,34 +359,73 @@ public sealed class ItemStatsSystem : EntitySystem
         if (!args.CanInteract)
             return;
 
-        var message = GetStatsExamineMessage(component);
+        var message = GetStatsExamineMessage(uid, component);
 
         _examine.AddHoverExamineVerb(
             args,
             component,
             Loc.GetString("item-stats-examine-verb"),
             message.ToMarkup(),
-            "/Textures/Interface/VerbIcons/dot.svg.192dpi.png");
+            "/Textures/Interface/VerbIcons/dot.svg.192dpi.png",
+            alignRight: true);
     }
 
     /// <summary>
     /// Generates the formatted examine message for item stats.
     /// </summary>
-    public FormattedMessage GetStatsExamineMessage(ItemStatsComponent component)
+    public FormattedMessage GetStatsExamineMessage(EntityUid uid, ItemStatsComponent component)
     {
         var msg = new FormattedMessage();
         var rarity = _proto.Index(component.Rarity);
 
-        // Rarity header with color
+        // Rarity header with color and level indicator
         var colorHex = rarity.Color.ToHex();
-        msg.AddMarkupOrThrow($"[color={colorHex}][bold]{Loc.GetString(rarity.Name)}[/bold][/color]");
+        var rarityText = $"[color={colorHex}][bold]{Loc.GetString(rarity.Name)}[/bold][/color]";
+
+        // Add level indicator if spawn level > 0
+        if (component.SpawnLevel > 0)
+        {
+            rarityText += $"  [color=#888888]{Loc.GetString("item-stats-level", ("level", component.SpawnLevel))}[/color]";
+        }
+
+        msg.AddMarkupOrThrow(rarityText);
         msg.PushNewline();
 
-        // Weapon damage multiplier (if applicable)
+        // Show base weapon damage for melee weapons
+        if (TryComp<MeleeWeaponComponent>(uid, out var melee))
+        {
+            var totalDamage = melee.Damage.GetTotal();
+            msg.AddMarkupOrThrow(Loc.GetString("item-stats-base-damage", ("value", totalDamage)));
+            msg.PushNewline();
+        }
+
+        // Calculate level bonus for display
+        var levelBonus = component.SpawnLevel * 0.01f * (_levelStatModifier / 100f);
+        var bonusMultiplier = 1f + levelBonus;
+
+        // Weapon damage bonus (if applicable)
         if (component.WeaponDamageMultiplier > 1f)
         {
             var dmgPercent = (component.WeaponDamageMultiplier - 1f) * 100f;
-            msg.AddMarkupOrThrow(Loc.GetString("item-stats-weapon-damage", ("value", dmgPercent.ToString("F1"))));
+            var dmgText = Loc.GetString("item-stats-weapon-damage", ("value", dmgPercent.ToString("F1")));
+
+            // Show base range (no level scaling - level bonus is applied separately)
+            if (component.WeaponDamageRange != null)
+            {
+                var minPct = (component.WeaponDamageRange.Min - 1f) * 100f;
+                var maxPct = (component.WeaponDamageRange.Max - 1f) * 100f;
+                dmgText += $" [color=#666666]({minPct:F0}-{maxPct:F0})[/color]";
+            }
+
+            msg.AddMarkupOrThrow(dmgText);
+            msg.PushNewline();
+        }
+
+        // Level bonus display (shows as separate line since it's applied additively)
+        if (component.SpawnLevel > 0 && levelBonus > 0)
+        {
+            var levelPct = levelBonus * 100f;
+            msg.AddMarkupOrThrow($"[color=#88ff88]+{levelPct:F0}% {Loc.GetString("item-stats-level-bonus")}[/color]");
             msg.PushNewline();
         }
 
@@ -292,12 +434,30 @@ public sealed class ItemStatsSystem : EntitySystem
         {
             if (component.SoftcritBonus > 0)
             {
-                msg.AddMarkupOrThrow(Loc.GetString("item-stats-softcrit-bonus", ("value", component.SoftcritBonus)));
+                var scText = Loc.GetString("item-stats-softcrit-bonus", ("value", component.SoftcritBonus));
+
+                if (component.SoftcritRange != null)
+                {
+                    var minSc = (int)Math.Round(component.SoftcritRange.Min * bonusMultiplier);
+                    var maxSc = (int)Math.Round(component.SoftcritRange.Max * bonusMultiplier);
+                    scText += $" [color=#666666]({minSc}-{maxSc})[/color]";
+                }
+
+                msg.AddMarkupOrThrow(scText);
                 msg.PushNewline();
             }
             if (component.DeathThresholdBonus > 0)
             {
-                msg.AddMarkupOrThrow(Loc.GetString("item-stats-death-bonus", ("value", component.DeathThresholdBonus)));
+                var dtText = Loc.GetString("item-stats-death-bonus", ("value", component.DeathThresholdBonus));
+
+                if (component.DeathThresholdRange != null)
+                {
+                    var minDt = (int)Math.Round(component.DeathThresholdRange.Min * bonusMultiplier);
+                    var maxDt = (int)Math.Round(component.DeathThresholdRange.Max * bonusMultiplier);
+                    dtText += $" [color=#666666]({minDt}-{maxDt})[/color]";
+                }
+
+                msg.AddMarkupOrThrow(dtText);
                 msg.PushNewline();
             }
         }
@@ -313,7 +473,17 @@ public sealed class ItemStatsSystem : EntitySystem
             {
                 var statName = GetStatDisplayName(stat);
                 var color = GetStatColor(stat);
-                msg.AddMarkupOrThrow($"[color={color}]+{value} {statName}[/color]");
+                var statText = $"[color={color}]+{value} {statName}[/color]";
+
+                // Show range if available
+                if (component.StatRanges.TryGetValue(stat, out var range))
+                {
+                    var minVal = (int)Math.Round(range.Min * bonusMultiplier);
+                    var maxVal = (int)Math.Round(range.Max * bonusMultiplier);
+                    statText += $" [color=#666666]({minVal}-{maxVal})[/color]";
+                }
+
+                msg.AddMarkupOrThrow(statText);
                 msg.PushNewline();
             }
         }
@@ -331,7 +501,18 @@ public sealed class ItemStatsSystem : EntitySystem
                     continue;
 
                 var affixName = Loc.GetString(affixProto.Name);
-                msg.AddMarkupOrThrow($"[color=#a0a0ff]+{affix.Value:F1}% {affixName}[/color]");
+                var affixText = $"[color=#a0a0ff]+{affix.Value:F1}% {affixName}[/color]";
+
+                // Show range if available
+                var affixRange = component.AffixRanges.Find(r => r.AffixId == affix.AffixId);
+                if (affixRange != null)
+                {
+                    var minAff = affixRange.Min * bonusMultiplier;
+                    var maxAff = affixRange.Max * bonusMultiplier;
+                    affixText += $" [color=#666666]({minAff:F0}-{maxAff:F0})[/color]";
+                }
+
+                msg.AddMarkupOrThrow(affixText);
                 msg.PushNewline();
             }
         }

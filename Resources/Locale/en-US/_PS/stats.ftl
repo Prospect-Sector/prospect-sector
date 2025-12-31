@@ -23,9 +23,12 @@ stat-intelligence = Intelligence
 stat-luck = Luck
 
 # Stat bonus display
+item-stats-base-damage = Base Damage: {$value}
 item-stats-weapon-damage = +{$value}% Weapon Damage
+item-stats-level-bonus = Level Bonus
 item-stats-softcrit-bonus = +{$value} Softcrit Threshold
 item-stats-death-bonus = +{$value} Death Threshold
+item-stats-level = Lv. {$level}
 
 # Affix names
 affix-melee-damage = Melee Damage

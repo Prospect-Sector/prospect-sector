@@ -19,7 +19,10 @@ namespace Content.Client._PS.Terradrop;
 [GenerateTypedNameReferences]
 public sealed partial class TerradropConsoleMenu : FancyWindow
 {
-    public Action<string>? OnStartTerradropPressed;
+    /// <summary>
+    /// Action invoked when starting a terradrop. Passes the map ID and selected level.
+    /// </summary>
+    public Action<string, int>? OnStartTerradropPressed;
 
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
@@ -42,6 +45,11 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
     public Dictionary<string, TerradropMapAvailability> List = new();
 
     private Box2i _bounds = new(DefaultPosition, DefaultPosition);
+
+    /// <summary>
+    /// The currently selected level. Remembered locally across map selections.
+    /// </summary>
+    private int _selectedLevel;
 
     public TerradropConsoleMenu()
     {
@@ -245,9 +253,10 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
             }
         }
 
-        // Create and add info panel
-        var control = new TerradropInfoPanel(proto, availability, _sprite);
-        control.StartAction += args => OnStartTerradropPressed?.Invoke(args.ID);
+        // Create and add info panel with stored level
+        var control = new TerradropInfoPanel(proto, availability, _sprite, _selectedLevel);
+        control.StartAction += (mapProto, level) => OnStartTerradropPressed?.Invoke(mapProto.ID, level);
+        control.LevelChanged += level => _selectedLevel = level;
         InfoContainer.AddChild(control);
     }
 

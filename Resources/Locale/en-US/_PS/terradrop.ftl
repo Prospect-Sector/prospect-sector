@@ -19,6 +19,13 @@ terradrop-start-generic = Start Terradrop Mission
 terradrop-start-explored = Restart Terradrop Mission
 terradrop-start-unavailable = Mission Unavailable
 
+terradrop-level-label = Level:
+terradrop-level-bonus = +{$bonus}% item stats
+terradrop-level-minus-ten = Decrease level by 10
+terradrop-level-minus-one = Decrease level by 1
+terradrop-level-plus-one = Increase level by 1
+terradrop-level-plus-ten = Increase level by 10
+
 terradrop-map-zerona-prime = Zerona Prime
 terradrop-map-veridia = Veridia
 terradrop-map-spironis = Spironis

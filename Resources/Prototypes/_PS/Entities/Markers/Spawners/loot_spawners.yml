@@ -9,7 +9,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
 
 # =============================================================================
 # MELEE WEAPON SPAWNERS
@@ -23,7 +23,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Objects/Weapons/Melee/kitchen_knife.rsi
       state: icon
   - type: RandomSpawner
@@ -39,8 +39,8 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
-    - sprite: Objects/Weapons/Melee/combatknife.rsi
+    - state: green
+    - sprite: Objects/Weapons/Melee/combat_knife.rsi
       state: icon
   - type: RandomSpawner
     prototypes:
@@ -60,7 +60,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Objects/Weapons/Melee/machete.rsi
       state: icon
   - type: RandomSpawner
@@ -82,7 +82,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Objects/Weapons/Melee/katana.rsi
       state: icon
   - type: RandomSpawner
@@ -108,7 +108,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
       state: base
   - type: RandomSpawner
@@ -127,7 +127,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Objects/Weapons/Guns/Rifles/lecter.rsi
       state: base
   - type: RandomSpawner
@@ -143,9 +143,9 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
-      state: base
+      state: icon
   - type: RandomSpawner
     prototypes:
     - PSShotgunPump
@@ -159,7 +159,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
       state: base
   - type: RandomSpawner
@@ -184,7 +184,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Clothing/OuterClothing/Armor/security_slim.rsi
       state: icon
   - type: RandomSpawner
@@ -201,7 +201,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Clothing/OuterClothing/Armor/security.rsi
       state: icon
   - type: RandomSpawner
@@ -226,7 +226,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Clothing/Head/Helmets/security.rsi
       state: icon
   - type: RandomSpawner
@@ -250,7 +250,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Clothing/Hands/Gloves/combat.rsi
       state: icon
   - type: RandomSpawner
@@ -271,7 +271,7 @@
   components:
   - type: Sprite
     layers:
-    - state: yellow
+    - state: green
     - sprite: Clothing/Mask/gas.rsi
       state: icon
   - type: RandomSpawner
@@ -367,7 +367,7 @@
   components:
   - type: Sprite
     layers:
-    - state: purple
+    - state: pink
   - type: RandomSpawner
     prototypes:
     - PSClaymore

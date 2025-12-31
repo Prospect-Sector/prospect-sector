@@ -1,6 +1,8 @@
 using System.Linq;
 using Content.Shared._PS.Stats.Components;
 using Content.Shared._PS.Terradrop;
+using Content.Shared.CCVar;
+using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
 
@@ -13,11 +15,15 @@ namespace Content.Server._PS.Stats.Systems;
 public sealed class ItemStatsInitSystem : EntitySystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+
+    private int _levelStatModifier = 100;
 
     public override void Initialize()
     {
         base.Initialize();
 
+        Subs.CVar(_cfg, CCVars.TerradropLevelStatModifier, value => _levelStatModifier = value, true);
         SubscribeLocalEvent<ItemStatsComponent, MapInitEvent>(OnMapInit);
     }
 
@@ -35,8 +41,10 @@ public sealed class ItemStatsInitSystem : EntitySystem
         var level = GetTerradropLevel(uid);
         component.SpawnLevel = level;
 
-        // Level 10 = 10% bonus, Level 50 = 50% bonus, etc.
-        var levelBonus = level * 0.01f;
+        // Apply configurable modifier to level bonus
+        // At modifier 100: level 100 = 100% bonus (2x stats)
+        // At modifier 900: level 100 = 900% bonus (10x stats)
+        var levelBonus = level * 0.01f * (_levelStatModifier / 100f);
 
         RollStats(uid, component, levelBonus);
         component.Initialized = true;
@@ -102,17 +110,12 @@ public sealed class ItemStatsInitSystem : EntitySystem
             }
         }
 
-        // Roll weapon damage multiplier
+        // Roll weapon damage multiplier (no level scaling - level bonus is applied separately in damage calc)
         if (component.WeaponDamageRange != null)
         {
             var range = component.WeaponDamageRange;
-            // For damage multiplier, boost above 1.0 (the bonus portion)
-            var baseMin = range.Min - 1f;
-            var baseMax = range.Max - 1f;
-            var boostedMin = 1f + (baseMin * bonusMultiplier);
-            var boostedMax = 1f + (baseMax * bonusMultiplier);
             component.WeaponDamageMultiplier = MathF.Round(
-                _random.NextFloat(boostedMin, boostedMax), 2);
+                _random.NextFloat(range.Min, range.Max), 2);
         }
 
         // Roll softcrit bonus

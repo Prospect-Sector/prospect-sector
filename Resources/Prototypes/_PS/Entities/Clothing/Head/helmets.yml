@@ -43,9 +43,9 @@
   description: Heavy riot helmet with face shield. Superior protection against melee attacks.
   components:
   - type: Sprite
-    sprite: Clothing/Head/Helmets/riot.rsi
+    sprite: Clothing/Head/Helmets/light_riot.rsi
   - type: Clothing
-    sprite: Clothing/Head/Helmets/riot.rsi
+    sprite: Clothing/Head/Helmets/light_riot.rsi
   - type: ItemStats
     rarity: Rare
     softcritBonus: 2

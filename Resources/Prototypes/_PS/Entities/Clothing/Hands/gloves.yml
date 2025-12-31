@@ -9,9 +9,9 @@
   abstract: true
   components:
   - type: Sprite
-    sprite: Clothing/Hands/Gloves/black.rsi
+    sprite: Clothing/Hands/Gloves/leather.rsi
   - type: Clothing
-    sprite: Clothing/Hands/Gloves/black.rsi
+    sprite: Clothing/Hands/Gloves/leather.rsi
   - type: Armor
     showArmorOnExamine: false
   - type: ItemStats
@@ -25,9 +25,9 @@
   description: Basic combat gloves providing minor protection and grip.
   components:
   - type: Sprite
-    sprite: Clothing/Hands/Gloves/black.rsi
+    sprite: Clothing/Hands/Gloves/leather.rsi
   - type: Clothing
-    sprite: Clothing/Hands/Gloves/black.rsi
+    sprite: Clothing/Hands/Gloves/leather.rsi
   - type: ItemStats
     rarity: Uncommon
     statBonuses:
