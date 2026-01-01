@@ -165,51 +165,53 @@ public sealed class HallwayGenerator
 
     /// <summary>
     /// Removes walls from all segments where they would block hallway intersections.
-    /// This handles cases where earlier segments placed walls that later segments need to pass through.
+    /// Only removes walls that block passage (hallway tiles on opposite sides), preserves corners.
     /// </summary>
     private void CleanupIntersectionWalls(HallwayResult result)
     {
-        var cardinalDirs = new[]
-        {
-            new Vector2i(1, 0), new Vector2i(-1, 0),
-            new Vector2i(0, 1), new Vector2i(0, -1)
-        };
-
         foreach (var segment in result.Segments)
         {
-            // Find walls to remove: any wall that is adjacent to hallway tiles from BOTH this segment and the global tile set
             var wallsToRemove = new List<Vector2i>();
 
             foreach (var wall in segment.WallTiles)
             {
-                // Check if this wall is adjacent to hallway tiles (could be blocking an intersection)
-                var adjacentToOwnTiles = false;
-                var adjacentToOtherTiles = false;
-
-                foreach (var dir in cardinalDirs)
-                {
-                    var adj = wall + dir;
-
-                    if (segment.Tiles.Contains(adj))
-                    {
-                        adjacentToOwnTiles = true;
-                    }
-                    else if (result.Tiles.Contains(adj) && !segment.Tiles.Contains(adj))
-                    {
-                        adjacentToOtherTiles = true;
-                    }
-                }
-
-                // If wall is between this segment and another hallway, remove it
-                if (adjacentToOwnTiles && adjacentToOtherTiles)
-                {
-                    wallsToRemove.Add(wall);
-                }
-
-                // Also remove if the wall position is now a hallway tile
+                // Remove if the wall position is now a hallway tile
                 if (result.Tiles.Contains(wall))
                 {
                     wallsToRemove.Add(wall);
+                    continue;
+                }
+
+                // Check if wall blocks passage: hallway tiles on OPPOSITE cardinal sides
+                // This preserves corner walls while removing blocking walls
+                var north = wall + new Vector2i(0, 1);
+                var south = wall + new Vector2i(0, -1);
+                var east = wall + new Vector2i(1, 0);
+                var west = wall + new Vector2i(-1, 0);
+
+                var hasNorth = result.Tiles.Contains(north);
+                var hasSouth = result.Tiles.Contains(south);
+                var hasEast = result.Tiles.Contains(east);
+                var hasWest = result.Tiles.Contains(west);
+
+                // Wall blocks if it has hallway tiles on opposite sides (N-S or E-W)
+                // AND at least one side is from a different segment (intersection)
+                var blocksNorthSouth = hasNorth && hasSouth;
+                var blocksEastWest = hasEast && hasWest;
+
+                if (blocksNorthSouth || blocksEastWest)
+                {
+                    // Verify it's actually at an intersection (tiles from different sources)
+                    var northFromOther = hasNorth && !segment.Tiles.Contains(north);
+                    var southFromOther = hasSouth && !segment.Tiles.Contains(south);
+                    var eastFromOther = hasEast && !segment.Tiles.Contains(east);
+                    var westFromOther = hasWest && !segment.Tiles.Contains(west);
+
+                    if ((blocksNorthSouth && (northFromOther || southFromOther)) ||
+                        (blocksEastWest && (eastFromOther || westFromOther)))
+                    {
+                        wallsToRemove.Add(wall);
+                    }
                 }
             }
 
