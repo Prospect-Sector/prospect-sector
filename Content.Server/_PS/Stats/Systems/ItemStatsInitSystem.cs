@@ -148,7 +148,11 @@ public sealed class ItemStatsInitSystem : EntitySystem
         if (!Resolve(uid, ref component))
             return;
 
-        RollStats(uid, component);
+        // Recalculate level bonus in case the item moved maps
+        var level = GetTerradropLevel(uid);
+        var levelBonus = level * 0.01f * (_levelStatModifier / 100f);
+
+        RollStats(uid, component, levelBonus);
         Dirty(uid, component);
     }
 }

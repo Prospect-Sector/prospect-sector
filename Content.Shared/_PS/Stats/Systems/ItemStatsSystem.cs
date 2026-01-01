@@ -62,6 +62,11 @@ public sealed class ItemStatsSystem : EntitySystem
     private const float LuckLevelBonusPerPoint = 0.025f;
 
     /// <summary>
+    /// Maximum Luck level bonus multiplier (2.0 = double level bonus at 40+ Luck).
+    /// </summary>
+    private const float MaxLuckLevelMultiplier = 2.0f;
+
+    /// <summary>
     /// Crit damage multiplier (2x = double damage).
     /// </summary>
     private const float CritDamageMultiplier = 2.0f;
@@ -113,7 +118,7 @@ public sealed class ItemStatsSystem : EntitySystem
 
         // Get user's Luck for level scaling bonus
         var userLuck = GetTotalStat(args.User, StatType.Luck);
-        var luckLevelMultiplier = 1f + (userLuck * LuckLevelBonusPerPoint);
+        var luckLevelMultiplier = Math.Min(1f + (userLuck * LuckLevelBonusPerPoint), MaxLuckLevelMultiplier);
 
         // Level bonus (e.g., level 31 = 31% bonus with default modifier), enhanced by Luck
         var levelBonus = component.SpawnLevel * 0.01f * (_levelStatModifier / 100f) * luckLevelMultiplier;
@@ -152,12 +157,12 @@ public sealed class ItemStatsSystem : EntitySystem
             args.Damage *= 1f + totalBonus;
         }
 
-        // Crit chance from Luck and CritChance affix
+        // Crit chance from Luck and CritChance affix (capped at 100%)
         var critChance = userLuck * LuckCritChancePerPoint;
         critChance += GetTotalAffixValue(args.User, AffixEffectType.CritChance) / 100f;
         critChance += GetAffixValue(component, AffixEffectType.CritChance) / 100f;
 
-        if (critChance > 0 && _random.Prob((float)Math.Min(critChance, 1.0)))
+        if (critChance > 0 && _random.Prob((float)Math.Min(critChance, 1.0))) // Cap at 100%
         {
             args.Damage *= CritDamageMultiplier;
         }
@@ -175,7 +180,7 @@ public sealed class ItemStatsSystem : EntitySystem
 
         // Get user's Luck for level scaling bonus
         var userLuck = GetTotalStat(args.User, StatType.Luck);
-        var luckLevelMultiplier = 1f + (userLuck * LuckLevelBonusPerPoint);
+        var luckLevelMultiplier = Math.Min(1f + (userLuck * LuckLevelBonusPerPoint), MaxLuckLevelMultiplier);
 
         // Level bonus (e.g., level 31 = 31% bonus with default modifier), enhanced by Luck
         var levelBonus = component.SpawnLevel * 0.01f * (_levelStatModifier / 100f) * luckLevelMultiplier;
@@ -317,10 +322,10 @@ public sealed class ItemStatsSystem : EntitySystem
         var enumerator = _inventory.GetSlotEnumerator((entity, inventory));
         while (enumerator.NextItem(out var item))
         {
-            if (TryComp<ItemStatsComponent>(item, out var stats))
+            if (TryComp<ItemStatsComponent>(item, out var stats) &&
+                stats.StatBonuses.TryGetValue(stat, out var value))
             {
-                if (stats.StatBonuses.TryGetValue(stat, out var value))
-                    total += value;
+                total += value;
             }
         }
 

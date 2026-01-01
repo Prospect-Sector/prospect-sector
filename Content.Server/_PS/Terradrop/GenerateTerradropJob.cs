@@ -355,40 +355,6 @@ public sealed class GenerateTerradropJob : Job<bool>
             }
         }
 
-        // Also spawn some vanilla loot for variety
-        var allLoot = _prototypeManager.Index(SharedSalvageSystem.ExpeditionsLootProto);
-        var lootBudget = difficultyProto.LootBudget * 0.5f; // Use half budget for vanilla loot
-
-        foreach (var rule in allLoot.LootRules)
-        {
-            switch (rule)
-            {
-                case RandomSpawnsLoot randomLoot:
-                    budgetEntries.Clear();
-
-                    foreach (var entry in randomLoot.Entries)
-                    {
-                        budgetEntries.Add(entry);
-                    }
-
-                    probSum = budgetEntries.Sum(x => x.Prob);
-
-                    while (lootBudget > 0f)
-                    {
-                        var entry = randomSystem.GetBudgetEntry(ref lootBudget, ref probSum, budgetEntries, random);
-                        if (entry == null)
-                            break;
-
-                        _sawmill.Debug($"Spawning dungeon loot {entry.Proto}");
-                        await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
-                    }
-
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         return true;
     }
 

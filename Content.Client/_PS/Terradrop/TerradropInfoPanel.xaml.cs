@@ -28,7 +28,7 @@ public sealed partial class TerradropInfoPanel : Control
     public Action<int>? LevelChanged;
 
     private int _level;
-    private int _minLevel;
+    private readonly int _minLevel;
 
     public TerradropInfoPanel(TerradropMapPrototype proto, TerradropMapAvailability availability, SpriteSystem sprite, int initialLevel = 0)
     {
@@ -116,14 +116,9 @@ public sealed partial class TerradropInfoPanel : Control
         LevelLabel.Text = _level.ToString();
 
         // Show stat bonus info
-        if (_level > 0)
-        {
-            LevelBonusLabel.Text = Loc.GetString("terradrop-level-bonus", ("bonus", _level));
-        }
-        else
-        {
-            LevelBonusLabel.Text = "";
-        }
+        LevelBonusLabel.Text = _level > 0
+            ? Loc.GetString("terradrop-level-bonus", ("bonus", _level))
+            : "";
 
         // Disable minus buttons if at minimum
         LevelMinusButton.Disabled = _level <= _minLevel;
