@@ -97,11 +97,8 @@ public sealed class ItemStatsSystem : EntitySystem
         // Defensive: Damage reduction (relayed to equipped items)
         SubscribeLocalEvent<ItemStatsComponent, InventoryRelayedEvent<DamageModifyEvent>>(OnDamageModify);
 
-        // Defensive: Dodge chance (checked once per damage event on target)
-        SubscribeLocalEvent<DamageableComponent, DamageModifyEvent>(OnDamageModifyDodge);
-
-        // Global damage floor to prevent stacking to 99%+ reduction
-        SubscribeLocalEvent<DamageableComponent, DamageModifyEvent>(OnDamageModifyFloor);
+        // Defensive: Dodge chance and global damage floor (checked once per damage event on target)
+        SubscribeLocalEvent<DamageableComponent, DamageModifyEvent>(OnDamageModifyTarget);
     }
 
     #region Damage Interception
@@ -261,35 +258,26 @@ public sealed class ItemStatsSystem : EntitySystem
     }
 
     /// <summary>
-    /// Handles dodge chance from Luck stat.
-    /// Checked once per damage event on the target entity.
+    /// Handles dodge chance and global damage floor for the target entity.
+    /// Checked once per damage event on the target.
     /// </summary>
-    private void OnDamageModifyDodge(EntityUid uid, DamageableComponent component, DamageModifyEvent args)
+    private void OnDamageModifyTarget(EntityUid uid, DamageableComponent component, DamageModifyEvent args)
     {
-        // Get total Luck from all equipped items
+        // Dodge chance from Luck stat
         var totalLuck = GetTotalStat(uid, StatType.Luck);
-        if (totalLuck <= 0)
-            return;
-
-        // Calculate dodge chance
-        var dodgeChance = totalLuck * LuckDodgeChancePerPoint;
-
-        // Roll for dodge - if successful, negate all damage
-        if (_random.Prob(Math.Min(dodgeChance, 0.5f))) // Cap at 50% dodge
+        if (totalLuck > 0)
         {
-            // Zero out all damage - complete dodge
-            args.Damage *= 0f;
-        }
-    }
+            var dodgeChance = totalLuck * LuckDodgeChancePerPoint;
 
-    /// <summary>
-    /// Applies a global damage floor to prevent stacking armor to 99%+ reduction.
-    /// Ensures at least GlobalMinimumDamageMultiplier (5%) of original damage is taken.
-    /// </summary>
-    private void OnDamageModifyFloor(EntityUid uid, DamageableComponent component, DamageModifyEvent args)
-    {
-        // The floor ensures you always take at least 5% of the original incoming damage
-        // This runs after all other damage modifications
+            // Roll for dodge - if successful, negate all damage
+            if (_random.Prob(Math.Min(dodgeChance, 0.5f))) // Cap at 50% dodge
+            {
+                args.Damage *= 0f;
+                return; // Dodged, no need to apply floor
+            }
+        }
+
+        // Global damage floor to prevent stacking armor to 99%+ reduction
         var originalTotal = args.OriginalDamage.GetTotal().Float();
         if (originalTotal <= 0)
             return;
