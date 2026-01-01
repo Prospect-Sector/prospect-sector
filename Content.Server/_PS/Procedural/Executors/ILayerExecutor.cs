@@ -1,8 +1,11 @@
+using System.Numerics;
 using System.Threading.Tasks;
 using Content.Server._PS.Procedural.Generation;
+using Content.Shared.EntityTable;
 using Content.Shared.Procedural;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server._PS.Procedural.Executors;
 
@@ -77,6 +80,14 @@ public abstract class LayerExecutorBase<TLayer> : ILayerExecutor where TLayer : 
     protected void QueueDecal(string decalId, Vector2 position, Angle rotation = default, Color? color = null)
     {
         Context.DecalCommands.Enqueue(new DecalCommand(decalId, position, rotation, color));
+    }
+
+    /// <summary>
+    /// Queues entities from an entity table to be spawned.
+    /// </summary>
+    protected void QueueEntityTable(ProtoId<EntityTablePrototype> tableId, Vector2i position, Angle rotation = default)
+    {
+        Context.EntityTableCommands.Enqueue(new EntityTableSpawnCommand(tableId, position, rotation));
     }
 
     /// <summary>

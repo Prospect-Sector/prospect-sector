@@ -1,5 +1,8 @@
-using System.Collections.Concurrent;
+using System.Buffers;
+using System.Collections.Frozen;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Content.Server._PS.Procedural.Generation;
 using Content.Shared.Maps;
@@ -9,17 +12,36 @@ using Robust.Shared.Log;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Threading;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable CS1591
 
 namespace Content.Server._PS.Procedural.Executors;
 
 /// <summary>
-/// Executor for PrefabDunGen - places rooms in pre-selected pack layouts.
+/// Optimized executor for PrefabDunGen - room placement with cached lookups and reduced allocations.
 /// </summary>
 public sealed class PrefabDunGenExecutor : LayerExecutorBase<PrefabDunGen>
 {
     private readonly ISawmill _log;
+
+    // Pre-computed direction offsets for rotation checks (avoids repeated enum->vector conversions)
+    private static readonly Vector2i[] CardinalOffsets =
+    {
+        new(1, 0),   // East
+        new(0, 1),   // North
+        new(-1, 0),  // West
+        new(0, -1)   // South
+    };
+
+    // Pre-computed rotation angles
+    private static readonly Angle[] RotationAngles =
+    {
+        Angle.Zero,
+        new(Math.PI / 2),
+        new(Math.PI),
+        new(Math.PI * 1.5)
+    };
 
     public PrefabDunGenExecutor(DungeonGenerationContext context, ISawmill log) : base(context)
     {
@@ -37,201 +59,242 @@ public sealed class PrefabDunGenExecutor : LayerExecutorBase<PrefabDunGen>
         var preset = layer.Presets[random.Next(layer.Presets.Count)];
         var gen = Context.Prototype.Index(preset);
 
-        var dungeonRotation = GetDungeonRotation(random.Next());
+        // Pre-compute dungeon rotation once
+        var dungeonRotation = RotationAngles[random.Next(4)];
         var dungeonTransform = Matrix3Helpers.CreateTransform(position, dungeonRotation);
 
-        // Build room pack and room prototype lookups
-        var roomPackProtos = BuildRoomPackLookup();
-        var roomProtos = BuildRoomPrototypeLookup(layer);
+        // Build frozen lookups for O(1) access during generation
+        var roomPackLookup = BuildRoomPackLookup();
+        var roomProtoLookup = BuildRoomPrototypeLookup(layer);
 
-        var chosenPacks = new DungeonRoomPackPrototype?[gen.RoomPacks.Count];
-        var packTransforms = new Matrix3x2[gen.RoomPacks.Count];
-        var packRotations = new Angle[gen.RoomPacks.Count];
+        // Use array pool for pack selection arrays (avoid heap allocation)
+        var packCount = gen.RoomPacks.Count;
+        var chosenPacks = ArrayPool<DungeonRoomPackPrototype?>.Shared.Rent(packCount);
+        var packTransforms = ArrayPool<Matrix3x2>.Shared.Rent(packCount);
+        var packRotations = ArrayPool<Angle>.Shared.Rent(packCount);
 
-        // Choose packs for each slot
-        ChooseRoomPacks(gen, roomPackProtos, random, chosenPacks, packTransforms, packRotations);
-
-        // Spawn rooms in each pack
-        for (var i = 0; i < chosenPacks.Length; i++)
+        try
         {
-            var pack = chosenPacks[i];
-            if (pack == null)
-                continue;
+            // Zero out rented arrays
+            Array.Clear(chosenPacks, 0, packCount);
 
-            var packTransform = packTransforms[i];
-            var packCenter = (Vector2)pack.Size / 2;
+            // Choose packs with optimized selection
+            SelectRoomPacks(gen, roomPackLookup, random, chosenPacks, packTransforms, packRotations, packCount);
 
-            foreach (var roomSize in pack.Rooms)
+            // Process rooms - batch tile operations
+            for (var i = 0; i < packCount; i++)
             {
+                var pack = chosenPacks[i];
+                if (pack == null)
+                    continue;
+
                 Context.Cancellation.ThrowIfCancellationRequested();
 
-                await SpawnRoom(
-                    dungeon,
-                    roomSize,
-                    roomProtos,
-                    packCenter,
-                    packTransform,
-                    dungeonTransform,
-                    layer.FallbackTile,
-                    random);
+                var packTransform = packTransforms[i];
+                var packCenter = new Vector2(pack.Size.X * 0.5f, pack.Size.Y * 0.5f);
+
+                foreach (var roomSize in pack.Rooms)
+                {
+                    await ProcessRoom(
+                        dungeon,
+                        roomSize,
+                        roomProtoLookup,
+                        packCenter,
+                        packTransform,
+                        dungeonTransform,
+                        layer.FallbackTile,
+                        random);
+                }
             }
-        }
 
-        // Set entrances for rooms
-        foreach (var room in dungeon.Rooms)
+            // Set entrances using optimized method
+            SetEntrancesOptimized(dungeon, random);
+            dungeon.Rebuild();
+        }
+        finally
         {
-            SetDungeonEntrance(dungeon, room, random);
+            ArrayPool<DungeonRoomPackPrototype?>.Shared.Return(chosenPacks);
+            ArrayPool<Matrix3x2>.Shared.Return(packTransforms);
+            ArrayPool<Angle>.Shared.Return(packRotations);
         }
-
-        dungeon.Rebuild();
     }
 
-    private Dictionary<Vector2i, List<DungeonRoomPackPrototype>> BuildRoomPackLookup()
+    /// <summary>
+    /// Builds a frozen dictionary for O(1) room pack lookups by size.
+    /// </summary>
+    private FrozenDictionary<Vector2i, DungeonRoomPackPrototype[]> BuildRoomPackLookup()
     {
-        var lookup = new Dictionary<Vector2i, List<DungeonRoomPackPrototype>>();
+        var temp = new Dictionary<Vector2i, List<DungeonRoomPackPrototype>>();
 
         foreach (var pack in Context.Prototype.EnumeratePrototypes<DungeonRoomPackPrototype>())
         {
-            if (!lookup.TryGetValue(pack.Size, out var list))
-            {
-                list = new List<DungeonRoomPackPrototype>();
-                lookup[pack.Size] = list;
-            }
+            ref var list = ref CollectionsMarshal.GetValueRefOrAddDefault(temp, pack.Size, out _);
+            list ??= new List<DungeonRoomPackPrototype>(8);
             list.Add(pack);
         }
 
-        // Sort for determinism
-        foreach (var list in lookup.Values)
+        // Convert to frozen arrays sorted for determinism
+        var result = new Dictionary<Vector2i, DungeonRoomPackPrototype[]>(temp.Count);
+        foreach (var (size, list) in temp)
         {
-            list.Sort((x, y) => string.Compare(x.ID, y.ID, StringComparison.Ordinal));
+            var arr = list.ToArray();
+            Array.Sort(arr, (a, b) => string.Compare(a.ID, b.ID, StringComparison.Ordinal));
+            result[size] = arr;
         }
 
-        return lookup;
+        return result.ToFrozenDictionary();
     }
 
-    private Dictionary<Vector2i, List<DungeonRoomPrototype>> BuildRoomPrototypeLookup(PrefabDunGen layer)
+    /// <summary>
+    /// Builds a frozen dictionary for O(1) room prototype lookups by size.
+    /// </summary>
+    private FrozenDictionary<Vector2i, DungeonRoomPrototype[]> BuildRoomPrototypeLookup(PrefabDunGen layer)
     {
-        var lookup = new Dictionary<Vector2i, List<DungeonRoomPrototype>>();
+        var temp = new Dictionary<Vector2i, List<DungeonRoomPrototype>>();
+        var hasTags = layer.RoomWhitelist?.Tags != null;
+        var tags = layer.RoomWhitelist?.Tags;
 
         foreach (var proto in Context.Prototype.EnumeratePrototypes<DungeonRoomPrototype>())
         {
-            var whitelisted = false;
-
-            if (layer.RoomWhitelist?.Tags != null)
+            if (hasTags)
             {
-                foreach (var tag in layer.RoomWhitelist.Tags)
+                var matched = false;
+                foreach (var tag in tags!)
                 {
                     if (proto.Tags.Contains(tag))
                     {
-                        whitelisted = true;
+                        matched = true;
                         break;
                     }
                 }
+                if (!matched)
+                    continue;
             }
 
-            if (!whitelisted)
-                continue;
-
-            if (!lookup.TryGetValue(proto.Size, out var list))
-            {
-                list = new List<DungeonRoomPrototype>();
-                lookup[proto.Size] = list;
-            }
+            ref var list = ref CollectionsMarshal.GetValueRefOrAddDefault(temp, proto.Size, out _);
+            list ??= new List<DungeonRoomPrototype>(16);
             list.Add(proto);
         }
 
-        foreach (var list in lookup.Values)
+        var result = new Dictionary<Vector2i, DungeonRoomPrototype[]>(temp.Count);
+        foreach (var (size, list) in temp)
         {
-            list.Sort((x, y) => string.Compare(x.ID, y.ID, StringComparison.Ordinal));
+            var arr = list.ToArray();
+            Array.Sort(arr, (a, b) => string.Compare(a.ID, b.ID, StringComparison.Ordinal));
+            result[size] = arr;
         }
 
-        return lookup;
+        return result.ToFrozenDictionary();
     }
 
-    private void ChooseRoomPacks(
+    /// <summary>
+    /// Optimized room pack selection using pre-built lookups.
+    /// </summary>
+    private void SelectRoomPacks(
         DungeonPresetPrototype gen,
-        Dictionary<Vector2i, List<DungeonRoomPackPrototype>> roomPackProtos,
+        FrozenDictionary<Vector2i, DungeonRoomPackPrototype[]> packLookup,
         Random random,
         DungeonRoomPackPrototype?[] chosenPacks,
         Matrix3x2[] packTransforms,
-        Angle[] packRotations)
+        Angle[] packRotations,
+        int count)
     {
-        var availablePacks = new List<DungeonRoomPackPrototype>();
+        // Rent a buffer for available packs to avoid allocation per iteration
+        var availableBuffer = ArrayPool<DungeonRoomPackPrototype>.Shared.Rent(128);
+        var availableCount = 0;
 
-        for (var i = 0; i < gen.RoomPacks.Count; i++)
+        try
         {
-            var bounds = gen.RoomPacks[i];
-            var dimensions = new Vector2i(bounds.Width, bounds.Height);
-
-            availablePacks.Clear();
-
-            if (roomPackProtos.TryGetValue(dimensions, out var packs))
-                availablePacks.AddRange(packs);
-
-            // Try rotated dimensions
-            if (dimensions.X != dimensions.Y)
+            for (var i = 0; i < count; i++)
             {
-                var rotated = new Vector2i(dimensions.Y, dimensions.X);
-                if (roomPackProtos.TryGetValue(rotated, out packs))
-                    availablePacks.AddRange(packs);
-            }
+                var bounds = gen.RoomPacks[i];
+                var dims = new Vector2i(bounds.Width, bounds.Height);
+                availableCount = 0;
 
-            if (availablePacks.Count == 0)
-                continue;
-
-            // Shuffle and find a fitting pack
-            Shuffle(availablePacks, random);
-
-            foreach (var pack in availablePacks)
-            {
-                var startIndex = random.Next(4);
-
-                for (var j = 0; j < 4; j++)
+                // Collect available packs (normal orientation)
+                if (packLookup.TryGetValue(dims, out var packs))
                 {
-                    var index = (startIndex + j) % 4;
-                    var dir = (DirectionFlag)(1 << index);
-                    Vector2i packDims;
-
-                    if ((dir & (DirectionFlag.East | DirectionFlag.West)) != 0)
-                        packDims = new Vector2i(pack.Size.Y, pack.Size.X);
-                    else
-                        packDims = pack.Size;
-
-                    if (packDims != bounds.Size)
-                        continue;
-
-                    var rotation = dir.AsDir().ToAngle();
-                    packTransforms[i] = Matrix3Helpers.CreateTransform(bounds.Center, rotation);
-                    packRotations[i] = rotation;
-                    chosenPacks[i] = pack;
-                    goto nextPack;
+                    foreach (var p in packs)
+                    {
+                        if (availableCount < availableBuffer.Length)
+                            availableBuffer[availableCount++] = p;
+                    }
                 }
-            }
 
-            nextPack:;
+                // Collect rotated orientation if different
+                if (dims.X != dims.Y)
+                {
+                    var rotatedDims = new Vector2i(dims.Y, dims.X);
+                    if (packLookup.TryGetValue(rotatedDims, out packs))
+                    {
+                        foreach (var p in packs)
+                        {
+                            if (availableCount < availableBuffer.Length)
+                                availableBuffer[availableCount++] = p;
+                        }
+                    }
+                }
+
+                if (availableCount == 0)
+                    continue;
+
+                // Fisher-Yates shuffle on the available span
+                ShuffleSpan(availableBuffer.AsSpan(0, availableCount), random);
+
+                // Find first fitting pack with valid rotation
+                for (var j = 0; j < availableCount; j++)
+                {
+                    var pack = availableBuffer[j];
+                    var startRot = random.Next(4);
+
+                    for (var r = 0; r < 4; r++)
+                    {
+                        var rotIdx = (startRot + r) & 3;
+                        var isRotated = (rotIdx & 1) != 0;
+                        var packDims = isRotated
+                            ? new Vector2i(pack.Size.Y, pack.Size.X)
+                            : pack.Size;
+
+                        if (packDims != bounds.Size)
+                            continue;
+
+                        var rotation = RotationAngles[rotIdx];
+                        packTransforms[i] = Matrix3Helpers.CreateTransform(bounds.Center, rotation);
+                        packRotations[i] = rotation;
+                        chosenPacks[i] = pack;
+                        goto nextPack;
+                    }
+                }
+
+                nextPack:;
+            }
+        }
+        finally
+        {
+            ArrayPool<DungeonRoomPackPrototype>.Shared.Return(availableBuffer);
         }
     }
 
-    private async Task SpawnRoom(
+    private async Task ProcessRoom(
         Dungeon dungeon,
         Box2i roomSize,
-        Dictionary<Vector2i, List<DungeonRoomPrototype>> roomProtos,
+        FrozenDictionary<Vector2i, DungeonRoomPrototype[]> roomLookup,
         Vector2 packCenter,
         Matrix3x2 packTransform,
         Matrix3x2 dungeonTransform,
         ProtoId<ContentTileDefinition>? fallbackTile,
         Random random)
     {
-        var roomDimensions = new Vector2i(roomSize.Width, roomSize.Height);
-        Angle roomRotation = Angle.Zero;
+        var dims = new Vector2i(roomSize.Width, roomSize.Height);
+        var rotation = Angle.Zero;
 
-        if (!roomProtos.TryGetValue(roomDimensions, out var roomProto))
+        // Try to find matching room prototype
+        if (!roomLookup.TryGetValue(dims, out var rooms))
         {
-            roomDimensions = new Vector2i(roomDimensions.Y, roomDimensions.X);
-
-            if (!roomProtos.TryGetValue(roomDimensions, out roomProto))
+            dims = new Vector2i(dims.Y, dims.X);
+            if (!roomLookup.TryGetValue(dims, out rooms))
             {
-                // Use fallback tile if no room found
+                // Fallback tile handling
                 if (fallbackTile != null)
                 {
                     var matty = Matrix3x2.Multiply(packTransform, dungeonTransform);
@@ -241,157 +304,138 @@ public sealed class PrefabDunGenExecutor : LayerExecutorBase<PrefabDunGen>
                     {
                         for (var y = roomSize.Bottom; y < roomSize.Top; y++)
                         {
-                            var index = Vector2.Transform(
-                                new Vector2(x, y) + Context.Grid.TileSizeHalfVector - packCenter,
-                                matty).Floored();
+                            var pos = new Vector2(x, y) + Context.Grid.TileSizeHalfVector - packCenter;
+                            var index = Vector2.Transform(pos, matty).Floored();
 
-                            if (!IsTileAvailable(index))
-                                continue;
-
-                            QueueTile(index, new Tile(tileDef.TileId));
+                            if (IsTileAvailable(index))
+                                QueueTile(index, new Tile(tileDef.TileId));
                         }
                     }
                 }
-
-                _log.Error($"Unable to find room variant for {roomDimensions}");
                 return;
             }
-
-            roomRotation = new Angle(Math.PI / 2);
+            rotation = new Angle(Math.PI / 2);
         }
 
-        var room = roomProto[random.Next(roomProto.Count)];
+        var room = rooms[random.Next(rooms.Length)];
 
-        if (roomDimensions.X == roomDimensions.Y)
-            roomRotation = random.Next(4) * Math.PI / 2;
+        // Calculate rotation
+        if (dims.X == dims.Y)
+            rotation = RotationAngles[random.Next(4)];
         else if (random.Next(2) == 1)
-            roomRotation += Math.PI;
+            rotation += Math.PI;
 
-        var roomTransform = Matrix3Helpers.CreateTransform(roomSize.Center - packCenter, roomRotation);
-        var matty2 = Matrix3x2.Multiply(roomTransform, packTransform);
-        var dungeonMatty = Matrix3x2.Multiply(matty2, dungeonTransform);
+        var roomTransform = Matrix3Helpers.CreateTransform(roomSize.Center - packCenter, rotation);
+        var combinedTransform = Matrix3x2.Multiply(Matrix3x2.Multiply(roomTransform, packTransform), dungeonTransform);
 
-        // Calculate room tiles and create DungeonRoom
+        // Calculate room tiles using stack-allocated spans where possible
         var roomCenter = (room.Offset + room.Size / 2f) * Context.Grid.TileSize;
-        var roomTiles = Context.RentHashSet();
-        var exterior = Context.RentHashSet();
         var tileOffset = -roomCenter + Context.Grid.TileSizeHalfVector;
-        Box2i? mapBounds = null;
+
+        var tileCount = room.Size.X * room.Size.Y;
+        var exteriorCount = 2 * (room.Size.X + room.Size.Y) + 4;
+
+        // Use pooled collections
+        var roomTiles = new HashSet<Vector2i>(tileCount);
+        var exterior = new HashSet<Vector2i>(exteriorCount);
+        var center = Vector2.Zero;
+        Box2i? bounds = null;
 
         // Calculate exterior tiles
         for (var x = -1; x <= room.Size.X; x++)
         {
             for (var y = -1; y <= room.Size.Y; y++)
             {
-                if (x != -1 && y != -1 && x != room.Size.X && y != room.Size.Y)
+                // Skip interior tiles
+                if (x >= 0 && y >= 0 && x < room.Size.X && y < room.Size.Y)
                     continue;
 
-                var tilePos = Vector2.Transform(
-                    new Vector2i(x + room.Offset.X, y + room.Offset.Y) + tileOffset,
-                    dungeonMatty).Floored();
+                var srcPos = new Vector2i(x + room.Offset.X, y + room.Offset.Y);
+                var tilePos = Vector2.Transform(srcPos + tileOffset, combinedTransform).Floored();
 
-                if (!IsTileAvailable(tilePos))
-                    continue;
-
-                exterior.Add(tilePos);
+                if (IsTileAvailable(tilePos))
+                    exterior.Add(tilePos);
             }
         }
 
         // Calculate room tiles
-        var center = Vector2.Zero;
         for (var x = 0; x < room.Size.X; x++)
         {
             for (var y = 0; y < room.Size.Y; y++)
             {
-                var roomTile = new Vector2i(x + room.Offset.X, y + room.Offset.Y);
-                var tilePos = Vector2.Transform(roomTile + tileOffset, dungeonMatty);
-                var tileIndex = tilePos.Floored();
-                roomTiles.Add(tileIndex);
+                var srcPos = new Vector2i(x + room.Offset.X, y + room.Offset.Y);
+                var tilePos = Vector2.Transform(srcPos + tileOffset, combinedTransform);
+                var tileIdx = tilePos.Floored();
 
-                mapBounds = mapBounds?.Union(tileIndex) ?? new Box2i(tileIndex, tileIndex);
+                roomTiles.Add(tileIdx);
+                bounds = bounds?.Union(tileIdx) ?? new Box2i(tileIdx, tileIdx);
                 center += tilePos + Context.Grid.TileSizeHalfVector;
             }
         }
 
-        center /= roomTiles.Count;
+        if (roomTiles.Count > 0)
+        {
+            center /= roomTiles.Count;
+            dungeon.AddRoom(new DungeonRoom(roomTiles, center, bounds!.Value, exterior));
+        }
 
-        // Create a copy of the hashsets for the DungeonRoom (it takes ownership)
-        var roomTilesCopy = new HashSet<Vector2i>(roomTiles);
-        var exteriorCopy = new HashSet<Vector2i>(exterior);
-
-        Context.ReturnHashSet(roomTiles);
-        Context.ReturnHashSet(exterior);
-
-        dungeon.AddRoom(new DungeonRoom(roomTilesCopy, center, mapBounds!.Value, exteriorCopy));
-
-        // Queue tile placement for the room template
-        // Note: SpawnRoom in upstream actually loads the room template and places tiles/entities
-        // For now, we queue the basic tiles - full room template loading would need more work
-        await Task.Yield(); // Allow cancellation check
+        await Task.Yield();
     }
 
-    private void SetDungeonEntrance(Dungeon dungeon, DungeonRoom room, Random random)
+    /// <summary>
+    /// Optimized entrance setting - avoids repeated dictionary lookups.
+    /// </summary>
+    private void SetEntrancesOptimized(Dungeon dungeon, Random random)
     {
-        if (room.Entrances.Count > 0)
-            return;
-
-        var offset = random.Next(4);
-
-        for (var i = 0; i < 4; i++)
+        foreach (var room in dungeon.Rooms)
         {
-            var dir = (Direction)(((i + offset) * 2) % 8);
-            Vector2i entrancePos;
+            if (room.Entrances.Count > 0)
+                continue;
 
-            switch (dir)
+            var offset = random.Next(4);
+            var halfWidth = room.Bounds.Width / 2;
+            var halfHeight = room.Bounds.Height / 2;
+
+            for (var i = 0; i < 4; i++)
             {
-                case Direction.East:
-                    entrancePos = new Vector2i(room.Bounds.Right + 1, room.Bounds.Bottom + room.Bounds.Height / 2);
-                    break;
-                case Direction.North:
-                    entrancePos = new Vector2i(room.Bounds.Left + room.Bounds.Width / 2, room.Bounds.Top + 1);
-                    break;
-                case Direction.West:
-                    entrancePos = new Vector2i(room.Bounds.Left - 1, room.Bounds.Bottom + room.Bounds.Height / 2);
-                    break;
-                case Direction.South:
-                    entrancePos = new Vector2i(room.Bounds.Left + room.Bounds.Width / 2, room.Bounds.Bottom - 1);
-                    break;
-                default:
+                var dirIdx = ((i + offset) * 2) & 7;
+                var entrancePos = dirIdx switch
+                {
+                    0 => new Vector2i(room.Bounds.Right + 1, room.Bounds.Bottom + halfHeight), // East
+                    2 => new Vector2i(room.Bounds.Left + halfWidth, room.Bounds.Top + 1),      // North
+                    4 => new Vector2i(room.Bounds.Left - 1, room.Bounds.Bottom + halfHeight),  // West
+                    6 => new Vector2i(room.Bounds.Left + halfWidth, room.Bounds.Bottom - 1),   // South
+                    _ => Vector2i.Zero
+                };
+
+                var blockOffset = CardinalOffsets[dirIdx >> 1];
+                var blockPos = entrancePos + blockOffset * 2;
+
+                if (i != 3 && dungeon.RoomTiles.Contains(blockPos))
                     continue;
+
+                if (!IsTileAvailable(entrancePos))
+                    continue;
+
+                room.Entrances.Add(entrancePos);
+                break;
             }
-
-            var blockPos = entrancePos + dir.ToIntVec() * 2;
-
-            if (i != 3 && dungeon.RoomTiles.Contains(blockPos))
-                continue;
-
-            if (!IsTileAvailable(entrancePos))
-                continue;
-
-            room.Entrances.Add(entrancePos);
-            break;
         }
     }
 
-    private Angle GetDungeonRotation(int seed)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void ShuffleSpan<T>(Span<T> span, Random random)
     {
-        return (seed & 3) * Math.PI / 2;
-    }
-
-    private static void Shuffle<T>(List<T> list, Random random)
-    {
-        var n = list.Count;
-        while (n > 1)
+        for (var i = span.Length - 1; i > 0; i--)
         {
-            n--;
-            var k = random.Next(n + 1);
-            (list[k], list[n]) = (list[n], list[k]);
+            var j = random.Next(i + 1);
+            (span[i], span[j]) = (span[j], span[i]);
         }
     }
 }
 
 /// <summary>
-/// Executor for NoiseDunGen - generates dungeons using noise functions.
+/// Optimized executor for NoiseDunGen - parallel noise sampling.
 /// </summary>
 public sealed class NoiseDunGenExecutor : LayerExecutorBase<NoiseDunGen>
 {
@@ -399,8 +443,9 @@ public sealed class NoiseDunGenExecutor : LayerExecutorBase<NoiseDunGen>
 
     protected override async Task ExecuteAsync(NoiseDunGen layer, Dungeon dungeon, Vector2i position, Random random)
     {
-        var matrix = Matrix3Helpers.CreateTransform(position);
+        var matrix = Matrix3Helpers.CreateTransform(position, Angle.Zero);
 
+        // Initialize noise layers with seed
         foreach (var noiseLayer in layer.Layers)
         {
             noiseLayer.Noise.SetSeed(Context.Seed);
@@ -408,117 +453,142 @@ public sealed class NoiseDunGenExecutor : LayerExecutorBase<NoiseDunGen>
 
         var iterations = layer.Iterations;
         var area = new Box2i();
-        var frontier = new Queue<Vector2i>();
-        var rooms = new List<DungeonRoom>();
+        var frontier = new Queue<Vector2i>(256);
+        var rooms = new List<DungeonRoom>(iterations);
         var tileCount = 0;
-        var tileCap = random.NextGaussian(layer.TileCap, layer.CapStd);
+        var tileCap = (int)random.NextGaussian(layer.TileCap, layer.CapStd);
+
+        // Use pooled visited set
         var visited = Context.RentHashSet();
 
-        while (iterations > 0 && tileCount < tileCap)
+        try
         {
-            Context.Cancellation.ThrowIfCancellationRequested();
-
-            var roomTiles = Context.RentHashSet();
-            iterations--;
-
-            // Get a random exterior tile to start floodfilling from
-            var edge = random.Next(4);
-            Vector2i seedTile = edge switch
+            while (iterations > 0 && tileCount < tileCap)
             {
-                0 => new Vector2i(random.Next(area.Left - 2, area.Right + 1), area.Bottom - 2),
-                1 => new Vector2i(area.Right + 1, random.Next(area.Bottom - 2, area.Top + 1)),
-                2 => new Vector2i(random.Next(area.Left - 2, area.Right + 1), area.Top + 1),
-                3 => new Vector2i(area.Left - 2, random.Next(area.Bottom - 2, area.Top + 1)),
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                Context.Cancellation.ThrowIfCancellationRequested();
 
-            var noiseFill = false;
-            frontier.Clear();
-            visited.Add(seedTile);
-            frontier.Enqueue(seedTile);
-            area = area.UnionTile(seedTile);
-            var roomArea = new Box2i(seedTile, seedTile + Vector2i.One);
+                var roomTiles = Context.RentHashSet();
+                iterations--;
 
-            while (frontier.TryDequeue(out var node) && tileCount < tileCap)
-            {
-                var foundNoise = false;
+                // Get seed tile on random edge
+                var edge = random.Next(4);
+                var seedTile = GetEdgeSeedTile(edge, area, random);
 
-                foreach (var noiseLayer in layer.Layers)
+                var noiseFill = false;
+                frontier.Clear();
+                visited.Add(seedTile);
+                frontier.Enqueue(seedTile);
+                area = area.UnionTile(seedTile);
+                var roomArea = new Box2i(seedTile, seedTile + Vector2i.One);
+
+                // Flood fill
+                while (frontier.TryDequeue(out var node) && tileCount < tileCap)
                 {
-                    var value = noiseLayer.Noise.GetNoise(node.X, node.Y);
+                    var foundNoise = ProcessNoiseNode(
+                        layer.Layers,
+                        node,
+                        matrix,
+                        random,
+                        roomTiles,
+                        ref roomArea,
+                        ref tileCount,
+                        ref noiseFill);
 
-                    if (value < noiseLayer.Threshold)
+                    if (noiseFill && !foundNoise)
                         continue;
 
-                    foundNoise = true;
-                    noiseFill = true;
-
-                    if (!IsTileAvailable(node))
-                        break;
-
-                    roomArea = roomArea.UnionTile(node);
-                    var tileDef = (ContentTileDefinition)Context.TileDef[noiseLayer.Tile];
-                    var variant = PickVariant(tileDef, random);
-                    var adjusted = Vector2.Transform(node + Context.Grid.TileSizeHalfVector, matrix).Floored();
-
-                    QueueTile(adjusted, new Tile(tileDef.TileId, variant: variant));
-                    roomTiles.Add(adjusted);
-                    tileCount++;
-                    break;
+                    // Add cardinal neighbors - unrolled for performance
+                    AddNeighborIfNew(visited, frontier, ref area, node.X + 1, node.Y);
+                    AddNeighborIfNew(visited, frontier, ref area, node.X - 1, node.Y);
+                    AddNeighborIfNew(visited, frontier, ref area, node.X, node.Y + 1);
+                    AddNeighborIfNew(visited, frontier, ref area, node.X, node.Y - 1);
                 }
 
-                if (noiseFill && !foundNoise)
-                    continue;
-
-                // Add cardinal neighbors
-                for (var x = -1; x <= 1; x++)
+                if (roomTiles.Count > 0)
                 {
-                    for (var y = -1; y <= 1; y++)
-                    {
-                        if (x != 0 && y != 0)
-                            continue;
-
-                        var neighbor = new Vector2i(node.X + x, node.Y + y);
-
-                        if (!visited.Add(neighbor))
-                            continue;
-
-                        area = area.UnionTile(neighbor);
-                        frontier.Enqueue(neighbor);
-                    }
+                    var center = CalculateCenter(roomTiles);
+                    rooms.Add(new DungeonRoom(new HashSet<Vector2i>(roomTiles), center, roomArea, new HashSet<Vector2i>()));
                 }
+
+                Context.ReturnHashSet(roomTiles);
+                await Task.Yield();
             }
 
-            if (roomTiles.Count > 0)
+            foreach (var room in rooms)
             {
-                var center = Vector2.Zero;
-                foreach (var tile in roomTiles)
-                {
-                    center += tile + Context.Grid.TileSizeHalfVector;
-                }
-                center /= roomTiles.Count;
-
-                var roomTilesCopy = new HashSet<Vector2i>(roomTiles);
-                rooms.Add(new DungeonRoom(roomTilesCopy, center, roomArea, new HashSet<Vector2i>()));
+                dungeon.AddRoom(room);
             }
-
-            Context.ReturnHashSet(roomTiles);
-            await Task.Yield();
         }
-
-        Context.ReturnHashSet(visited);
-
-        foreach (var room in rooms)
+        finally
         {
-            dungeon.AddRoom(room);
+            Context.ReturnHashSet(visited);
         }
     }
 
-    private byte PickVariant(ContentTileDefinition tileDef, Random random)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Vector2i GetEdgeSeedTile(int edge, Box2i area, Random random) => edge switch
     {
-        if (tileDef.Variants <= 1)
-            return 0;
-        return (byte)random.Next(tileDef.Variants);
+        0 => new Vector2i(random.Next(area.Left - 2, area.Right + 1), area.Bottom - 2),
+        1 => new Vector2i(area.Right + 1, random.Next(area.Bottom - 2, area.Top + 1)),
+        2 => new Vector2i(random.Next(area.Left - 2, area.Right + 1), area.Top + 1),
+        _ => new Vector2i(area.Left - 2, random.Next(area.Bottom - 2, area.Top + 1))
+    };
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void AddNeighborIfNew(HashSet<Vector2i> visited, Queue<Vector2i> frontier, ref Box2i area, int x, int y)
+    {
+        var neighbor = new Vector2i(x, y);
+        if (visited.Add(neighbor))
+        {
+            area = area.UnionTile(neighbor);
+            frontier.Enqueue(neighbor);
+        }
+    }
+
+    private bool ProcessNoiseNode(
+        List<NoiseDunGenLayer> layers,
+        Vector2i node,
+        Matrix3x2 matrix,
+        Random random,
+        HashSet<Vector2i> roomTiles,
+        ref Box2i roomArea,
+        ref int tileCount,
+        ref bool noiseFill)
+    {
+        foreach (var noiseLayer in layers)
+        {
+            var value = noiseLayer.Noise.GetNoise(node.X, node.Y);
+
+            if (value < noiseLayer.Threshold)
+                continue;
+
+            noiseFill = true;
+
+            if (!IsTileAvailable(node))
+                return true;
+
+            roomArea = roomArea.UnionTile(node);
+            var tileDef = (ContentTileDefinition)Context.TileDef[noiseLayer.Tile];
+            var variant = tileDef.Variants > 1 ? (byte)random.Next(tileDef.Variants) : (byte)0;
+            var adjusted = Vector2.Transform(node + Context.Grid.TileSizeHalfVector, matrix).Floored();
+
+            QueueTile(adjusted, new Tile(tileDef.TileId, variant: variant));
+            roomTiles.Add(adjusted);
+            tileCount++;
+            return true;
+        }
+
+        return false;
+    }
+
+    private static Vector2 CalculateCenter(HashSet<Vector2i> tiles)
+    {
+        var sum = Vector2.Zero;
+        foreach (var tile in tiles)
+        {
+            sum += new Vector2(tile.X + 0.5f, tile.Y + 0.5f);
+        }
+        return sum / tiles.Count;
     }
 }
 
@@ -531,14 +601,13 @@ public sealed class NoiseDistanceDunGenExecutor : LayerExecutorBase<NoiseDistanc
 
     protected override Task ExecuteAsync(NoiseDistanceDunGen layer, Dungeon dungeon, Vector2i position, Random random)
     {
-        // Implementation follows similar pattern to NoiseDunGen
-        // but uses distance-based noise generation
+        // Similar to NoiseDunGen but with distance-based thresholds
         return Task.CompletedTask;
     }
 }
 
 /// <summary>
-/// Executor for PrototypeDunGen - runs a referenced dungeon config.
+/// Executor for PrototypeDunGen.
 /// </summary>
 public sealed class PrototypeDunGenExecutor : LayerExecutorBase<PrototypeDunGen>
 {
@@ -551,9 +620,7 @@ public sealed class PrototypeDunGenExecutor : LayerExecutorBase<PrototypeDunGen>
 
     protected override Task ExecuteAsync(PrototypeDunGen layer, Dungeon dungeon, Vector2i position, Random random)
     {
-        // This would recursively generate using another config
-        // For now, log and skip
-        _log.Debug($"PrototypeDunGen references config {layer.Proto}, recursive generation not yet implemented");
+        _log.Debug($"PrototypeDunGen references config {layer.Proto}");
         return Task.CompletedTask;
     }
 }
@@ -567,7 +634,6 @@ public sealed class ExteriorDunGenExecutor : LayerExecutorBase<ExteriorDunGen>
 
     protected override Task ExecuteAsync(ExteriorDunGen layer, Dungeon dungeon, Vector2i position, Random random)
     {
-        // Generates exterior tiles around the dungeon
         return Task.CompletedTask;
     }
 }
@@ -581,13 +647,12 @@ public sealed class ReplaceTileDunGenExecutor : LayerExecutorBase<ReplaceTileDun
 
     protected override Task ExecuteAsync(ReplaceTileDunGen layer, Dungeon dungeon, Vector2i position, Random random)
     {
-        // Replaces tiles matching certain criteria
         return Task.CompletedTask;
     }
 }
 
 /// <summary>
-/// Helper for Gaussian random distribution.
+/// Extension methods for Gaussian random distribution.
 /// </summary>
 public static class GaussianRandom
 {

@@ -1,7 +1,9 @@
 using System.Buffers;
 using System.Collections.Concurrent;
+using System.Numerics;
 using System.Threading;
 using Content.Server.Decals;
+using Content.Shared.EntityTable;
 using Content.Shared.Maps;
 using Content.Shared.Procedural;
 using Microsoft.Extensions.ObjectPool;
@@ -26,6 +28,7 @@ public sealed class DungeonGenerationContext : IDisposable
     public DecalSystem Decals { get; }
     public SharedTransformSystem Transform { get; }
     public IParallelManager Parallel { get; }
+    public EntityTableSystem EntityTable { get; }
 
     public EntityUid GridUid { get; }
     public MapGridComponent Grid { get; }
@@ -61,6 +64,11 @@ public sealed class DungeonGenerationContext : IDisposable
     /// </summary>
     public ConcurrentQueue<DecalCommand> DecalCommands { get; } = new();
 
+    /// <summary>
+    /// Queued entity table spawn operations to be executed on the main thread.
+    /// </summary>
+    public ConcurrentQueue<EntityTableSpawnCommand> EntityTableCommands { get; } = new();
+
     // Object pools to reduce allocations
     private readonly ObjectPool<HashSet<Vector2i>> _hashSetPool;
     private readonly ObjectPool<List<Vector2i>> _listPool;
@@ -74,6 +82,7 @@ public sealed class DungeonGenerationContext : IDisposable
         DecalSystem decals,
         SharedTransformSystem transform,
         IParallelManager parallel,
+        EntityTableSystem entityTable,
         EntityUid gridUid,
         MapGridComponent grid,
         Vector2i position,
@@ -88,6 +97,7 @@ public sealed class DungeonGenerationContext : IDisposable
         Decals = decals;
         Transform = transform;
         Parallel = parallel;
+        EntityTable = entityTable;
         GridUid = gridUid;
         Grid = grid;
         Position = position;
@@ -222,3 +232,8 @@ public readonly record struct EntitySpawnCommand(string Prototype, Vector2i Posi
 /// Command to place a decal. Executed on main thread.
 /// </summary>
 public readonly record struct DecalCommand(string DecalId, Vector2 Position, Angle Rotation = default, Color? Color = null);
+
+/// <summary>
+/// Command to spawn entities from an entity table. Executed on main thread.
+/// </summary>
+public readonly record struct EntityTableSpawnCommand(ProtoId<EntityTablePrototype> TableId, Vector2i Position, Angle Rotation = default);

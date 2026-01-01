@@ -120,6 +120,9 @@ public sealed class ParallelDungeonGenerator
         // Process entity spawns
         await FlushEntityCommandsAsync();
 
+        // Process entity table spawns
+        await FlushEntityTableCommandsAsync();
+
         // Process decals
         await FlushDecalCommandsAsync();
     }
@@ -171,6 +174,30 @@ public sealed class ParallelDungeonGenerator
         {
             var coords = new EntityCoordinates(_context.GridUid, cmd.Position);
             _context.Decals.TryAddDecal(cmd.DecalId, coords, out _, cmd.Color, cmd.Rotation, 0, true);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task FlushEntityTableCommandsAsync()
+    {
+        while (_context.EntityTableCommands.TryDequeue(out var cmd))
+        {
+            var table = _context.Prototype.Index(cmd.TableId);
+            var coords = _context.Maps.GridTileToLocal(_context.GridUid, _context.Grid, cmd.Position);
+
+            foreach (var proto in _context.EntityTable.GetSpawns(table))
+            {
+                if (cmd.Rotation != Angle.Zero)
+                {
+                    var rotatedCoords = new EntityCoordinates(coords.EntityId, coords.Position);
+                    _context.EntityManager.SpawnEntity(proto, rotatedCoords);
+                }
+                else
+                {
+                    _context.EntityManager.SpawnEntity(proto, coords);
+                }
+            }
         }
 
         return Task.CompletedTask;

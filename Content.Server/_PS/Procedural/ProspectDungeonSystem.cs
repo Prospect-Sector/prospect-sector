@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using Content.Server._PS.Procedural.Generation;
 using Content.Server.Decals;
 using Content.Shared.CCVar;
+using Content.Shared.EntityTable;
 using Content.Shared.Maps;
 using Content.Shared.Procedural;
 using Robust.Server.GameObjects;
 using Robust.Shared.Configuration;
+using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
@@ -29,6 +31,7 @@ public sealed class ProspectDungeonSystem : EntitySystem
     [Dependency] private readonly DecalSystem _decals = default!;
     [Dependency] private readonly MapLoaderSystem _loader = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly EntityTableSystem _entityTable = default!;
 
     private bool _enabled;
     private int _workerCount;
@@ -97,6 +100,7 @@ public sealed class ProspectDungeonSystem : EntitySystem
                 _decals,
                 _transform,
                 _parallel,
+                _entityTable,
                 gridUid,
                 grid,
                 position,

@@ -37,7 +37,7 @@ public sealed class LayerExecutorRegistry
         Register<ReplaceTileDunGen>(new ReplaceTileDunGenExecutor(_context));
 
         // Post Generation Layers
-        Register<CorridorDunGen>(new CorridorDunGenExecutor(_context, _log));
+        Register<CorridorDunGen>(new CorridorDunGenExecutor(_context));
         Register<WormCorridorDunGen>(new WormCorridorDunGenExecutor(_context));
         Register<BoundaryWallDunGen>(new BoundaryWallDunGenExecutor(_context));
         Register<DungeonEntranceDunGen>(new DungeonEntranceDunGenExecutor(_context));
