@@ -1,11 +1,16 @@
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Content.Server._PS.Procedural.Generation;
 using Content.Server.Decals;
+using Content.Server.Procedural;
 using Content.Shared.CCVar;
+using Content.Shared.Construction.EntitySystems;
 using Content.Shared.EntityTable;
 using Content.Shared.Maps;
 using Content.Shared.Procedural;
+using Content.Shared.Tag;
 using Robust.Server.GameObjects;
 using Robust.Shared.Configuration;
 using Robust.Shared.EntitySerialization.Systems;
@@ -32,12 +37,18 @@ public sealed class ProspectDungeonSystem : EntitySystem
     [Dependency] private readonly MapLoaderSystem _loader = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly EntityTableSystem _entityTable = default!;
+    [Dependency] private readonly DungeonSystem _dungeon = default!;
+    [Dependency] private readonly AnchorableSystem _anchorable = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly TagSystem _tags = default!;
 
     private bool _enabled;
     private int _workerCount;
 
     private readonly Dictionary<int, CancellationTokenSource> _activeJobs = new();
     private int _nextJobId;
+
+    private const string StatsFile = "dungeon_stats.log";
 
     public bool Enabled => _enabled;
 
@@ -90,6 +101,8 @@ public sealed class ProspectDungeonSystem : EntitySystem
         var jobId = Interlocked.Increment(ref _nextJobId);
         _activeJobs[jobId] = cts;
 
+        var sw = Stopwatch.StartNew();
+
         try
         {
             var context = new DungeonGenerationContext(
@@ -101,6 +114,10 @@ public sealed class ProspectDungeonSystem : EntitySystem
                 _transform,
                 _parallel,
                 _entityTable,
+                _dungeon,
+                _anchorable,
+                _lookup,
+                _tags,
                 gridUid,
                 grid,
                 position,
@@ -109,7 +126,21 @@ public sealed class ProspectDungeonSystem : EntitySystem
                 cts.Token);
 
             var generator = new ParallelDungeonGenerator(context, Log);
-            return await generator.GenerateAsync(config);
+            var dungeons = await generator.GenerateAsync(config);
+
+            sw.Stop();
+
+            // Log stats to file
+            var totalTiles = 0;
+            foreach (var dungeon in dungeons)
+                totalTiles += dungeon.AllTiles.Count;
+
+            var line = $"{DateTime.Now:O}|{sw.ElapsedMilliseconds}ms|dungeons:{dungeons.Count}|tiles:{totalTiles}|seed:{seed}|system:prospect";
+            File.AppendAllText(StatsFile, line + Environment.NewLine);
+
+            Log.Info($"[Prospect] Dungeon generated in {sw.ElapsedMilliseconds}ms ({dungeons.Count} dungeons, {totalTiles} tiles)");
+
+            return dungeons;
         }
         finally
         {

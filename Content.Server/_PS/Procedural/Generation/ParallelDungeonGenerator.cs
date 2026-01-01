@@ -114,6 +114,9 @@ public sealed class ParallelDungeonGenerator
     /// </summary>
     private async Task FlushCommandsAsync()
     {
+        // Process room spawns first (they set tiles and spawn entities)
+        await FlushRoomSpawnCommandsAsync();
+
         // Process tile commands in batches
         await FlushTileCommandsAsync();
 
@@ -125,6 +128,21 @@ public sealed class ParallelDungeonGenerator
 
         // Process decals
         await FlushDecalCommandsAsync();
+    }
+
+    private Task FlushRoomSpawnCommandsAsync()
+    {
+        while (_context.RoomSpawnCommands.TryDequeue(out var cmd))
+        {
+            _context.Dungeon.SpawnRoom(
+                _context.GridUid,
+                _context.Grid,
+                cmd.Transform,
+                cmd.Room,
+                cmd.ReservedTiles);
+        }
+
+        return Task.CompletedTask;
     }
 
     private Task FlushTileCommandsAsync()

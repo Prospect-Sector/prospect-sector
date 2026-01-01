@@ -3,13 +3,19 @@ using System.Collections.Concurrent;
 using System.Numerics;
 using System.Threading;
 using Content.Server.Decals;
+using Content.Server.Procedural;
+using Content.Shared.Construction.EntitySystems;
+using Content.Shared.Doors.Components;
 using Content.Shared.EntityTable;
 using Content.Shared.Maps;
 using Content.Shared.Procedural;
+using Content.Shared.Tag;
 using Microsoft.Extensions.ObjectPool;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
+using Robust.Shared.Physics.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Threading;
 
@@ -29,6 +35,16 @@ public sealed class DungeonGenerationContext : IDisposable
     public SharedTransformSystem Transform { get; }
     public IParallelManager Parallel { get; }
     public EntityTableSystem EntityTable { get; }
+    public DungeonSystem Dungeon { get; }
+    public AnchorableSystem Anchorable { get; }
+    public EntityLookupSystem Lookup { get; }
+    public TagSystem Tags { get; }
+
+    // Entity queries for physics checks
+    public EntityQuery<PhysicsComponent> PhysicsQuery { get; }
+    public EntityQuery<DoorComponent> DoorQuery { get; }
+
+    private static readonly ProtoId<TagPrototype> WallTag = "Wall";
 
     public EntityUid GridUid { get; }
     public MapGridComponent Grid { get; }
@@ -69,6 +85,11 @@ public sealed class DungeonGenerationContext : IDisposable
     /// </summary>
     public ConcurrentQueue<EntityTableSpawnCommand> EntityTableCommands { get; } = new();
 
+    /// <summary>
+    /// Queued room spawn operations to be executed on the main thread.
+    /// </summary>
+    public ConcurrentQueue<RoomSpawnCommand> RoomSpawnCommands { get; } = new();
+
     // Object pools to reduce allocations
     private readonly ObjectPool<HashSet<Vector2i>> _hashSetPool;
     private readonly ObjectPool<List<Vector2i>> _listPool;
@@ -83,6 +104,10 @@ public sealed class DungeonGenerationContext : IDisposable
         SharedTransformSystem transform,
         IParallelManager parallel,
         EntityTableSystem entityTable,
+        DungeonSystem dungeon,
+        AnchorableSystem anchorable,
+        EntityLookupSystem lookup,
+        TagSystem tags,
         EntityUid gridUid,
         MapGridComponent grid,
         Vector2i position,
@@ -98,12 +123,20 @@ public sealed class DungeonGenerationContext : IDisposable
         Transform = transform;
         Parallel = parallel;
         EntityTable = entityTable;
+        Dungeon = dungeon;
+        Anchorable = anchorable;
+        Lookup = lookup;
+        Tags = tags;
         GridUid = gridUid;
         Grid = grid;
         Position = position;
         Seed = seed;
         WorkerCount = workerCount;
         Cancellation = cancellation;
+
+        // Initialize entity queries
+        PhysicsQuery = entityManager.GetEntityQuery<PhysicsComponent>();
+        DoorQuery = entityManager.GetEntityQuery<DoorComponent>();
 
         // Create thread-local randoms seeded deterministically
         _threadRandom = new ThreadLocal<Random>(() =>
@@ -182,6 +215,91 @@ public sealed class DungeonGenerationContext : IDisposable
     public bool TryReserveTile(Vector2i tile) => ReservedTiles.TryAdd(tile, 0);
 
     /// <summary>
+    /// Checks if a tile is free of collision entities.
+    /// </summary>
+    public bool TileFree(Vector2i tile, int collisionLayer, int collisionMask)
+    {
+        return Anchorable.TileFree((GridUid, Grid), tile, collisionLayer, collisionMask);
+    }
+
+    /// <summary>
+    /// Checks if a tile has a wall entity.
+    /// </summary>
+    public bool HasWall(Vector2i tile)
+    {
+        var anchored = Maps.GetAnchoredEntitiesEnumerator(GridUid, Grid, tile);
+
+        while (anchored.MoveNext(out var uid))
+        {
+            if (Tags.HasTag(uid.Value, WallTag))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if a tile has a hard physics entity that isn't a door.
+    /// </summary>
+    public bool HasHardPhysicsNonDoor(Vector2i tile)
+    {
+        var anchored = Maps.GetAnchoredEntitiesEnumerator(GridUid, Grid, tile);
+
+        while (anchored.MoveNext(out var ent))
+        {
+            if (!PhysicsQuery.TryGetComponent(ent, out var physics) ||
+                !physics.CanCollide ||
+                !physics.Hard ||
+                DoorQuery.HasComponent(ent.Value))
+            {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Clears door-blocking entities around a tile.
+    /// </summary>
+    public void ClearDoor(Dungeon dungeon, Vector2i indices, bool strict = false)
+    {
+        var flags = strict
+            ? LookupFlags.Dynamic | LookupFlags.Static | LookupFlags.StaticSundries
+            : LookupFlags.Dynamic | LookupFlags.Static;
+
+        for (var x = -1; x <= 1; x++)
+        {
+            for (var y = -1; y <= 1; y++)
+            {
+                if (x != 0 && y != 0)
+                    continue;
+
+                var neighbor = new Vector2i(indices.X + x, indices.Y + y);
+
+                if (!dungeon.RoomTiles.Contains(neighbor))
+                    continue;
+
+                var tilePos = Maps.GridTileToLocal(GridUid, Grid, neighbor);
+
+                foreach (var ent in Lookup.GetEntitiesIntersecting(tilePos, flags))
+                {
+                    if (!PhysicsQuery.TryGetComponent(ent, out var physics) ||
+                        !physics.CanCollide ||
+                        !physics.Hard)
+                    {
+                        continue;
+                    }
+
+                    EntityManager.QueueDeleteEntity(ent);
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Reserves multiple tiles atomically.
     /// </summary>
     public void ReserveTiles(IEnumerable<Vector2i> tiles)
@@ -237,3 +355,8 @@ public readonly record struct DecalCommand(string DecalId, Vector2 Position, Ang
 /// Command to spawn entities from an entity table. Executed on main thread.
 /// </summary>
 public readonly record struct EntityTableSpawnCommand(ProtoId<EntityTablePrototype> TableId, Vector2i Position, Angle Rotation = default);
+
+/// <summary>
+/// Command to spawn a room from a prototype template. Executed on main thread.
+/// </summary>
+public readonly record struct RoomSpawnCommand(DungeonRoomPrototype Room, Matrix3x2 Transform, HashSet<Vector2i>? ReservedTiles = null);

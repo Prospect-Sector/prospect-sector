@@ -29,4 +29,11 @@ public sealed partial class CCVars
     /// </summary>
     public static readonly CVarDef<int> ProspectDungeonWorkers =
         CVarDef.Create("prospect.dungeon_workers", 0, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Number of test dungeons to generate on round start for benchmarking.
+    /// Set to 0 to disable.
+    /// </summary>
+    public static readonly CVarDef<int> ProspectDungeonBenchmark =
+        CVarDef.Create("prospect.dungeon_benchmark", 0, CVar.SERVERONLY);
 }

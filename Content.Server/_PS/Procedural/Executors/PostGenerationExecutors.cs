@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Content.Server._PS.Procedural.Generation;
+using Content.Server.Procedural;
 using Content.Shared.Maps;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.PostGeneration;
@@ -502,6 +503,7 @@ public sealed class BoundaryWallDunGenExecutor : LayerExecutorBase<BoundaryWallD
 
 /// <summary>
 /// Executor for DungeonEntranceDunGen - creates dungeon external entrances.
+/// Matches upstream with TileFree checks, ClearDoor, and nearby tile clearing.
 /// </summary>
 public sealed class DungeonEntranceDunGenExecutor : LayerExecutorBase<DungeonEntranceDunGen>
 {
@@ -544,7 +546,12 @@ public sealed class DungeonEntranceDunGenExecutor : LayerExecutorBase<DungeonEnt
                         dungeon.CorridorTiles.Contains(oppositeDirVec))
                         continue;
 
-                    if (!IsTileAvailable(tile))
+                    // Check if exterior spot is free
+                    if (!Context.TileFree(tile, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
+                        continue;
+
+                    // Check if interior spot is free
+                    if (!Context.TileFree(dirVec, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
                         continue;
 
                     // Valid entrance found
@@ -552,7 +559,29 @@ public sealed class DungeonEntranceDunGenExecutor : LayerExecutorBase<DungeonEnt
 
                     var variant = tileDef.Variants > 1 ? (byte)random.Next(tileDef.Variants) : (byte)0;
                     QueueTile(tile, new Tile(tileDef.TileId, variant: variant));
+
+                    // Clear door-blocking entities
+                    Context.ClearDoor(dungeon, tile);
+
                     QueueEntityTable(layer.Contents, tile);
+
+                    // Clear out any biome tiles nearby to avoid blocking the entrance
+                    var gridCoords = Context.Maps.GridTileToLocal(Context.GridUid, Context.Grid, tile);
+                    foreach (var nearTile in Context.Maps.GetLocalTilesIntersecting(Context.GridUid, Context.Grid,
+                                 new Circle(gridCoords.Position, 1.5f), false))
+                    {
+                        if (dungeon.RoomTiles.Contains(nearTile.GridIndices) ||
+                            dungeon.RoomExteriorTiles.Contains(nearTile.GridIndices) ||
+                            dungeon.CorridorTiles.Contains(nearTile.GridIndices) ||
+                            dungeon.CorridorExteriorTiles.Contains(nearTile.GridIndices))
+                        {
+                            continue;
+                        }
+
+                        var nearVariant = tileDef.Variants > 1 ? (byte)random.Next(tileDef.Variants) : (byte)0;
+                        QueueTile(nearTile.GridIndices, new Tile(tileDef.TileId, variant: nearVariant));
+                    }
+
                     break;
                 }
 
@@ -653,6 +682,7 @@ public sealed class EntranceFlankDunGenExecutor : LayerExecutorBase<EntranceFlan
 
 /// <summary>
 /// Executor for ExternalWindowDunGen - places windows on exterior walls.
+/// Matches upstream with TileFree checks and perpendicular validation.
 /// </summary>
 public sealed class ExternalWindowDunGenExecutor : LayerExecutorBase<ExternalWindowDunGen>
 {
@@ -680,11 +710,15 @@ public sealed class ExternalWindowDunGenExecutor : LayerExecutorBase<ExternalWin
         {
             foreach (var tile in validTiles)
             {
-                if (index >= count)
+                if (index > count)
                     break;
 
-                if (takenTiles.Contains(tile))
+                // Check if tile is already taken or has collision
+                if (!Context.TileFree(tile, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask) ||
+                    takenTiles.Contains(tile))
+                {
                     continue;
+                }
 
                 // Check we're not on a corner - need 3 tiles in a row
                 for (var i = 0; i < 2; i++)
@@ -698,11 +732,32 @@ public sealed class ExternalWindowDunGenExecutor : LayerExecutorBase<ExternalWin
                     {
                         var neighbor = tile + dirVec * j;
 
-                        if (!allExterior.Contains(neighbor) || takenTiles.Contains(neighbor))
+                        if (!allExterior.Contains(neighbor) ||
+                            takenTiles.Contains(neighbor) ||
+                            !Context.TileFree(neighbor, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
                         {
                             isValid = false;
                             break;
                         }
+
+                        // Also check perpendicular tiles are free (matching upstream)
+                        foreach (var k in new[] { 2, 6 })
+                        {
+                            var perp = (Direction)((i * 2 + k) % 8);
+                            var perpVec = perp.ToIntVec();
+                            var perpTile = tile + perpVec;
+
+                            if (allExterior.Contains(perpTile) ||
+                                takenTiles.Contains(neighbor) ||
+                                !Context.TileFree(perpTile, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
+                            {
+                                isValid = false;
+                                break;
+                            }
+                        }
+
+                        if (!isValid)
+                            break;
                     }
 
                     if (!isValid)
@@ -756,52 +811,93 @@ public sealed class ExternalWindowDunGenExecutor : LayerExecutorBase<ExternalWin
 
 /// <summary>
 /// Executor for InternalWindowDunGen - places windows between adjacent rooms.
+/// Matches upstream logic: checks for rooms 4-6 tiles away, sorts by distance, takes top 3 per direction.
 /// </summary>
 public sealed class InternalWindowDunGenExecutor : LayerExecutorBase<InternalWindowDunGen>
 {
+    private const int MinDistance = 4;
+    private const int MaxDistance = 6;
+
     public InternalWindowDunGenExecutor(DungeonGenerationContext context) : base(context) { }
 
     protected override Task ExecuteAsync(InternalWindowDunGen layer, Dungeon dungeon, Vector2i position, Random random)
     {
-        // Similar to external but for room-to-room boundaries
         var tileDef = (ContentTileDefinition)Context.TileDef[layer.Tile];
-        var windowTiles = new ValueList<Vector2i>(32);
 
         foreach (var room in dungeon.Rooms)
         {
             Context.Cancellation.ThrowIfCancellationRequested();
 
-            foreach (var tile in room.Exterior)
-            {
-                // Check if this exterior tile borders another room
-                var bordersAnotherRoom = false;
-                for (var i = 0; i < 4; i++)
-                {
-                    var dir = (Direction)(i * 2);
-                    var neighbor = tile + dir.ToIntVec();
+            var validTiles = new List<Vector2i>();
 
-                    if (room.Tiles.Contains(neighbor))
+            // Check each cardinal direction
+            for (var i = 0; i < 4; i++)
+            {
+                var dir = (DirectionFlag)Math.Pow(2, i);
+                var dirVec = dir.AsDir().ToIntVec();
+
+                foreach (var tile in room.Tiles)
+                {
+                    // Calculate angle from room center to determine which direction this tile faces
+                    var tileAngle = (tile + Context.Grid.TileSizeHalfVector - room.Center).ToAngle();
+                    var roundedAngle = Math.Round(tileAngle.Theta / (Math.PI / 2)) * (Math.PI / 2);
+                    var tileVec = (Vector2i)new Angle(roundedAngle).ToVec().Rounded();
+
+                    if (!tileVec.Equals(dirVec))
                         continue;
 
-                    if (dungeon.RoomTiles.Contains(neighbor))
+                    var valid = false;
+
+                    // Check if there's another room within minDistance to maxDistance
+                    for (var j = 1; j < MaxDistance; j++)
                     {
-                        bordersAnotherRoom = true;
-                        break;
+                        var edgeNeighbor = tile + dirVec * j;
+
+                        if (dungeon.RoomTiles.Contains(edgeNeighbor))
+                        {
+                            if (j < MinDistance)
+                            {
+                                valid = false;
+                            }
+                            else
+                            {
+                                valid = true;
+                            }
+
+                            break;
+                        }
                     }
+
+                    if (!valid)
+                        continue;
+
+                    // Window tile is one step outside the room
+                    var windowTile = tile + dirVec;
+
+                    if (!IsTileAvailable(windowTile))
+                        continue;
+
+                    if (!Context.TileFree(windowTile, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
+                        continue;
+
+                    validTiles.Add(windowTile);
                 }
 
-                if (!bordersAnotherRoom || !IsTileAvailable(tile))
-                    continue;
+                // Sort by distance from room center and take top 3
+                validTiles.Sort((x, y) =>
+                    (x + Context.Grid.TileSizeHalfVector - room.Center).LengthSquared()
+                        .CompareTo((y + Context.Grid.TileSizeHalfVector - room.Center).LengthSquared()));
 
-                var variant = tileDef.Variants > 1 ? (byte)random.Next(tileDef.Variants) : (byte)0;
-                QueueTile(tile, new Tile(tileDef.TileId, variant: variant));
-                windowTiles.Add(tile);
+                for (var j = 0; j < Math.Min(validTiles.Count, 3); j++)
+                {
+                    var windowTile = validTiles[j];
+                    var variant = tileDef.Variants > 1 ? (byte)random.Next(tileDef.Variants) : (byte)0;
+                    QueueTile(windowTile, new Tile(tileDef.TileId, variant: variant));
+                    QueueEntityTable(layer.Contents, windowTile);
+                }
+
+                validTiles.Clear();
             }
-        }
-
-        foreach (var tile in windowTiles)
-        {
-            QueueEntityTable(layer.Contents, tile);
         }
 
         return Task.CompletedTask;
@@ -810,6 +906,7 @@ public sealed class InternalWindowDunGenExecutor : LayerExecutorBase<InternalWin
 
 /// <summary>
 /// Executor for JunctionDunGen - creates junctions in corridors where paths widen.
+/// Matches upstream with TileFree and HasWall checks.
 /// </summary>
 public sealed class JunctionDunGenExecutor : LayerExecutorBase<JunctionDunGen>
 {
@@ -818,12 +915,16 @@ public sealed class JunctionDunGenExecutor : LayerExecutorBase<JunctionDunGen>
     protected override Task ExecuteAsync(JunctionDunGen layer, Dungeon dungeon, Vector2i position, Random random)
     {
         var tileDef = (ContentTileDefinition)Context.TileDef[layer.Tile];
-        var width = (int)Math.Ceiling(layer.Width / 2f);
         var exteriorWidth = (int)Math.Floor(layer.Width / 2f);
+        var width = (int)Math.Ceiling(layer.Width / 2f);
 
         foreach (var tile in dungeon.CorridorTiles)
         {
             Context.Cancellation.ThrowIfCancellationRequested();
+
+            // Check if starting tile is free
+            if (!Context.TileFree(tile, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
+                continue;
 
             // Check each cardinal direction for junction potential
             for (var i = 0; i < 2; i++)
@@ -840,11 +941,10 @@ public sealed class JunctionDunGenExecutor : LayerExecutorBase<JunctionDunGen>
 
                     var neighbor = tile + neighborVec * j;
 
-                    // End tiles should be walls
+                    // End tiles should have walls
                     if (j == -width || j == width)
                     {
-                        if (!dungeon.RoomExteriorTiles.Contains(neighbor) &&
-                            !dungeon.CorridorExteriorTiles.Contains(neighbor))
+                        if (!Context.HasWall(neighbor))
                         {
                             isValid = false;
                             break;
@@ -853,7 +953,23 @@ public sealed class JunctionDunGenExecutor : LayerExecutorBase<JunctionDunGen>
                     }
 
                     // Interior tiles should be free
-                    if (!dungeon.CorridorTiles.Contains(neighbor) && !dungeon.RoomTiles.Contains(neighbor))
+                    if (!Context.TileFree(neighbor, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
+                    {
+                        isValid = false;
+                        break;
+                    }
+
+                    // Check perpendicular tiles are also free
+                    var perp1 = tile + neighborVec * j + ((Direction)((i * 2 + 2) % 8)).ToIntVec();
+                    var perp2 = tile + neighborVec * j + ((Direction)((i * 2 + 6) % 8)).ToIntVec();
+
+                    if (!Context.TileFree(perp1, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
+                    {
+                        isValid = false;
+                        break;
+                    }
+
+                    if (!Context.TileFree(perp2, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
                     {
                         isValid = false;
                         break;
@@ -863,18 +979,19 @@ public sealed class JunctionDunGenExecutor : LayerExecutorBase<JunctionDunGen>
                 if (!isValid)
                     continue;
 
-                // Check corners to see if the corridor opens up
+                // Check corners to see if either side opens up (needs to be a funnel, not just 1-wide corridor)
                 foreach (var j in new[] { -exteriorWidth, exteriorWidth })
                 {
                     var freeCount = 0;
 
+                    // Need at least 3 of 4 diagonal corners free
                     for (var k = 0; k < 4; k++)
                     {
                         var cornerDir = (Direction)(k * 2 + 1);
                         var cornerVec = cornerDir.ToIntVec();
                         var cornerNeighbor = tile + neighborVec * j + cornerVec;
 
-                        if (dungeon.CorridorTiles.Contains(cornerNeighbor) || dungeon.RoomTiles.Contains(cornerNeighbor))
+                        if (Context.TileFree(cornerNeighbor, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
                             freeCount++;
                     }
 
@@ -882,6 +999,8 @@ public sealed class JunctionDunGenExecutor : LayerExecutorBase<JunctionDunGen>
                         continue;
 
                     // Valid junction found - place tiles
+                    isValid = true;
+
                     for (var x = -width + 1; x < width; x++)
                     {
                         var junctionTile = tile + neighborDir.ToIntVec() * x;
@@ -896,6 +1015,9 @@ public sealed class JunctionDunGenExecutor : LayerExecutorBase<JunctionDunGen>
 
                     break;
                 }
+
+                if (isValid)
+                    break;
             }
         }
 
@@ -953,14 +1075,10 @@ public sealed class WallMountDunGenExecutor : LayerExecutorBase<WallMountDunGen>
 
 /// <summary>
 /// Executor for CornerClutterDunGen - places clutter in corridor corners.
+/// Matches upstream by using HasWall entity check instead of tile set check.
 /// </summary>
 public sealed class CornerClutterDunGenExecutor : LayerExecutorBase<CornerClutterDunGen>
 {
-    private static readonly Vector2i[] CardinalOffsets =
-    {
-        new(1, 0), new(0, 1), new(-1, 0), new(0, -1)
-    };
-
     public CornerClutterDunGenExecutor(DungeonGenerationContext context) : base(context) { }
 
     protected override Task ExecuteAsync(CornerClutterDunGen layer, Dungeon dungeon, Vector2i position, Random random)
@@ -969,18 +1087,18 @@ public sealed class CornerClutterDunGenExecutor : LayerExecutorBase<CornerClutte
         {
             Context.Cancellation.ThrowIfCancellationRequested();
 
-            if (!IsTileAvailable(tile))
-                continue;
-
-            // Check if at least 2 adjacent tiles are walls (corner detection)
+            // Check if at least 2 adjacent cardinal tiles have walls (corner detection)
             for (var i = 0; i < 4; i++)
             {
-                var blocked = IsWallTile(dungeon, tile + CardinalOffsets[i]);
+                var dir = (Direction)(i * 2);
+                var blocked = Context.HasWall(tile + dir.ToIntVec());
+
                 if (!blocked)
                     continue;
 
-                var nextDir = (i + 1) % 4;
-                blocked = IsWallTile(dungeon, tile + CardinalOffsets[nextDir]);
+                var nextDir = (Direction)((i + 1) * 2 % 8);
+                blocked = Context.HasWall(tile + nextDir.ToIntVec());
+
                 if (!blocked)
                     continue;
 
@@ -995,12 +1113,6 @@ public sealed class CornerClutterDunGenExecutor : LayerExecutorBase<CornerClutte
         }
 
         return Task.CompletedTask;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool IsWallTile(Dungeon dungeon, Vector2i pos)
-    {
-        return dungeon.RoomExteriorTiles.Contains(pos) || dungeon.CorridorExteriorTiles.Contains(pos);
     }
 }
 
@@ -1040,7 +1152,7 @@ public sealed class CorridorClutterDunGenExecutor : LayerExecutorBase<CorridorCl
 }
 
 /// <summary>
-/// Executor for CorridorDecalSkirtingDunGen.
+/// Executor for CorridorDecalSkirtingDunGen - matches upstream logic with physics checks.
 /// </summary>
 public sealed class CorridorDecalSkirtingDunGenExecutor : LayerExecutorBase<CorridorDecalSkirtingDunGen>
 {
@@ -1048,22 +1160,79 @@ public sealed class CorridorDecalSkirtingDunGenExecutor : LayerExecutorBase<Corr
 
     protected override Task ExecuteAsync(CorridorDecalSkirtingDunGen layer, Dungeon dungeon, Vector2i position, Random random)
     {
+        var directions = new ValueList<DirectionFlag>(4);
+        var pocketDirections = new ValueList<Direction>(4);
+        var offset = -Context.Grid.TileSizeHalfVector; // CRITICAL: negative offset for decal positioning
+
         foreach (var tile in dungeon.CorridorTiles)
         {
             Context.Cancellation.ThrowIfCancellationRequested();
+            directions.Clear();
 
-            for (var dir = 0; dir < 4; dir++)
+            // Check cardinal directions for hard physics entities (but not doors)
+            for (var i = 0; i < 4; i++)
             {
-                var direction = (Direction)(dir * 2);
-                var neighbor = tile + direction.ToIntVec();
+                var dir = (DirectionFlag)Math.Pow(2, i);
+                var neighbor = tile + dir.AsDir().ToIntVec();
 
-                if (dungeon.CorridorTiles.Contains(neighbor) || dungeon.RoomTiles.Contains(neighbor))
-                    continue;
-
-                if (layer.CardinalDecals.TryGetValue(direction.AsFlag(), out var decalId))
+                if (Context.HasHardPhysicsNonDoor(neighbor))
                 {
-                    var pos = tile + Context.Grid.TileSizeHalfVector;
-                    QueueDecal(decalId, pos);
+                    directions.Add(dir);
+                }
+            }
+
+            // Handle pockets (diagonal corners)
+            if (directions.Count == 0)
+            {
+                pocketDirections.Clear();
+
+                for (var i = 1; i < 5; i++)
+                {
+                    var dir = (Direction)(i * 2 - 1); // Diagonal directions
+                    var neighbor = tile + dir.ToIntVec();
+
+                    if (Context.HasHardPhysicsNonDoor(neighbor))
+                    {
+                        pocketDirections.Add(dir);
+                    }
+                }
+
+                if (pocketDirections.Count == 1)
+                {
+                    if (layer.PocketDecals.TryGetValue(pocketDirections[0], out var pocketDecal))
+                    {
+                        var gridPos = Context.Maps.GridTileToLocal(Context.GridUid, Context.Grid, tile);
+                        var decalPos = gridPos.Position + offset;
+                        QueueDecal(pocketDecal, decalPos, color: layer.Color);
+                    }
+                }
+
+                continue;
+            }
+
+            // Handle single cardinal direction
+            if (directions.Count == 1)
+            {
+                if (layer.CardinalDecals.TryGetValue(directions[0], out var cardinalDecal))
+                {
+                    var gridPos = Context.Maps.GridTileToLocal(Context.GridUid, Context.Grid, tile);
+                    var decalPos = gridPos.Position + offset;
+                    QueueDecal(cardinalDecal, decalPos, color: layer.Color);
+                }
+
+                continue;
+            }
+
+            // Handle corners (two adjacent cardinal directions)
+            if (directions.Count == 2)
+            {
+                var dirFlag = directions[0] | directions[1];
+
+                if (layer.CornerDecals.TryGetValue(dirFlag, out var cornerDecal))
+                {
+                    var gridPos = Context.Maps.GridTileToLocal(Context.GridUid, Context.Grid, tile);
+                    var decalPos = gridPos.Position + offset;
+                    QueueDecal(cornerDecal, decalPos, color: layer.Color);
                 }
             }
         }

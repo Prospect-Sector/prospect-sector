@@ -328,6 +328,9 @@ public sealed class PrefabDunGenExecutor : LayerExecutorBase<PrefabDunGen>
         var roomTransform = Matrix3Helpers.CreateTransform(roomSize.Center - packCenter, rotation);
         var combinedTransform = Matrix3x2.Multiply(Matrix3x2.Multiply(roomTransform, packTransform), dungeonTransform);
 
+        // Queue room spawn - this loads tiles, entities, and decals from the template
+        Context.RoomSpawnCommands.Enqueue(new RoomSpawnCommand(room, combinedTransform));
+
         // Calculate room tiles using stack-allocated spans where possible
         var roomCenter = (room.Offset + room.Size / 2f) * Context.Grid.TileSize;
         var tileOffset = -roomCenter + Context.Grid.TileSizeHalfVector;
