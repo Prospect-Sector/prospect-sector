@@ -22,6 +22,7 @@ using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
+using Content.Server._PS.Procedural; // Prospect
 
 namespace Content.Server.Procedural;
 
@@ -40,6 +41,7 @@ public sealed partial class DungeonSystem : SharedDungeonSystem
     [Dependency] private readonly MapLoaderSystem _loader = default!;
     [Dependency] private readonly SharedMapSystem _maps = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly ProspectDungeonSystem _prospectDungeon = default!; // Prospect
 
     private readonly List<(Vector2i, Tile)> _tiles = new();
 
@@ -200,6 +202,14 @@ public sealed partial class DungeonSystem : SharedDungeonSystem
         int seed,
         EntityCoordinates? coordinates = null)
     {
+        // Prospect: parallel dungeon generation
+        if (_prospectDungeon.Enabled)
+        {
+            _prospectDungeon.Generate(gen, gridUid, grid, position, seed, coordinates);
+            return;
+        }
+        // Prospect: End
+
         var cancelToken = new CancellationTokenSource();
         var job = new DungeonJob.DungeonJob(
             Log,
@@ -233,6 +243,13 @@ public sealed partial class DungeonSystem : SharedDungeonSystem
         Vector2i position,
         int seed)
     {
+        // Prospect: parallel dungeon generation
+        if (_prospectDungeon.Enabled)
+        {
+            return await _prospectDungeon.GenerateAsync(gen, gridUid, grid, position, seed);
+        }
+        // Prospect: End
+
         var cancelToken = new CancellationTokenSource();
         var job = new DungeonJob.DungeonJob(
             Log,

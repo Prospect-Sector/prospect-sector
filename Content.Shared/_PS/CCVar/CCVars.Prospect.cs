@@ -15,4 +15,18 @@ public sealed partial class CCVars
     /// </summary>
     public static readonly CVarDef<bool> EmergencyArrivalsShuttle =
         CVarDef.Create("prospect.arrivals", true, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Whether to use the Prospect parallel dungeon generation system.
+    /// When enabled, dungeon generation uses multi-threaded parallel processing for improved performance.
+    /// </summary>
+    public static readonly CVarDef<bool> ProspectParallelDungeons =
+        CVarDef.Create("prospect.parallel_dungeons", true, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Maximum number of parallel workers for dungeon generation.
+    /// Set to 0 to use all available processors.
+    /// </summary>
+    public static readonly CVarDef<int> ProspectDungeonWorkers =
+        CVarDef.Create("prospect.dungeon_workers", 0, CVar.SERVERONLY);
 }
