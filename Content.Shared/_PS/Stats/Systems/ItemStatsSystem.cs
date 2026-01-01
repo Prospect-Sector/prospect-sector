@@ -66,6 +66,12 @@ public sealed class ItemStatsSystem : EntitySystem
     /// </summary>
     private const float CritDamageMultiplier = 2.0f;
 
+    /// <summary>
+    /// Global minimum damage multiplier to prevent stacking to 99%+ reduction.
+    /// 0.05 = always take at least 5% of incoming damage.
+    /// </summary>
+    private const float GlobalMinimumDamageMultiplier = 0.05f;
+
     private int _levelStatModifier = 100;
 
     public override void Initialize()
@@ -88,6 +94,9 @@ public sealed class ItemStatsSystem : EntitySystem
 
         // Defensive: Dodge chance (checked once per damage event on target)
         SubscribeLocalEvent<DamageableComponent, DamageModifyEvent>(OnDamageModifyDodge);
+
+        // Global damage floor to prevent stacking to 99%+ reduction
+        SubscribeLocalEvent<DamageableComponent, DamageModifyEvent>(OnDamageModifyFloor);
     }
 
     #region Damage Interception
@@ -265,6 +274,29 @@ public sealed class ItemStatsSystem : EntitySystem
         {
             // Zero out all damage - complete dodge
             args.Damage *= 0f;
+        }
+    }
+
+    /// <summary>
+    /// Applies a global damage floor to prevent stacking armor to 99%+ reduction.
+    /// Ensures at least GlobalMinimumDamageMultiplier (5%) of original damage is taken.
+    /// </summary>
+    private void OnDamageModifyFloor(EntityUid uid, DamageableComponent component, DamageModifyEvent args)
+    {
+        // The floor ensures you always take at least 5% of the original incoming damage
+        // This runs after all other damage modifications
+        var originalTotal = args.OriginalDamage.GetTotal().Float();
+        if (originalTotal <= 0)
+            return;
+
+        var currentTotal = args.Damage.GetTotal().Float();
+        var minimumDamage = originalTotal * GlobalMinimumDamageMultiplier;
+
+        // If current damage is below the floor, scale it back up
+        if (currentTotal > 0 && currentTotal < minimumDamage)
+        {
+            var scale = minimumDamage / currentTotal;
+            args.Damage *= scale;
         }
     }
 

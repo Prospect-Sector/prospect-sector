@@ -196,8 +196,14 @@ public sealed class GenerateTerradropJob : Job<bool>
             "Volcanic" => "PSDungeonLava",
             "Continental" => "PSDungeonLab",
             "Shadow" => "PSDungeonHaunted",
-            _ => "PSDungeonGeneric"
+            _ => null
         };
+
+        if (psDungeonId == null)
+        {
+            _sawmill.Warning($"Unknown biome '{biomeId}' for terradrop dungeon, falling back to PSDungeonGeneric");
+            psDungeonId = "PSDungeonGeneric";
+        }
         var dungeonConfig = _prototypeManager.Index<DungeonConfigPrototype>(psDungeonId);
         var dungeons = await WaitAsyncTask(
             _dungeon.GenerateDungeonAsync(
