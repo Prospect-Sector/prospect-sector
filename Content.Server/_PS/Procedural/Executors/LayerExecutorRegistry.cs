@@ -1,4 +1,5 @@
 using Content.Server._PS.Procedural.Generation;
+using Content.Shared._PS.Procedural.StationGeneration;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.DungeonGenerators;
 using Content.Shared.Procedural.DungeonLayers;
@@ -63,6 +64,9 @@ public sealed class LayerExecutorRegistry
         // Biome layers
         Register<BiomeDunGen>(new BiomeDunGenExecutor(_context));
         Register<BiomeMarkerLayerDunGen>(new BiomeMarkerLayerDunGenExecutor(_context));
+
+        // Voronoi Station Generation
+        Register<VoronoiStationDunGen>(new VoronoiStationDunGenExecutor(_context, _log));
     }
 
     private void Register<TLayer>(ILayerExecutor executor) where TLayer : IDunGenLayer

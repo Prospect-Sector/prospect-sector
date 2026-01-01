@@ -1,0 +1,64 @@
+# Voronoi Station Generation Config
+# Generates a station with clustered department zones and maints tunnels
+
+- type: dungeonConfig
+  id: VoronoiStation
+  layers:
+  - !type:VoronoiStationDunGen
+    stationRadius: 80
+    departments:
+    - Medical
+    - Security
+    - Engineering
+    - Science
+    - Service
+    - Cargo
+    floorTile: FloorSteel
+    maintsTile: FloorDark
+    wallPrototype: WallSolid
+    hallwayDoorPrototype: AirlockGlass
+    maintsDoorPrototype: AirlockMaint
+    hallwayWidth: 3
+    roomGap: 1
+    addRedundantHallways: true
+    redundantHallwayChance: 0.3
+    minDepartmentSpacing: 30
+
+  # Post-generation layers to add details
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: FloorSteel
+
+  - !type:CorridorDecalSkirtingDunGen
+    cardinal:
+    - BrickTileDarkCornerNe
+    - BrickTileDarkCornerNw
+    - BrickTileDarkCornerSe
+    - BrickTileDarkCornerSw
+    cardinalRotation: false
+
+# Smaller test config
+- type: dungeonConfig
+  id: VoronoiStationSmall
+  layers:
+  - !type:VoronoiStationDunGen
+    stationRadius: 50
+    departments:
+    - Medical
+    - Engineering
+    - Science
+    floorTile: FloorSteel
+    maintsTile: FloorDark
+    wallPrototype: WallSolid
+    hallwayDoorPrototype: AirlockGlass
+    maintsDoorPrototype: AirlockMaint
+    hallwayWidth: 3
+    roomGap: 1
+    addRedundantHallways: false
+    minDepartmentSpacing: 25
+
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: FloorSteel
