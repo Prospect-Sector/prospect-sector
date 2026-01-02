@@ -12,6 +12,7 @@ using Content.Shared._PS.CargoStorage.BUI;
 using Content.Shared._PS.CargoStorage.Data;
 using Content.Shared._PS.CargoStorage.Events;
 using Content.Shared._PS.CargoStorage.Systems;
+using Content.Shared.Storage.Components;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._PS.CargoStorage.Systems;
@@ -99,7 +100,7 @@ public sealed partial class CargoStorageSystem
 
         // Check whitelist/blacklist for particular prototype
         if (_whitelistSystem.IsWhitelistFail(storage.Whitelist, sold) ||
-            _whitelistSystem.IsBlacklistPass(storage.Blacklist, sold) &&
+            _whitelistSystem.IsWhitelistPass(storage.Blacklist, sold) &&
             _whitelistSystem.IsWhitelistFailOrNull(storage.WhitelistOverride, sold))
         {
             return;

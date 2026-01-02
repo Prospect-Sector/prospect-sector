@@ -1,0 +1,57 @@
+- type: guideEntry
+  id: PSScience
+  name: guide-entry-science
+  text: "/ServerInfo/_PS/Guidebook/Science/Science.xml"
+  children:
+  - PSTechnologies
+  - PSAnomalousResearch
+  - PSXenoarchaeology
+  - PSRobotics
+
+- type: guideEntry
+  id: PSTechnologies
+  name: guide-entry-technologies
+  text: "/ServerInfo/_PS/Guidebook/Science/Technologies.xml"
+  filterEnabled: True
+
+- type: guideEntry
+  id: PSAnomalousResearch
+  name: guide-entry-anomalous-research
+  text: "/ServerInfo/_PS/Guidebook/Science/AnomalousResearch.xml"
+  children:
+  - PSAPE
+  - PSScannersAndVessels
+
+- type: guideEntry
+  id: PSScannersAndVessels
+  name: guide-entry-scanners-and-vessels
+  text: "/ServerInfo/_PS/Guidebook/Science/ScannersAndVessels.xml"
+
+- type: guideEntry
+  id: PSAPE
+  name: guide-entry-ape
+  text: "/ServerInfo/_PS/Guidebook/Science/APE.xml"
+
+- type: guideEntry
+  id: PSXenoarchaeology
+  name: guide-entry-xenoarchaeology
+  text: "/ServerInfo/_PS/Guidebook/Science/Xenoarchaeology.xml"
+  children:
+  - PSArtifactReports
+
+- type: guideEntry
+  id: PSRobotics
+  name: guide-entry-robotics
+  text: "/ServerInfo/_PS/Guidebook/Science/Robotics.xml"
+  children:
+  - PSCyborgs
+
+- type: guideEntry
+  id: PSArtifactReports
+  name: guide-entry-artifact-reports
+  text: "/ServerInfo/_PS/Guidebook/Science/ArtifactReports.xml"
+
+- type: guideEntry
+  id: PSCyborgs
+  name: guide-entry-cyborgs
+  text: "/ServerInfo/_PS/Guidebook/Science/Cyborgs.xml"

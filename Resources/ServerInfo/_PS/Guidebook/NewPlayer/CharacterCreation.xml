@@ -1,0 +1,84 @@
+<Document>
+  # Important Character Creation Tips
+  This guide covers the parts of character creation that affect gameplay in this gamemode.
+  (Cosmetic changes are unchanged and are not included here.)
+
+  -------------------------------------------------------------
+
+  ## Spawn Priority
+  Spawn options determine where you appear **when joining an ongoing round**.
+
+  - **Cryosleep**: You awaken inside the station’s cryosleep chamber.
+  - **None**: Automatically selects whichever spawn option is valid for the map.
+
+  The **Arrivals shuttle system does not exist** in this gamemode, so only station-based spawns are used.
+  This setting is mostly preference and can safely be left on “None.”
+
+  -------------------------------------------------------------
+
+  ## Jobs
+  In the lobby you may set job preferences. These determine which roles the system considers you for when the round begins.
+
+  Priority works as follows:
+  - High priority jobs are rolled first
+  - Then medium priority
+  - Then low priority
+
+  If you are not selected for any preferred role, you may choose to:
+  - Spawn as a passenger
+  - Or return to the lobby to wait for the next round
+
+  Some jobs remain locked until you gain enough playtime in accessible entry-level roles.
+
+  [textlink="Learn more about jobs here." link="Jobs"]
+
+  -------------------------------------------------------------
+
+  ## Job Loadouts
+  Each job allows you to select a **loadout** of clothing or minor equipment.
+  Loadout items may affect gameplay:
+
+  - Some clothing provides **armor protection**
+  - Some items may **slow your movement speed**
+  - Higher-responsibility roles (Engineering, Cargo, Medical, etc.) may feel these effects more strongly
+
+  You can also select your **bag type**:
+  - [color=#a4885c]Backpacks[/color]: Medium capacity, easier to store large items
+  - [color=#a4885c]Satchels[/color]: Highest total storage, worst for carrying large items
+  - [color=#a4885c]Duffel Bags[/color]: Largest capacity but incur a movement penalty
+
+  -------------------------------------------------------------
+
+  ## Traits
+
+  ### Speech Traits
+  These modify how your text appears in chat. Some are mild, while others drastically change speech patterns.
+
+  Options include:
+  - Accentless
+  - Social anxiety (stutter)
+  - Southern drawl
+  - Pirate accent
+  - Cowboy accent
+  - Italian accent
+  - Frontal lisp
+  - Pathological liar
+
+  It is recommended to master normal communication or mild accents before selecting strong or comedic accents.
+
+  ### Disability Traits
+  These introduce gameplay challenges. Beginners should avoid them until familiar with the game loop and station environment.
+
+  - Blindness
+  - Muted (cannot speak; use emotes or pen-and-paper)
+  - Short-sighted
+  - Narcolepsy
+  - Pacifist
+  - Paracusia (auditory hallucinations)
+  - Lightweight drunk
+  - Snoring
+  - Unrevivable (cannot be resuscitated)
+
+  Choose these only if you understand the difficulty they add to your play experience.
+
+</Document>

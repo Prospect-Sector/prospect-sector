@@ -1,0 +1,207 @@
+<Document>
+  # Salvage
+
+  The [color=cyan]Salvage[/color] team works alongside Cargo to provide the station with its most important resource: **raw materials**.
+  Salvage is responsible for pulling in wrecks with the [color=cyan]Salvage Magnet[/color], gathering ore and scrap during expeditions, and returning these materials to Cargo for processing.
+
+  Salvage work is dangerous, but with proper equipment and coordination, it becomes one of the station’s most essential and rewarding roles.
+
+  -------------------------------------------------------------
+
+  ## Preparations
+
+  Salvage requires proper EVA gear, tools, and navigation equipment.
+  All basic gear is provided in the Salvage Bay.
+
+  <Box>
+    <GuideEntityEmbed Entity="SuitStorageSalv"/>
+    <GuideEntityEmbed Entity="LockerSalvageSpecialist"/>
+    <GuideEntityEmbed Entity="VendingMachineSalvage"/>
+  </Box>
+
+  ### Required EVA Setup
+  <Box>
+    <GuideEntityEmbed Entity="ClothingOuterHardsuitSpatio"/>
+    <GuideEntityEmbed Entity="ClothingShoesBootsMag"/>
+    <GuideEntityEmbed Entity="VendingMachineTankDispenserEVA"/>
+  </Box>
+
+  - [color=cyan]Spationaut Hardsuit[/color]: Provides pressure protection and an integrated helmet light.
+  - [color=cyan]Magboots[/color]: Prevent drifting and slipping in zero-gravity.
+  - Appropriate [color=cyan]Gas Tank[/color]: Oxygen or Nitrogen depending on species.
+
+  ### Mining and Defense
+  Salvage Specialists must be armed and prepared to gather materials.
+
+  <Box>
+    <GuideEntityEmbed Entity="WeaponProtoKineticAccelerator"/>
+  </Box>
+
+  - [color=cyan]Proto-Kinetic Accelerator[/color]: Infinite-ammo tool useful for both self-defense and light mining.
+
+  <Box>
+    <GuideEntityEmbed Entity="Pickaxe"/>
+    <GuideEntityEmbed Entity="OreBag"/>
+  </Box>
+
+  - [color=cyan]Pickaxe[/color]: Reliable mining tool and melee option.
+  - [color=cyan]Ore Bag[/color]: Automatically collects nearby ore when worn on the belt.
+
+  ### Useful Extra Equipment
+  <Box>
+    <GuideEntityEmbed Entity="FireExtinguisher"/>
+    <GuideEntityEmbed Entity="WeaponGrapplingGun"/>
+    <GuideEntityEmbed Entity="SalvagePDA"/>
+    <GuideEntityEmbed Entity="ComputerRadar"/>
+  </Box>
+
+  - [color=cyan]Fire Extinguisher[/color]: Basic propulsion method in open space.
+  - [color=cyan]Grappling Gun[/color]: Fast traversal tool with infinite shots.
+  - [color=cyan]Salvage PDA[/color]: Comes with GPS software; note the station’s coordinates before leaving.
+  - [color=cyan]Mass Scanner Computer[/color]: Shows wreck and debris positions; useful for planning.
+
+  Additional optional tools:
+
+  <Box>
+    <GuideEntityEmbed Entity="RadioHandheld"/>
+    <GuideEntityEmbed Entity="HandheldGPSBasic"/>
+    <GuideEntityEmbed Entity="ClothingBeltUtilityFilled"/>
+  </Box>
+
+  - [color=cyan]Handheld Radio[/color], [color=cyan]GPS[/color], and [color=cyan]Utility Belt[/color] help coordinate and organize salvage tasks.
+
+  -------------------------------------------------------------
+
+  ## Salvage Magnet Pulls
+
+  <Box>
+    <GuideEntityEmbed Entity="SalvageMagnet"/>
+  </Box>
+
+  The [color=cyan]Salvage Magnet[/color] lets Salvagers pull in:
+  - Asteroids
+  - Salvage Wrecks
+  - Space Debris
+
+  Each pull lasts **6 minutes**. Anything left behind after this time disappears.
+  Offers refresh every **3 minutes** if not accepted.
+
+  During a pull:
+  - Fly to the grid
+  - Gather ore, scrap, and components
+  - Avoid hazards
+  - Return materials to Cargo for processing
+
+  -------------------------------------------------------------
+
+  ## Asteroids
+
+  <Box>
+    <GuideEntityEmbed Entity="Pickaxe"/>
+    <GuideEntityEmbed Entity="OreBag"/>
+    <GuideEntityEmbed Entity="OreProcessor"/>
+  </Box>
+
+  Asteroids contain concentrated ore deposits and are usually safer than wrecks.
+  Simply mine with your pickaxe, collect with your ore bag, and refine at the [color=cyan]Ore Processor[/color].
+
+  Watch out for:
+  - [color=red]Gibtonite[/color] — volatile ore that explodes when disturbed.
+
+  -------------------------------------------------------------
+
+  ## Space Debris
+
+  <Box>
+    <GuideEntityEmbed Entity="Wrench"/>
+    <GuideEntityEmbed Entity="FireExtinguisher"/>
+    <GuideEntityEmbed Entity="Recycler"/>
+  </Box>
+
+  Space Debris contains:
+  - Raw materials (steel, glass, plastic)
+  - Machinery parts
+  - Scrap and components
+
+  Hazards include:
+  - [color=red]Space Carp[/color]
+  - [color=red]Sharkminnows[/color]
+  - Hidden [color=red]Landmines[/color]
+
+  Collected scrap should be fed into the department [color=cyan]Recycler[/color] for conversion into usable materials.
+
+  -------------------------------------------------------------
+
+  ## Salvage Wrecks
+
+  <Box>
+    <GuideEntityEmbed Entity="SurvivalKnife"/>
+    <GuideEntityEmbed Entity="Fulton"/>
+    <GuideEntityEmbed Entity="WeaponProtoKineticAccelerator"/>
+  </Box>
+
+  Wrecks vary widely in danger and reward.
+  Expect:
+  - Damaged structure
+  - Hostile creatures
+  - Abandoned machines and equipment
+
+  Bring defensive gear, use your PKA to neutralize threats, and salvage machinery and metal for processing.
+
+  -------------------------------------------------------------
+
+  ## Working With Cargo
+
+  Salvage and Cargo form one supply chain.
+  Salvage gathers and returns resources — Cargo processes, stores, and distributes them.
+
+  Salvagers should:
+  - Deliver ore promptly
+  - Provide scrap for recycling
+  - Return mechanical components for future fabrication
+  - Communicate material needs with Cargo so lathes stay stocked
+
+  In turn, Cargo:
+  - Refines ore into sheets
+  - Prints components required for salvage gear upkeep
+  - Maintains storage reserves for future pulls
+
+  -------------------------------------------------------------
+
+  ## Advanced Support From Science
+
+  <Box>
+    <GuideEntityEmbed Entity="ToyFigurineScientist"/>
+    <GuideEntityEmbed Entity="ResearchDisk"/>
+  </Box>
+
+  Science can manufacture improved equipment including:
+  - [color=cyan]Mining Drills[/color]
+  - [color=cyan]Mass Scanners[/color]
+  - [color=cyan]PKA Upgrades[/color]
+
+  Science depends on Salvage for rare materials, and Salvage benefits from their research output.
+
+  -------------------------------------------------------------
+
+  ## Large-Scale Salvage: The Mining Asteroid
+
+  <Box>
+    <GuideEntityEmbed Entity="MobGoliath"/>
+    <GuideEntityEmbed Entity="MobHivelord"/>
+    <GuideEntityEmbed Entity="MobBasilisk"/>
+  </Box>
+
+  The Mining Asteroid contains:
+  - High-value ore
+  - Dangerous fauna
+  - Large cavern systems
+
+  Expect:
+  - [color=cyan]Goliaths[/color] — heavy melee beasts
+  - [color=cyan]Hivelords[/color] — ranged summoners
+  - [color=cyan]Basilisks[/color] — freezing attackers
+
+  Only well-equipped, coordinated teams should attempt asteroid operations.
+
+</Document>

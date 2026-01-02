@@ -1,0 +1,11 @@
+- type: guideEntry
+  id: PSJobs
+  name: guide-entry-jobs
+  text: "/ServerInfo/_PS/Guidebook/Jobs.xml"
+  children:
+  - PSService
+  - PSCargo
+  - PSMedical
+  - PSScience
+  - PSEngineering
+  - PSCommand

@@ -36,18 +36,18 @@ namespace Content.Client.Info
 
             PopulateTutorial(tutorialList);
 
-            Contents.AddChild(rootContainer);
+            ContentsContainer.AddChild(rootContainer);
 
             SetSize = new Vector2(650, 650);
         }
 
         private void PopulateTutorial(Info tutorialList)
         {
-            AddSection(tutorialList, Loc.GetString("ui-info-header-intro"), "Intro.txt");
+            AddSection(tutorialList, Loc.GetString("ui-info-header-intro"), "_PS/Intro.txt"); // Prospect
             var infoControlSection = new InfoControlsSection();
             tutorialList.InfoContainer.AddChild(infoControlSection);
-            AddSection(tutorialList, Loc.GetString("ui-info-header-gameplay"), "Gameplay.txt", true);
-            AddSection(tutorialList, Loc.GetString("ui-info-header-sandbox"), "Sandbox.txt", true);
+            AddSection(tutorialList, Loc.GetString("ui-info-header-gameplay"), "_PS/Gameplay.txt", true); // Prospect
+            AddSection(tutorialList, Loc.GetString("ui-info-header-sandbox"), "_PS/Sandbox.txt", true); // Prospect
 
             infoControlSection.ControlsButton.OnPressed += _ => UserInterfaceManager.GetUIController<OptionsUIController>().OpenWindow();
         }

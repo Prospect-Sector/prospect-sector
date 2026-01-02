@@ -434,6 +434,7 @@ entities:
     - type: RadiationGridResistance
     - type: BecomesStation
       id: Prospect
+    - type: ProspectEmergencyArrivalsShuttleTarget
 - proto: AirAlarm
   entities:
   - uid: 238
