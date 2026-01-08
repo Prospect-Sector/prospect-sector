@@ -391,8 +391,7 @@ public sealed class ItemStatsSystem : EntitySystem
             component,
             Loc.GetString("item-stats-examine-verb"),
             message.ToMarkup(),
-            "/Textures/Interface/VerbIcons/dot.svg.192dpi.png",
-            alignRight: true);
+            "/Textures/Interface/VerbIcons/dot.svg.192dpi.png");
     }
 
     /// <summary>
