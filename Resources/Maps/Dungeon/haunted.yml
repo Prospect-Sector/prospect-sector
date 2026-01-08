@@ -482,7 +482,7 @@ entities:
     - pos: 8.86887,27.028563
       parent: 1653
       type: Transform
-- proto: Chainsaw
+- proto: PSSpawnerMeleeRare
   entities:
   - uid: 396
     components:

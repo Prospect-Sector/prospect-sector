@@ -1,0 +1,379 @@
+# Prospect Sector - Loot Spawners
+# These spawners spawn PS equipment with randomized stats
+
+# Base PS spawner marker
+- type: entity
+  id: PSSpawnerBase
+  parent: MarkerBase
+  abstract: true
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+
+# =============================================================================
+# MELEE WEAPON SPAWNERS
+# =============================================================================
+
+- type: entity
+  name: PS melee weapon spawner
+  suffix: Common
+  id: PSSpawnerMeleeCommon
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Weapons/Melee/kitchen_knife.rsi
+      state: icon
+  - type: RandomSpawner
+    prototypes:
+    - PSKitchenKnife
+    chance: 1.0
+
+- type: entity
+  name: PS melee weapon spawner
+  suffix: Uncommon
+  id: PSSpawnerMeleeUncommon
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Weapons/Melee/combat_knife.rsi
+      state: icon
+  - type: RandomSpawner
+    prototypes:
+    - PSKitchenKnife
+    - PSCombatKnife
+    - PSFireAxe
+    rarePrototypes:
+    - PSMachete
+    rareChance: 0.15
+    chance: 1.0
+
+- type: entity
+  name: PS melee weapon spawner
+  suffix: Rare
+  id: PSSpawnerMeleeRare
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Weapons/Melee/machete.rsi
+      state: icon
+  - type: RandomSpawner
+    prototypes:
+    - PSCombatKnife
+    - PSMachete
+    - PSFireAxe
+    rarePrototypes:
+    - PSClaymore
+    - PSKatana
+    rareChance: 0.20
+    chance: 1.0
+
+- type: entity
+  name: PS melee weapon spawner
+  suffix: Exotic
+  id: PSSpawnerMeleeExotic
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Weapons/Melee/katana.rsi
+      state: icon
+  - type: RandomSpawner
+    prototypes:
+    - PSMachete
+    - PSClaymore
+    - PSKatana
+    rarePrototypes:
+    - PSClaymore
+    - PSKatana
+    rareChance: 0.35
+    chance: 1.0
+
+# =============================================================================
+# RANGED WEAPON SPAWNERS
+# =============================================================================
+
+- type: entity
+  name: PS ranged weapon spawner
+  suffix: Pistols
+  id: PSSpawnerRangedPistol
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
+      state: base
+  - type: RandomSpawner
+    prototypes:
+    - PSPistolStandard
+    rarePrototypes:
+    - PSPistolCombat
+    rareChance: 0.25
+    chance: 1.0
+
+- type: entity
+  name: PS ranged weapon spawner
+  suffix: Rifles
+  id: PSSpawnerRangedRifle
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Weapons/Guns/Rifles/lecter.rsi
+      state: base
+  - type: RandomSpawner
+    prototypes:
+    - PSRifleAssault
+    chance: 1.0
+
+- type: entity
+  name: PS ranged weapon spawner
+  suffix: Shotguns
+  id: PSSpawnerRangedShotgun
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
+      state: icon
+  - type: RandomSpawner
+    prototypes:
+    - PSShotgunPump
+    chance: 1.0
+
+- type: entity
+  name: PS ranged weapon spawner
+  suffix: Mixed
+  id: PSSpawnerRangedMixed
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
+      state: base
+  - type: RandomSpawner
+    prototypes:
+    - PSPistolStandard
+    - PSPistolCombat
+    rarePrototypes:
+    - PSRifleAssault
+    - PSShotgunPump
+    rareChance: 0.20
+    chance: 1.0
+
+# =============================================================================
+# ARMOR SPAWNERS
+# =============================================================================
+
+- type: entity
+  name: PS armor spawner
+  suffix: Light
+  id: PSSpawnerArmorLight
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Clothing/OuterClothing/Armor/security_slim.rsi
+      state: icon
+  - type: RandomSpawner
+    prototypes:
+    - PSArmorVestSecurity
+    - PSArmorExpeditionLight
+    chance: 1.0
+
+- type: entity
+  name: PS armor spawner
+  suffix: Heavy
+  id: PSSpawnerArmorHeavy
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Clothing/OuterClothing/Armor/security.rsi
+      state: icon
+  - type: RandomSpawner
+    prototypes:
+    - PSArmorVestSecurity
+    - PSArmorVestBulletproof
+    - PSArmorRiot
+    rarePrototypes:
+    - PSArmorTactical
+    rareChance: 0.15
+    chance: 1.0
+
+# =============================================================================
+# HELMET SPAWNERS
+# =============================================================================
+
+- type: entity
+  name: PS helmet spawner
+  suffix: Mixed
+  id: PSSpawnerHelmet
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Clothing/Head/Helmets/security.rsi
+      state: icon
+  - type: RandomSpawner
+    prototypes:
+    - PSHelmetSecurity
+    - PSHelmetRiot
+    rarePrototypes:
+    - PSHelmetTactical
+    rareChance: 0.20
+    chance: 1.0
+
+# =============================================================================
+# ACCESSORY SPAWNERS
+# =============================================================================
+
+- type: entity
+  name: PS gloves spawner
+  suffix: Mixed
+  id: PSSpawnerGloves
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Clothing/Hands/Gloves/combat.rsi
+      state: icon
+  - type: RandomSpawner
+    prototypes:
+    - PSGlovesStandard
+    - PSGlovesTactical
+    - PSGlovesMarksman
+    rarePrototypes:
+    - PSGlovesHeavyCombat
+    rareChance: 0.15
+    chance: 1.0
+
+- type: entity
+  name: PS mask spawner
+  suffix: Mixed
+  id: PSSpawnerMask
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Clothing/Mask/gas.rsi
+      state: icon
+  - type: RandomSpawner
+    prototypes:
+    - PSMaskGas
+    - PSMaskSecurityGas
+    - PSMaskExpedition
+    rarePrototypes:
+    - PSMaskTactical
+    rareChance: 0.15
+    chance: 1.0
+
+# =============================================================================
+# COMBINED LOOT SPAWNERS (for expedition chests, etc.)
+# =============================================================================
+
+- type: entity
+  name: PS loot spawner
+  suffix: Tier 1, Common
+  id: PSSpawnerLootTier1
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+  - type: RandomSpawner
+    prototypes:
+    - PSKitchenKnife
+    - PSGlovesStandard
+    - PSMaskGas
+    chance: 0.9
+
+- type: entity
+  name: PS loot spawner
+  suffix: Tier 2, Uncommon
+  id: PSSpawnerLootTier2
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+  - type: RandomSpawner
+    prototypes:
+    - PSCombatKnife
+    - PSFireAxe
+    - PSPistolStandard
+    - PSArmorVestSecurity
+    - PSArmorExpeditionLight
+    - PSHelmetSecurity
+    - PSGlovesTactical
+    - PSMaskSecurityGas
+    rarePrototypes:
+    - PSMachete
+    - PSPistolCombat
+    rareChance: 0.20
+    chance: 1.0
+
+- type: entity
+  name: PS loot spawner
+  suffix: Tier 3, Rare
+  id: PSSpawnerLootTier3
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: blue
+  - type: RandomSpawner
+    prototypes:
+    - PSMachete
+    - PSPistolCombat
+    - PSRifleAssault
+    - PSShotgunPump
+    - PSArmorVestBulletproof
+    - PSArmorRiot
+    - PSHelmetRiot
+    - PSGlovesMarksman
+    - PSMaskExpedition
+    rarePrototypes:
+    - PSClaymore
+    - PSKatana
+    - PSArmorTactical
+    - PSHelmetTactical
+    - PSGlovesHeavyCombat
+    - PSMaskTactical
+    rareChance: 0.25
+    chance: 1.0
+
+- type: entity
+  name: PS loot spawner
+  suffix: Tier 4, Exotic
+  id: PSSpawnerLootTier4
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: pink
+  - type: RandomSpawner
+    prototypes:
+    - PSClaymore
+    - PSKatana
+    - PSArmorTactical
+    - PSHelmetTactical
+    - PSGlovesHeavyCombat
+    - PSMaskTactical
+    chance: 1.0

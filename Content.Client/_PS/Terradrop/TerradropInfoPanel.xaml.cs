@@ -16,9 +16,21 @@ public sealed partial class TerradropInfoPanel : Control
     [Dependency] private readonly ILogManager _logManager = default!;
 
     private ISawmill _sawmill = default!;
-    public Action<TerradropMapPrototype>? StartAction;
 
-    public TerradropInfoPanel(TerradropMapPrototype proto, TerradropMapAvailability availability, SpriteSystem sprite)
+    /// <summary>
+    /// Action invoked when starting a terradrop. Passes the prototype and selected level.
+    /// </summary>
+    public Action<TerradropMapPrototype, int>? StartAction;
+
+    /// <summary>
+    /// Action invoked when level is changed. Used to persist level selection.
+    /// </summary>
+    public Action<int>? LevelChanged;
+
+    private int _level;
+    private readonly int _minLevel;
+
+    public TerradropInfoPanel(TerradropMapPrototype proto, TerradropMapAvailability availability, SpriteSystem sprite, int initialLevel = 0)
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
@@ -26,6 +38,10 @@ public sealed partial class TerradropInfoPanel : Control
         _sawmill = _logManager.GetSawmill("terradrop.console");
 
         var terradrop = _ent.System<TerradropSystem>();
+
+        // Initialize level from prototype minimum and passed value
+        _minLevel = proto.MinLevel;
+        _level = Math.Max(initialLevel, _minLevel);
 
         NodeNameLabel.Text = Loc.GetString(proto.Name);
         NodeStatusLabel.Text = Loc.GetString(
@@ -52,17 +68,18 @@ public sealed partial class TerradropInfoPanel : Control
 
         InitializePrerequisites(proto, terradrop, sprite);
         InitializeMapUnlocks(proto, terradrop, sprite);
+        InitializeLevelControls();
 
         StartButton.Disabled = availability == TerradropMapAvailability.Unavailable;
 
-        // Replace the event handling method to use a simpler approach
+        // Start button sends prototype and level
         StartButton.OnPressed += _ =>
         {
-            _sawmill.Debug($"Start button pressed for {proto.ID}");
+            _sawmill.Debug($"Start button pressed for {proto.ID} at level {_level}");
             if (StartAction != null)
             {
-                _sawmill.Debug($"Triggering StartAction for {proto.ID}");
-                StartAction.Invoke(proto);
+                _sawmill.Debug($"Triggering StartAction for {proto.ID} at level {_level}");
+                StartAction.Invoke(proto, _level);
             }
             else
             {
@@ -70,7 +87,42 @@ public sealed partial class TerradropInfoPanel : Control
             }
         };
 
-        _sawmill.Debug($"Created map panel: {proto.ID}, availability: {availability}, button disabled: {StartButton.Disabled}");
+        _sawmill.Debug($"Created map panel: {proto.ID}, availability: {availability}, level: {_level}, button disabled: {StartButton.Disabled}");
+    }
+
+    private void InitializeLevelControls()
+    {
+        UpdateLevelDisplay();
+
+        LevelMinusTenButton.OnPressed += _ => AdjustLevel(-10);
+        LevelMinusButton.OnPressed += _ => AdjustLevel(-1);
+        LevelPlusButton.OnPressed += _ => AdjustLevel(1);
+        LevelPlusTenButton.OnPressed += _ => AdjustLevel(10);
+    }
+
+    private void AdjustLevel(int delta)
+    {
+        var newLevel = Math.Max(_minLevel, _level + delta);
+        if (newLevel != _level)
+        {
+            _level = newLevel;
+            UpdateLevelDisplay();
+            LevelChanged?.Invoke(_level);
+        }
+    }
+
+    private void UpdateLevelDisplay()
+    {
+        LevelLabel.Text = _level.ToString();
+
+        // Show stat bonus info
+        LevelBonusLabel.Text = _level > 0
+            ? Loc.GetString("terradrop-level-bonus", ("bonus", _level))
+            : "";
+
+        // Disable minus buttons if at minimum
+        LevelMinusButton.Disabled = _level <= _minLevel;
+        LevelMinusTenButton.Disabled = _level <= _minLevel;
     }
 
     private void InitializePrerequisites(TerradropMapPrototype proto, TerradropSystem terradrop, SpriteSystem sprite)

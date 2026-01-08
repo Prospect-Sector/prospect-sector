@@ -1,0 +1,67 @@
+# Item Rarity Tiers (T1-T5)
+# Higher tiers have better base stats and more affixes
+
+- type: itemRarity
+  id: Uncommon
+  name: rarity-uncommon
+  tier: 1
+  color: "#00FF00"  # Green
+  weaponDamageMultMin: 0.01
+  weaponDamageMultMax: 0.05
+  armorSoftcritBonus: 2
+  armorDeathBonus: 2
+  affixCount: 1
+  affixEffectMultiplier: 1.0
+  artifactTraitCount: 0
+
+- type: itemRarity
+  id: Rare
+  name: rarity-rare
+  tier: 2
+  color: "#0088FF"  # Blue
+  weaponDamageMultMin: 0.05
+  weaponDamageMultMax: 0.15
+  armorSoftcritBonus: 4
+  armorDeathBonus: 4
+  affixCount: 1
+  affixEffectMultiplier: 1.2
+  artifactTraitCount: 0
+
+- type: itemRarity
+  id: Exotic
+  name: rarity-exotic
+  tier: 3
+  color: "#FFFF00"  # Yellow
+  weaponDamageMultMin: 0.15
+  weaponDamageMultMax: 0.30
+  armorSoftcritBonus: 6
+  armorDeathBonus: 6
+  affixCount: 2
+  affixEffectMultiplier: 1.35
+  artifactTraitCount: 0
+
+- type: itemRarity
+  id: Bluespaced
+  name: rarity-bluespaced
+  tier: 4
+  color: "#FF8800"  # Orange
+  weaponDamageMultMin: 0.30
+  weaponDamageMultMax: 0.45
+  armorSoftcritBonus: 10
+  armorDeathBonus: 10
+  affixCount: 2
+  affixEffectMultiplier: 1.55
+  artifactTraitCount: 2
+
+- type: itemRarity
+  id: Anomalous
+  name: rarity-anomalous
+  tier: 5
+  color: "#FF0000"  # Red
+  weaponDamageMultMin: 0.45
+  weaponDamageMultMax: 0.60
+  armorSoftcritBonus: 15
+  armorDeathBonus: 15
+  affixCount: 3
+  affixEffectMultiplier: 1.75
+  artifactTraitCount: 2

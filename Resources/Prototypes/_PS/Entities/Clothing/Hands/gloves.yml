@@ -1,0 +1,97 @@
+# Prospect Sector - Gloves with Stats
+# These gloves use the ItemStats system for rarity and affixes
+# PS uses ItemStats/Fortitude for damage reduction instead of upstream armor coefficients
+
+# Base combat gloves with stats support
+- type: entity
+  id: PSClothingHandsGlovesBase
+  parent: ClothingHandsBase
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Clothing/Hands/Gloves/leather.rsi
+  - type: Clothing
+    sprite: Clothing/Hands/Gloves/leather.rsi
+  - type: Armor
+    showArmorOnExamine: false
+  - type: ItemStats
+    rarity: Uncommon
+
+# Standard Gloves
+- type: entity
+  id: PSGlovesStandard
+  parent: PSClothingHandsGlovesBase
+  name: combat gloves
+  description: Basic combat gloves providing minor protection and grip.
+  components:
+  - type: Sprite
+    sprite: Clothing/Hands/Gloves/leather.rsi
+  - type: Clothing
+    sprite: Clothing/Hands/Gloves/leather.rsi
+  - type: ItemStats
+    rarity: Uncommon
+    statBonuses:
+      Dexterity: 1
+
+# Tactical Gloves
+- type: entity
+  id: PSGlovesTactical
+  parent: PSClothingHandsGlovesBase
+  name: tactical gloves
+  description: High-quality tactical gloves with reinforced knuckles.
+  components:
+  - type: Sprite
+    sprite: Clothing/Hands/Gloves/combat.rsi
+  - type: Clothing
+    sprite: Clothing/Hands/Gloves/combat.rsi
+  - type: ItemStats
+    rarity: Rare
+    statBonuses:
+      Dexterity: 2
+      Strength: 1
+    affixes:
+    - affixId: MeleeDamage
+      value: 2.0
+
+# Marksman Gloves
+- type: entity
+  id: PSGlovesMarksman
+  parent: PSClothingHandsGlovesBase
+  name: marksman gloves
+  description: Precision gloves designed for improved weapon handling and accuracy.
+  components:
+  - type: Sprite
+    sprite: Clothing/Hands/Gloves/fingerless.rsi
+  - type: Clothing
+    sprite: Clothing/Hands/Gloves/fingerless.rsi
+  - type: ItemStats
+    rarity: Rare
+    statBonuses:
+      Dexterity: 3
+    affixes:
+    - affixId: RangedDamage
+      value: 2.5
+    - affixId: CritChance
+      value: 1.5
+
+# Heavy Combat Gloves
+- type: entity
+  id: PSGlovesHeavyCombat
+  parent: PSClothingHandsGlovesBase
+  name: heavy combat gloves
+  description: Reinforced armored gloves for close combat situations.
+  components:
+  - type: Sprite
+    sprite: Clothing/Hands/Gloves/combat.rsi
+  - type: Clothing
+    sprite: Clothing/Hands/Gloves/combat.rsi
+  - type: ItemStats
+    rarity: Exotic
+    statBonuses:
+      Strength: 3
+      Dexterity: 1
+    affixes:
+    - affixId: MeleeDamage
+      value: 3.5
+    - affixId: CritChance
+      value: 2.0

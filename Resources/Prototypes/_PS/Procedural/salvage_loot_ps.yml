@@ -1,0 +1,55 @@
+# Prospect Sector - Salvage Loot Table
+# These entries add PS equipment spawners to terradrop expeditions
+# Items spawn with randomized stats based on the terradrop level
+
+- type: salvageLoot
+  id: PSSalvageLoot
+  loots:
+    - !type:RandomSpawnsLoot
+      entries:
+        # Tier 1 - Common equipment (cheap, frequent)
+        - proto: PSSpawnerLootTier1
+          cost: 1
+          prob: 1.5
+        # Tier 2 - Uncommon equipment
+        - proto: PSSpawnerLootTier2
+          cost: 2
+          prob: 1.0
+        # Tier 3 - Rare equipment
+        - proto: PSSpawnerLootTier3
+          cost: 3
+          prob: 0.5
+        # Tier 4 - Exotic equipment (expensive, rare)
+        - proto: PSSpawnerLootTier4
+          cost: 5
+          prob: 0.25
+        # Weapon-specific spawners
+        - proto: PSSpawnerMeleeUncommon
+          cost: 2
+          prob: 0.8
+        - proto: PSSpawnerMeleeRare
+          cost: 3
+          prob: 0.4
+        - proto: PSSpawnerRangedPistol
+          cost: 2
+          prob: 0.6
+        - proto: PSSpawnerRangedMixed
+          cost: 3
+          prob: 0.4
+        # Armor spawners
+        - proto: PSSpawnerArmorLight
+          cost: 2
+          prob: 0.6
+        - proto: PSSpawnerArmorHeavy
+          cost: 3
+          prob: 0.3
+        - proto: PSSpawnerHelmet
+          cost: 2
+          prob: 0.5
+        # Accessory spawners
+        - proto: PSSpawnerGloves
+          cost: 1
+          prob: 0.8
+        - proto: PSSpawnerMask
+          cost: 1
+          prob: 0.6

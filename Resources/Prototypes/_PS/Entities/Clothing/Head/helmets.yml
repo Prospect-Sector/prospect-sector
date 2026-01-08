@@ -1,0 +1,83 @@
+# Prospect Sector - Helmets with Stats
+# These helmets use the ItemStats system for rarity and affixes
+# PS uses ItemStats/Fortitude for damage reduction instead of upstream armor coefficients
+
+# Base helmet with stats support
+- type: entity
+  id: PSClothingHeadHelmetBase
+  parent: ClothingHeadBase
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Clothing/Head/Helmets/security.rsi
+  - type: Clothing
+    sprite: Clothing/Head/Helmets/security.rsi
+  - type: Armor
+    showArmorOnExamine: false
+  - type: ItemStats
+    rarity: Uncommon
+
+# Security Helmet
+- type: entity
+  id: PSHelmetSecurity
+  parent: PSClothingHeadHelmetBase
+  name: security helmet
+  description: Standard security helmet providing head protection.
+  components:
+  - type: Sprite
+    sprite: Clothing/Head/Helmets/security.rsi
+  - type: Clothing
+    sprite: Clothing/Head/Helmets/security.rsi
+  - type: ItemStats
+    rarity: Uncommon
+    softcritBonus: 1
+    deathThresholdBonus: 1
+    statBonuses:
+      Fortitude: 1
+
+# Riot Helmet
+- type: entity
+  id: PSHelmetRiot
+  parent: PSClothingHeadHelmetBase
+  name: riot helmet
+  description: Heavy riot helmet with face shield. Superior protection against melee attacks.
+  components:
+  - type: Sprite
+    sprite: Clothing/Head/Helmets/light_riot.rsi
+  - type: Clothing
+    sprite: Clothing/Head/Helmets/light_riot.rsi
+  - type: ItemStats
+    rarity: Rare
+    softcritBonus: 2
+    deathThresholdBonus: 2
+    statBonuses:
+      Fortitude: 2
+      Strength: 1
+    affixes:
+    - affixId: Armor
+      value: 2.5
+
+# Tactical Helmet
+- type: entity
+  id: PSHelmetTactical
+  parent: PSClothingHeadHelmetBase
+  name: tactical helmet
+  description: Advanced tactical helmet with integrated systems.
+  components:
+  - type: Sprite
+    sprite: Clothing/Head/Helmets/security.rsi
+  - type: Clothing
+    sprite: Clothing/Head/Helmets/security.rsi
+  - type: ItemStats
+    rarity: Exotic
+    softcritBonus: 3
+    deathThresholdBonus: 3
+    statBonuses:
+      Fortitude: 2
+      Dexterity: 1
+      Intelligence: 1
+    affixes:
+    - affixId: Armor
+      value: 3.0
+    - affixId: LootRarity
+      value: 2.0

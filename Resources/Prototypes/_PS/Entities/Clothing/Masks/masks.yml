@@ -1,0 +1,107 @@
+# Prospect Sector - Masks with Stats
+# These masks use the ItemStats system for rarity and affixes
+# PS uses ItemStats/Fortitude for damage reduction instead of upstream armor coefficients
+
+# Base combat mask with stats support
+- type: entity
+  id: PSClothingMaskBase
+  parent: ClothingMaskBase
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Clothing/Mask/gas.rsi
+  - type: Clothing
+    sprite: Clothing/Mask/gas.rsi
+  - type: Armor
+    showArmorOnExamine: false
+  - type: ItemStats
+    rarity: Uncommon
+
+# Standard Gas Mask
+- type: entity
+  id: PSMaskGas
+  parent: PSClothingMaskBase
+  name: gas mask
+  description: Standard gas mask providing respiratory protection.
+  components:
+  - type: Sprite
+    sprite: Clothing/Mask/gas.rsi
+  - type: Clothing
+    sprite: Clothing/Mask/gas.rsi
+  - type: BreathMask
+  - type: IngestionBlocker
+  - type: IdentityBlocker
+  - type: ItemStats
+    rarity: Uncommon
+    statBonuses:
+      Fortitude: 1
+
+# Security Gas Mask
+- type: entity
+  id: PSMaskSecurityGas
+  parent: PSClothingMaskBase
+  name: security gas mask
+  description: Reinforced gas mask used by security forces.
+  components:
+  - type: Sprite
+    sprite: Clothing/Mask/gassecurity.rsi
+  - type: Clothing
+    sprite: Clothing/Mask/gassecurity.rsi
+  - type: BreathMask
+  - type: IngestionBlocker
+  - type: IdentityBlocker
+  - type: ItemStats
+    rarity: Rare
+    statBonuses:
+      Fortitude: 2
+    affixes:
+    - affixId: Armor
+      value: 1.5
+
+# Tactical Mask
+- type: entity
+  id: PSMaskTactical
+  parent: PSClothingMaskBase
+  name: tactical mask
+  description: Advanced tactical mask with integrated HUD elements.
+  components:
+  - type: Sprite
+    sprite: Clothing/Mask/gassecurity.rsi
+  - type: Clothing
+    sprite: Clothing/Mask/gassecurity.rsi
+  - type: BreathMask
+  - type: IngestionBlocker
+  - type: IdentityBlocker
+  - type: ItemStats
+    rarity: Exotic
+    statBonuses:
+      Fortitude: 2
+      Intelligence: 1
+      Luck: 1
+    affixes:
+    - affixId: LootRarity
+      value: 3.0
+    - affixId: Armor
+      value: 2.0
+
+# Expedition Mask
+- type: entity
+  id: PSMaskExpedition
+  parent: PSClothingMaskBase
+  name: expedition mask
+  description: Specialized mask for expedition teams. Enhances survival capabilities.
+  components:
+  - type: Sprite
+    sprite: Clothing/Mask/gas.rsi
+  - type: Clothing
+    sprite: Clothing/Mask/gas.rsi
+  - type: BreathMask
+  - type: IngestionBlocker
+  - type: ItemStats
+    rarity: Rare
+    statBonuses:
+      Luck: 2
+      Agility: 1
+    affixes:
+    - affixId: LootRarity
+      value: 4.0

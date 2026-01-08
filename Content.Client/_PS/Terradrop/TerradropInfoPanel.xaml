@@ -36,6 +36,16 @@
                     HorizontalExpand="True"/>
             <Label Name="NodeStatusLabel"
                    HorizontalExpand="True"/>
+            <!-- Level Selector -->
+            <BoxContainer Orientation="Horizontal" Margin="0 8 0 4">
+                <Label Text="{Loc 'terradrop-level-label'}" VerticalAlignment="Center" Margin="0 0 8 0"/>
+                <Button Name="LevelMinusTenButton" Text="--" MinWidth="32" Margin="0 0 2 0" ToolTip="{Loc 'terradrop-level-minus-ten'}"/>
+                <Button Name="LevelMinusButton" Text="-" MinWidth="32" Margin="0 0 4 0" ToolTip="{Loc 'terradrop-level-minus-one'}"/>
+                <Label Name="LevelLabel" Text="0" MinWidth="40" HorizontalAlignment="Center" VerticalAlignment="Center" StyleClasses="LabelKeyText"/>
+                <Button Name="LevelPlusButton" Text="+" MinWidth="32" Margin="4 0 2 0" ToolTip="{Loc 'terradrop-level-plus-one'}"/>
+                <Button Name="LevelPlusTenButton" Text="++" MinWidth="32" ToolTip="{Loc 'terradrop-level-plus-ten'}"/>
+            </BoxContainer>
+            <Label Name="LevelBonusLabel" Text="" Margin="0 0 0 4" StyleClasses="LabelSubText"/>
             <Button Name="StartButton"
                     Text="{Loc 'terradrop-start-generic'}"
                     HorizontalAlignment="Left"

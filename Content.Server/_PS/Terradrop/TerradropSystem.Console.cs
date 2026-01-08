@@ -67,13 +67,17 @@ public sealed partial class TerradropSystem
                     return;
                 }
 
+                // Validate level is at least the map's minimum
+                var selectedLevel = Math.Max(message.Level, mapProto.MinLevel);
+
                 // Found a pad to use.
                 CreateNewTerradropJob(
                     mapPrototype: mapProto,
                     missionParams: missionParams,
                     station: station,
                     targetPad: uid,
-                    landingPadTile: landingPadTile
+                    landingPadTile: landingPadTile,
+                    level: selectedLevel
                 );
                 return;
             }

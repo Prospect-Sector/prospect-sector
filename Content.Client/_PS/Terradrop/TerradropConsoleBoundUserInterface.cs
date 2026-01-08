@@ -38,21 +38,21 @@ public sealed class TerradropConsoleBoundUserInterface : BoundUserInterface
         _consoleMenu.SetEntity(owner);
         _consoleMenu.OnClose += () => _consoleMenu = null;
 
-        // Set up technology unlock handler
-        _consoleMenu.OnStartTerradropPressed += id =>
+        // Set up terradrop start handler
+        _consoleMenu.OnStartTerradropPressed += (id, level) =>
         {
             try
             {
-                _sawmill.Debug($"Sending ConsoleUnlockTechnologyMessage for tech ID: {id}");
+                _sawmill.Debug($"Sending StartTerradropMessage for map ID: {id}, level: {level}");
 
-                // Create and send the message
-                var message = new StartTerradropMessage(id);
+                // Create and send the message with level
+                var message = new StartTerradropMessage(id, level);
                 SendMessage(message);
-                _sawmill.Info($"Sent unlock message for technology: {id}"); // Log success
+                _sawmill.Info($"Sent start message for terradrop: {id} at level {level}");
             }
-            catch (Exception ex) // Log any exceptions that occur during message sending
+            catch (Exception ex)
             {
-                _sawmill.Error($"Error sending technology unlock message for {id}: {ex}");
+                _sawmill.Error($"Error sending terradrop start message for {id}: {ex}");
             }
         };
     }

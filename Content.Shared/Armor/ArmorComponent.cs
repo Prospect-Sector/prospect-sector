@@ -15,7 +15,7 @@ public sealed partial class ArmorComponent : Component
     /// The damage reduction
     /// </summary>
     [DataField(required: true)]
-    public DamageModifierSet Modifiers = default!;
+    public DamageModifierSet Modifiers = new(); // Prospect: default to empty (no modification)
 
     /// <summary>
     /// A multiplier applied to the calculated point value

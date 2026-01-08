@@ -21,7 +21,8 @@ public sealed partial class TerradropSystem
         SalvageMissionParams missionParams,
         EntityUid station,
         EntityUid targetPad,
-        Tile landingPadTile
+        Tile landingPadTile,
+        int level = 0
     )
     {
         var cancelToken = new CancellationTokenSource();
@@ -41,6 +42,7 @@ public sealed partial class TerradropSystem
             mapPrototype,
             missionParams,
             landingPadTile,
+            level,
             cancelToken.Token);
 
         _jobs.Add((job, cancelToken));

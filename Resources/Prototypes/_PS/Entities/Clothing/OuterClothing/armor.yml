@@ -1,0 +1,132 @@
+# Prospect Sector - Armor with Stats
+# These armors use the ItemStats system for rarity and affixes
+# PS uses ItemStats/Fortitude for damage reduction instead of upstream armor coefficients
+
+# Base armor with stats support
+- type: entity
+  id: PSClothingOuterArmorBase
+  parent: ClothingOuterBaseMedium
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Clothing/OuterClothing/Armor/security.rsi
+  - type: Clothing
+    sprite: Clothing/OuterClothing/Armor/security.rsi
+  - type: Armor
+    showArmorOnExamine: false
+  - type: ExplosionResistance
+    damageCoefficient: 1.0
+  - type: ItemStats
+    rarity: Uncommon
+
+# Standard Security Vest
+- type: entity
+  id: PSArmorVestSecurity
+  parent: PSClothingOuterArmorBase
+  name: security armor vest
+  description: A standard armored vest providing basic protection. Standard issue for security personnel.
+  components:
+  - type: Sprite
+    sprite: Clothing/OuterClothing/Armor/security.rsi
+  - type: Clothing
+    sprite: Clothing/OuterClothing/Armor/security.rsi
+  - type: ItemStats
+    rarity: Uncommon
+    softcritBonus: 2
+    deathThresholdBonus: 2
+    statBonuses:
+      Fortitude: 2
+
+# Bulletproof Vest - Higher tier
+- type: entity
+  id: PSArmorVestBulletproof
+  parent: PSClothingOuterArmorBase
+  name: bulletproof vest
+  description: A heavy bulletproof vest with excellent protection against projectiles.
+  components:
+  - type: Sprite
+    sprite: Clothing/OuterClothing/Armor/bulletproof.rsi
+  - type: Clothing
+    sprite: Clothing/OuterClothing/Armor/bulletproof.rsi
+  - type: ItemStats
+    rarity: Rare
+    softcritBonus: 4
+    deathThresholdBonus: 4
+    statBonuses:
+      Fortitude: 3
+      Strength: 1
+    affixes:
+    - affixId: Armor
+      value: 3.0
+
+# Tactical Armor - High tier
+- type: entity
+  id: PSArmorTactical
+  parent: PSClothingOuterArmorBase
+  name: tactical armor
+  description: Advanced tactical armor providing superior protection without sacrificing mobility.
+  components:
+  - type: Sprite
+    sprite: Clothing/OuterClothing/Armor/captain_carapace.rsi
+  - type: Clothing
+    sprite: Clothing/OuterClothing/Armor/captain_carapace.rsi
+  - type: ItemStats
+    rarity: Exotic
+    softcritBonus: 6
+    deathThresholdBonus: 6
+    statBonuses:
+      Fortitude: 4
+      Strength: 2
+      Agility: 1
+    affixes:
+    - affixId: Armor
+      value: 4.5
+    - affixId: HpThreshold
+      value: 2
+
+# Riot Armor - Heavy defense
+- type: entity
+  id: PSArmorRiot
+  parent: PSClothingOuterArmorBase
+  name: riot armor
+  description: Heavy riot suppression armor. Excellent melee protection but reduces mobility.
+  components:
+  - type: Sprite
+    sprite: Clothing/OuterClothing/Armor/riot.rsi
+  - type: Clothing
+    sprite: Clothing/OuterClothing/Armor/riot.rsi
+  - type: ClothingSpeedModifier
+    walkModifier: 0.9
+    sprintModifier: 0.85
+  - type: ItemStats
+    rarity: Rare
+    softcritBonus: 5
+    deathThresholdBonus: 5
+    statBonuses:
+      Fortitude: 4
+      Strength: 2
+    affixes:
+    - affixId: Armor
+      value: 5.0
+
+# Light Expedition Armor
+- type: entity
+  id: PSArmorExpeditionLight
+  parent: PSClothingOuterArmorBase
+  name: light expedition armor
+  description: Lightweight armor designed for expeditions. Balanced protection and mobility.
+  components:
+  - type: Sprite
+    sprite: Clothing/OuterClothing/Armor/security_slim.rsi
+  - type: Clothing
+    sprite: Clothing/OuterClothing/Armor/security_slim.rsi
+  - type: ItemStats
+    rarity: Uncommon
+    softcritBonus: 2
+    deathThresholdBonus: 2
+    statBonuses:
+      Agility: 2
+      Fortitude: 1
+    affixes:
+    - affixId: MoveSpeed
+      value: 2.0
