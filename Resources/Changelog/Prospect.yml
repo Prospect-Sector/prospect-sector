@@ -56,3 +56,20 @@ Entries:
   id: 8
   time: '2025-08-18T17:39:59.0000000+00:00'
   url: https://github.com/Prospect-Sector/prospect-sector/pull/50
+- author: GreaseMonk
+  changes:
+    - type: Add
+      message: Item stats system with 6 core stats and 17 affix types
+    - type: Add
+      message: 5 rarity tiers for equipment (Uncommon through Anomalous)
+    - type: Add
+      message: Randomized stat rolls on equipment spawn
+    - type: Add
+      message: Terradrop mission levels - higher levels yield better loot
+    - type: Add
+      message: 'New PS equipment: melee weapons, ranged weapons, armor sets'
+    - type: Tweak
+      message: PS armor uses Fortitude stat instead of damage coefficients
+  id: 9
+  time: '2026-01-08T19:17:24.0000000+00:00'
+  url: https://github.com/Prospect-Sector/prospect-sector/pull/57
