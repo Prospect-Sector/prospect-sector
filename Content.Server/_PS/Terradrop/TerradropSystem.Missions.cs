@@ -45,7 +45,7 @@ public sealed partial class TerradropSystem
         }
 
         var players =
-            AllEntityQuery<HumanoidAppearanceComponent, ActorComponent, MobStateComponent, TransformComponent>();
+            AllEntityQuery<HumanoidProfileComponent, ActorComponent, MobStateComponent, TransformComponent>();
         while (players.MoveNext(out var playerUid, out _, out _, out _, out var xform))
         {
             if (xform.MapUid == uid)
