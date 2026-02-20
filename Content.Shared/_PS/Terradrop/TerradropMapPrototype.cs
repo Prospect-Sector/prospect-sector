@@ -7,7 +7,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._PS.Terradrop;
 
 [Prototype]
-public sealed class TerradropMapPrototype: IPrototype
+public sealed partial class TerradropMapPrototype: IPrototype
 {
     /// <inheritdoc/>
     [IdDataField]
