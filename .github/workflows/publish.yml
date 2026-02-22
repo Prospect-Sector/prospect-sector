@@ -7,11 +7,13 @@ concurrency:
 on:
   workflow_dispatch:
   schedule: # Prospect: Enable
-  - cron: '0 */8 * * *'
+  - cron: '0 */8 * * *' # Prospect
 
+# Prospect: guard step permissions
 permissions:
   actions: read
   contents: read
+# Prospect: End
 
 jobs:
   build:
@@ -22,6 +24,7 @@ jobs:
       # if: ${{GITHUB.REF_NAME == 'main' && github.repository == 'Prospect-Sector/prospect-sector'}}
       # run: exit 1
 
+    # Prospect: skip publish if main unchanged since last successful run
     - name: Skip if main has not changed since last successful publish
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -64,6 +67,7 @@ jobs:
         fi
 
         echo "Main changed since last publish; continuing."
+    # Prospect: End
 
     - name: Install dependencies
       run: sudo apt-get install -y python3-paramiko python3-lxml
