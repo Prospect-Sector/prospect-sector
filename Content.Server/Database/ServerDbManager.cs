@@ -1089,17 +1089,16 @@ namespace Content.Server.Database
                 Password = pass
             };
 
-            // Prospect: SSL mode, trust server certificate, and disable GSSAPI.
+            // Prospect: SSL mode and trust server certificate.
             if (!Enum.TryParse<Npgsql.SslMode>(sslModeString, true, out var sslModeParsed))
                 sslModeParsed = Npgsql.SslMode.Disable;
             npgBuilder.SslMode = sslModeParsed;
             npgBuilder.TrustServerCertificate = trustServerCert;
-            npgBuilder.GssEncryptionMode = Npgsql.GssEncryptionMode.Disable; // Prospect: GSSAPI hangs on managed DBs
 
             var connectionString = npgBuilder.ConnectionString;
 
             _sawmill.Debug($"Using Postgres \"{host}:{port}/{db}\" SSLMode={npgBuilder.SslMode} TrustServerCertificate={trustServerCert}");
-            // Prospect: End
+            // End Prospect: SSL mode and trust server certificate.
 
             builder.UseNpgsql(connectionString);
             SetupLogging(builder);
