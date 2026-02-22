@@ -86,6 +86,9 @@ public sealed partial class CCVars
 
     public static readonly CVarDef<string> DatabasePgGssEncryptionMode =
         CVarDef.Create("database.pg_gss_encryption_mode", "Disable", CVar.SERVERONLY); // GssEncryptionMode values: Disable, Prefer, Require.
+
+    public static readonly CVarDef<string> DatabasePgChannelBinding =
+        CVarDef.Create("database.pg_channel_binding", "Disable", CVar.SERVERONLY); // ChannelBinding values: Disable, Prefer, Require.
     /// <summary>
     /// End Prospect: Added for SSL/TLS support ---
     /// </summary>
