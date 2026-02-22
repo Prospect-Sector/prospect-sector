@@ -48,6 +48,11 @@ namespace Content.Server.Database
                 {
                     await ctx.Database.MigrateAsync();
                 }
+                catch (Exception e) // Prospect: log migration errors so they're not silently swallowed
+                {
+                    _notifyLog.Error($"Database migration failed: {e}");
+                    throw;
+                }
                 finally
                 {
                     await ctx.DisposeAsync();
