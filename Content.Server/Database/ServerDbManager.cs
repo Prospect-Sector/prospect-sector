@@ -1089,18 +1089,27 @@ namespace Content.Server.Database
                 Password = pass
             };
 
-            // Prospect: SSL mode and trust server certificate.
+            // Prospect: SSL mode for managed DBs.
             if (!Enum.TryParse<Npgsql.SslMode>(sslModeString, true, out var sslModeParsed))
                 sslModeParsed = Npgsql.SslMode.Disable;
             npgBuilder.SslMode = sslModeParsed;
-            npgBuilder.TrustServerCertificate = trustServerCert;
 
             var connectionString = npgBuilder.ConnectionString;
 
-            _sawmill.Debug($"Using Postgres \"{host}:{port}/{db}\" SSLMode={npgBuilder.SslMode} TrustServerCertificate={trustServerCert}");
-            // End Prospect: SSL mode and trust server certificate.
+            // Prospect: Use NpgsqlDataSource with explicit SSL callback to bypass cert validation.
+            // TrustServerCertificate is obsolete in Npgsql 10 and does nothing.
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+            if (trustServerCert)
+            {
+                dataSourceBuilder.UseSslClientAuthenticationOptionsCallback(options =>
+                    options.RemoteCertificateValidationCallback = (_, _, _, _) => true);
+            }
+            var dataSource = dataSourceBuilder.Build();
 
-            builder.UseNpgsql(connectionString);
+            _sawmill.Debug($"Using Postgres \"{host}:{port}/{db}\" SSLMode={npgBuilder.SslMode} TrustServerCert={trustServerCert}");
+            // Prospect: End
+
+            builder.UseNpgsql(dataSource);
             SetupLogging(builder);
             return (builder.Options, connectionString);
         }
