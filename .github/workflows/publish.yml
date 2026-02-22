@@ -7,7 +7,11 @@ concurrency:
 on:
   workflow_dispatch:
   schedule: # Prospect: Enable
-  - cron: '0 8 * * *'
+  - cron: '0 */8 * * *'
+
+permissions:
+  actions: read
+  contents: read
 
 jobs:
   build:
@@ -17,6 +21,49 @@ jobs:
     # - name: Fail if we are attempting to run on the main branch # Prospect: Disable
       # if: ${{GITHUB.REF_NAME == 'main' && github.repository == 'Prospect-Sector/prospect-sector'}}
       # run: exit 1
+
+    - name: Skip if main has not changed since last successful publish
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
+        WF_NAME: ${{ github.workflow }}
+        BRANCH: main
+      run: |
+        set -euo pipefail
+
+        echo "Repo: $REPO"
+        echo "Workflow: $WF_NAME"
+        echo "Branch: $BRANCH"
+
+        # Current HEAD SHA of main
+        current_sha="$(gh api "repos/${REPO}/commits/${BRANCH}" --jq .sha)"
+        echo "Current main SHA: $current_sha"
+
+        # Find head_sha of last successful run of this workflow on main (excluding current run)
+        last_sha="$(
+          gh api "repos/${REPO}/actions/runs?branch=${BRANCH}&status=success&per_page=50" --jq \
+          --arg WF_NAME "$WF_NAME" --arg CUR_RUN_ID "${{ github.run_id }}" '
+            .workflow_runs
+            | map(select(.name == $WF_NAME))
+            | map(select((.id|tostring) != $CUR_RUN_ID))
+            | sort_by(.run_started_at) | reverse
+            | .[0].head_sha // empty
+          '
+        )"
+
+        if [ -z "${last_sha:-}" ]; then
+          echo "No previous successful run found; continuing."
+          exit 0
+        fi
+
+        echo "Last successful run SHA: $last_sha"
+
+        if [ "$current_sha" = "$last_sha" ]; then
+          echo "No new commits on main since last successful publish; skipping."
+          exit 0
+        fi
+
+        echo "Main changed since last publish; continuing."
 
     - name: Install dependencies
       run: sudo apt-get install -y python3-paramiko python3-lxml
