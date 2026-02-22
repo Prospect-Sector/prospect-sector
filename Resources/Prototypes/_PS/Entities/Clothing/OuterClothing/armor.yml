@@ -13,6 +13,7 @@
   - type: Clothing
     sprite: Clothing/OuterClothing/Armor/security.rsi
   - type: Armor
+    modifiers: {}
     showArmorOnExamine: false
   - type: ExplosionResistance
     damageCoefficient: 1.0
