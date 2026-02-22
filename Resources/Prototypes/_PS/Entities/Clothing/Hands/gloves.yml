@@ -13,6 +13,7 @@
   - type: Clothing
     sprite: Clothing/Hands/Gloves/leather.rsi
   - type: Armor
+    modifiers: {}
     showArmorOnExamine: false
   - type: ItemStats
     rarity: Uncommon
