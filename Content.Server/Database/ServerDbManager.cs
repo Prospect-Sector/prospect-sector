@@ -1078,6 +1078,7 @@ namespace Content.Server.Database
 
             var sslModeString = _cfg.GetCVar(CCVars.DatabasePgSslMode); // Prospect
             var trustServerCert = _cfg.GetCVar(CCVars.DatabasePgTrustServerCertificate); // Prospect
+            var gssEncryptionModeString = _cfg.GetCVar(CCVars.DatabasePgGssEncryptionMode); // Prospect
 
             var builder = new DbContextOptionsBuilder<PostgresServerDbContext>();
             var npgBuilder = new NpgsqlConnectionStringBuilder
@@ -1094,11 +1095,13 @@ namespace Content.Server.Database
                 sslModeParsed = Npgsql.SslMode.Disable;
             npgBuilder.SslMode = sslModeParsed;
             npgBuilder.TrustServerCertificate = trustServerCert;
-            npgBuilder.GssEncryptionMode = Npgsql.GssEncryptionMode.Disable; // Prospect: GSSAPI hangs on managed DBs
+            if (!Enum.TryParse<Npgsql.GssEncryptionMode>(gssEncryptionModeString, true, out var gssModeParsed))
+                gssModeParsed = Npgsql.GssEncryptionMode.Disable;
+            npgBuilder.GssEncryptionMode = gssModeParsed; // Prospect: GSSAPI hangs on managed DBs
 
             var connectionString = npgBuilder.ConnectionString;
 
-            _sawmill.Debug($"Using Postgres \"{host}:{port}/{db}\" SSLMode={npgBuilder.SslMode} TrustServerCertificate={trustServerCert}");
+            _sawmill.Debug($"Using Postgres \"{host}:{port}/{db}\" SSLMode={npgBuilder.SslMode} TrustServerCertificate={trustServerCert} GssEncryptionMode={npgBuilder.GssEncryptionMode}");
             // Prospect: End
 
             builder.UseNpgsql(connectionString);
