@@ -44,7 +44,7 @@ jobs:
 
         # Find head_sha of last successful run of this workflow on main (excluding current run)
         last_sha="$(
-          gh api "repos/${REPO}/actions/runs?branch=${BRANCH}&status=success&per_page=50" --jq \
+          gh api "repos/${REPO}/actions/runs?branch=${BRANCH}&status=success&per_page=100" --jq \
           --arg WF_NAME "$WF_NAME" --arg CUR_RUN_ID "${{ github.run_id }}" '
             .workflow_runs
             | map(select(.name == $WF_NAME))
