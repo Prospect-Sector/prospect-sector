@@ -3,7 +3,7 @@
 
 - type: entity
   id: PSPlanetIconZeronaPrime
-  noSpawn: true
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _PS/Terradrop/planets.rsi
@@ -11,7 +11,7 @@
 
 - type: entity
   id: PSPlanetIconVeridia
-  noSpawn: true
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _PS/Terradrop/planets.rsi
@@ -19,7 +19,7 @@
 
 - type: entity
   id: PSPlanetIconSpironis
-  noSpawn: true
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _PS/Terradrop/planets.rsi
@@ -27,7 +27,7 @@
 
 - type: entity
   id: PSPlanetIconRecharis
-  noSpawn: true
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _PS/Terradrop/planets.rsi
@@ -35,7 +35,7 @@
 
 - type: entity
   id: PSPlanetIconObscyra
-  noSpawn: true
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _PS/Terradrop/planets.rsi
@@ -43,7 +43,7 @@
 
 - type: entity
   id: PSPlanetIconEbonis
-  noSpawn: true
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _PS/Terradrop/planets.rsi
@@ -51,7 +51,7 @@
 
 - type: entity
   id: PSPlanetIconCrimsonis
-  noSpawn: true
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _PS/Terradrop/planets.rsi
@@ -59,7 +59,7 @@
 
 - type: entity
   id: PSPlanetIconBastara
-  noSpawn: true
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _PS/Terradrop/planets.rsi
@@ -67,7 +67,7 @@
 
 - type: entity
   id: PSPlanetIconCrownis
-  noSpawn: true
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _PS/Terradrop/planets.rsi
@@ -75,7 +75,7 @@
 
 - type: entity
   id: PSPlanetIconFerros
-  noSpawn: true
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _PS/Terradrop/planets.rsi
