@@ -77,13 +77,15 @@ public sealed class ItemStatsSystem : EntitySystem
     /// </summary>
     private const float GlobalMinimumDamageMultiplier = 0.05f;
 
-    private int _levelStatModifier = 100;
+    private float _itemCoefficient = 0.2f;
+    private float _itemExponent = 1.5f;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        Subs.CVar(_cfg, CCVars.TerradropLevelStatModifier, value => _levelStatModifier = value, true);
+        Subs.CVar(_cfg, CCVars.TerradropItemStatCoefficient, value => _itemCoefficient = value / 100f, true);
+        Subs.CVar(_cfg, CCVars.TerradropItemStatExponent, value => _itemExponent = value / 100f, true);
 
         // Examine tooltip
         SubscribeLocalEvent<ItemStatsComponent, GetVerbsEvent<ExamineVerb>>(OnExamine);
@@ -117,8 +119,8 @@ public sealed class ItemStatsSystem : EntitySystem
         var userLuck = GetTotalStat(args.User, StatType.Luck);
         var luckLevelMultiplier = Math.Min(1f + (userLuck * LuckLevelBonusPerPoint), MaxLuckLevelMultiplier);
 
-        // Level bonus (e.g., level 31 = 31% bonus with default modifier), enhanced by Luck
-        var levelBonus = component.SpawnLevel * 0.01f * (_levelStatModifier / 100f) * luckLevelMultiplier;
+        // Level bonus (power curve), enhanced by Luck
+        var levelBonus = _itemCoefficient * MathF.Pow(component.SpawnLevel, _itemExponent) * luckLevelMultiplier;
         totalBonus += levelBonus;
 
         // Weapon damage bonus (e.g., 1.10 multiplier = 10% bonus)
@@ -179,8 +181,8 @@ public sealed class ItemStatsSystem : EntitySystem
         var userLuck = GetTotalStat(args.User, StatType.Luck);
         var luckLevelMultiplier = Math.Min(1f + (userLuck * LuckLevelBonusPerPoint), MaxLuckLevelMultiplier);
 
-        // Level bonus (e.g., level 31 = 31% bonus with default modifier), enhanced by Luck
-        var levelBonus = component.SpawnLevel * 0.01f * (_levelStatModifier / 100f) * luckLevelMultiplier;
+        // Level bonus (power curve), enhanced by Luck
+        var levelBonus = _itemCoefficient * MathF.Pow(component.SpawnLevel, _itemExponent) * luckLevelMultiplier;
         totalBonus += levelBonus;
 
         // Weapon damage bonus (e.g., 1.10 multiplier = 10% bonus)
@@ -423,8 +425,8 @@ public sealed class ItemStatsSystem : EntitySystem
             msg.PushNewline();
         }
 
-        // Calculate level bonus for display
-        var levelBonus = component.SpawnLevel * 0.01f * (_levelStatModifier / 100f);
+        // Calculate level bonus for display (power curve)
+        var levelBonus = _itemCoefficient * MathF.Pow(component.SpawnLevel, _itemExponent);
         var bonusMultiplier = 1f + levelBonus;
 
         // Weapon damage bonus (if applicable)
