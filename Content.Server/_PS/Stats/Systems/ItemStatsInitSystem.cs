@@ -17,13 +17,15 @@ public sealed class ItemStatsInitSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
 
-    private int _levelStatModifier = 100;
+    private float _itemCoefficient = 0.2f;
+    private float _itemExponent = 1.5f;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        Subs.CVar(_cfg, CCVars.TerradropLevelStatModifier, value => _levelStatModifier = value, true);
+        Subs.CVar(_cfg, CCVars.TerradropItemStatCoefficient, value => _itemCoefficient = value / 100f, true);
+        Subs.CVar(_cfg, CCVars.TerradropItemStatExponent, value => _itemExponent = value / 100f, true);
         SubscribeLocalEvent<ItemStatsComponent, MapInitEvent>(OnMapInit);
     }
 
@@ -41,10 +43,8 @@ public sealed class ItemStatsInitSystem : EntitySystem
         var level = GetTerradropLevel(uid);
         component.SpawnLevel = level;
 
-        // Apply configurable modifier to level bonus
-        // At modifier 100: level 100 = 100% bonus (2x stats)
-        // At modifier 900: level 100 = 900% bonus (10x stats)
-        var levelBonus = level * 0.01f * (_levelStatModifier / 100f);
+        // Power curve: bonus = coefficient * level^exponent
+        var levelBonus = _itemCoefficient * MathF.Pow(level, _itemExponent);
 
         RollStats(uid, component, levelBonus);
         component.Initialized = true;
@@ -150,7 +150,7 @@ public sealed class ItemStatsInitSystem : EntitySystem
 
         // Recalculate level bonus in case the item moved maps
         var level = GetTerradropLevel(uid);
-        var levelBonus = level * 0.01f * (_levelStatModifier / 100f);
+        var levelBonus = _itemCoefficient * MathF.Pow(level, _itemExponent);
 
         RollStats(uid, component, levelBonus);
         Dirty(uid, component);

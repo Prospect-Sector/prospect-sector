@@ -390,6 +390,10 @@ public sealed class GenerateTerradropJob : Job<bool>
                 var uid = _entManager.SpawnAtPosition(entry.Proto, _map.GridTileToLocal(grid, grid, tile));
                 _entManager.RemoveComponent<GhostRoleComponent>(uid);
                 _entManager.RemoveComponent<GhostTakeoverAvailableComponent>(uid);
+
+                // Scale mob stats based on terradrop level
+                _entManager.EnsureComponent<TerradropMobComponent>(uid);
+
                 return;
             }
         }
