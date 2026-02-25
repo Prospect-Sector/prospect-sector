@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
@@ -54,8 +54,16 @@ public sealed class TerradropConsoleBoundInterfaceState : BoundUserInterfaceStat
     /// </summary>
     public Dictionary<string, TerradropMapAvailability> MapNodes;
 
-    public TerradropConsoleBoundInterfaceState(Dictionary<string, TerradropMapAvailability> mapNodes) // Frontier R&D console rework = researches field
+    /// <summary>
+    /// Active instance names per map ID. Used for the reconnect popup.
+    /// </summary>
+    public Dictionary<string, List<string>> ActiveInstances;
+
+    public TerradropConsoleBoundInterfaceState(
+        Dictionary<string, TerradropMapAvailability> mapNodes,
+        Dictionary<string, List<string>> activeInstances)
     {
         MapNodes = mapNodes;
+        ActiveInstances = activeInstances;
     }
 }

@@ -1,6 +1,8 @@
-﻿using System.Numerics;
+using System.Numerics;
+using Content.Server.Chat.Managers;
 using Content.Server.Salvage.Expeditions;
 using Content.Shared._PS.Terradrop;
+using Content.Shared.Chat;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.FixedPoint;
@@ -19,9 +21,37 @@ namespace Content.Server._PS.Terradrop;
 /// </summary>
 public sealed partial class TerradropSystem
 {
+    [Dependency] private readonly IChatManager _chatManager = default!;
+
     private void InitializeMissionHandling()
     {
         SubscribeLocalEvent<SalvageExpeditionComponent, EntityTerminatingEvent>(OnMapTerminating);
+        SubscribeLocalEvent<ActorComponent, EntParentChangedMessage>(OnActorParentChanged);
+    }
+
+    private void OnActorParentChanged(EntityUid uid, ActorComponent actor, ref EntParentChangedMessage args)
+    {
+        var xform = args.Transform;
+        var newMapUid = xform.MapUid;
+
+        // Only care about actual map changes.
+        if (newMapUid == args.OldMapId)
+            return;
+
+        if (newMapUid == null || !TryComp<TerradropMapComponent>(newMapUid, out var mapComp))
+            return;
+
+        if (string.IsNullOrEmpty(mapComp.InstanceName))
+            return;
+
+        var message = Loc.GetString("terradrop-instance-entered", ("name", mapComp.InstanceName));
+        _chatManager.ChatMessageToOne(
+            ChatChannel.Server,
+            message,
+            message,
+            source: EntityUid.Invalid,
+            hideChat: false,
+            client: actor.PlayerSession.Channel);
     }
 
     // Send ghosts back to the default map so they don't lose their stuff.

@@ -248,10 +248,8 @@
   components:
   - type: Sprite
     layers:
-    - state: base
+    - state: icon
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-0
-      map: ["enum.GunVisualLayers.Mag"]
   - type: Item
     size: Large
     shape:
@@ -260,6 +258,7 @@
     quickEquip: false
     slots:
     - Back
+    - suitStorage
   - type: Gun
     fireRate: 1.5
     selectedMode: SemiAuto
@@ -280,10 +279,6 @@
     containers:
       ballistic-ammo: !type:Container
   - type: AmmoCounter
-  - type: MagazineVisuals
-    magState: mag
-    steps: 8
-    zeroVisible: false
   - type: Appearance
   - type: StaticPrice
     price: 1200

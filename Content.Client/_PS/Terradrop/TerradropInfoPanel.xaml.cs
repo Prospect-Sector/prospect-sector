@@ -27,15 +27,34 @@ public sealed partial class TerradropInfoPanel : Control
     /// </summary>
     public Action<int>? LevelChanged;
 
+    /// <summary>
+    /// Action invoked when the disconnect button is pressed.
+    /// </summary>
+    public Action? DisconnectAction;
+
+    /// <summary>
+    /// Action invoked when an instance is selected for reconnection. Passes (mapId, instanceIndex).
+    /// </summary>
+    public Action<string, int>? ReconnectAction;
+
     private int _level;
     private readonly int _minLevel;
+    private readonly TerradropMapPrototype _proto_;
+    private readonly List<string>? _activeInstances;
 
-    public TerradropInfoPanel(TerradropMapPrototype proto, TerradropMapAvailability availability, SpriteSystem sprite, int initialLevel = 0)
+    public TerradropInfoPanel(
+        TerradropMapPrototype proto,
+        TerradropMapAvailability availability,
+        SpriteSystem sprite,
+        int initialLevel = 0,
+        List<string>? activeInstances = null)
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
 
         _sawmill = _logManager.GetSawmill("terradrop.console");
+        _proto_ = proto;
+        _activeInstances = activeInstances;
 
         var terradrop = _ent.System<TerradropSystem>();
 
@@ -54,6 +73,8 @@ public sealed partial class TerradropInfoPanel : Control
                 _ => "terradrop-availability-unknown"
             }
         );
+
+        // Start button always says "Start New Instance" when in progress, otherwise normal text.
         StartButton.Text = Loc.GetString(
             availability switch
             {
@@ -72,19 +93,42 @@ public sealed partial class TerradropInfoPanel : Control
 
         StartButton.Disabled = availability == TerradropMapAvailability.Unavailable;
 
+        // Show disconnect/reconnect buttons only when instances exist.
+        var hasInstances = activeInstances != null && activeInstances.Count > 0;
+        DisconnectButton.Visible = hasInstances;
+        ReconnectButton.Visible = hasInstances;
+
         // Start button sends prototype and level
         StartButton.OnPressed += _ =>
         {
             _sawmill.Debug($"Start button pressed for {proto.ID} at level {_level}");
-            if (StartAction != null)
+            StartAction?.Invoke(proto, _level);
+        };
+
+        DisconnectButton.OnPressed += _ =>
+        {
+            DisconnectAction?.Invoke();
+        };
+
+        ReconnectButton.OnPressed += _ =>
+        {
+            if (_activeInstances == null || _activeInstances.Count == 0)
+                return;
+
+            // If only one instance, reconnect directly.
+            if (_activeInstances.Count == 1)
             {
-                _sawmill.Debug($"Triggering StartAction for {proto.ID} at level {_level}");
-                StartAction.Invoke(proto, _level);
+                ReconnectAction?.Invoke(_proto_.ID, 0);
+                return;
             }
-            else
+
+            // Multiple instances: show popup.
+            var popup = new TerradropInstanceListPopup(_activeInstances);
+            popup.InstanceSelected += index =>
             {
-                _sawmill.Error($"StartAction is null for {proto.ID}");
-            }
+                ReconnectAction?.Invoke(_proto_.ID, index);
+            };
+            popup.OpenCentered();
         };
 
         _sawmill.Debug($"Created map panel: {proto.ID}, availability: {availability}, level: {_level}, button disabled: {StartButton.Disabled}");

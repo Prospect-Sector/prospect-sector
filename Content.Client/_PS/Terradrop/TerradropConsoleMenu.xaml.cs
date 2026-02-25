@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Numerics;
 using Content.Client.Parallax;
 using Content.Client.Research;
@@ -24,6 +24,16 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
     /// </summary>
     public Action<string, int>? OnStartTerradropPressed;
 
+    /// <summary>
+    /// Action invoked when disconnect is pressed.
+    /// </summary>
+    public Action? OnDisconnectPressed;
+
+    /// <summary>
+    /// Action invoked when reconnect is requested. Passes (mapId, instanceIndex).
+    /// </summary>
+    public Action<string, int>? OnReconnectPressed;
+
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
@@ -43,6 +53,11 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
     private const int CardSize = 64;
     private static readonly Vector2i DefaultPosition = Vector2i.Zero;
     public Dictionary<string, TerradropMapAvailability> List = new();
+
+    /// <summary>
+    /// Active instance names per map ID. Updated from server state.
+    /// </summary>
+    public Dictionary<string, List<string>> ActiveInstances = new();
 
     private Box2i _bounds = new(DefaultPosition, DefaultPosition);
 
@@ -163,39 +178,6 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
     public void UpdateInformationPanel()
     {
         // TODO: Display threat level and other map details
-
-        // if (!_entity.TryGetComponent(Entity, out TechnologyDatabaseComponent? database))
-        //     return;
-
-        // ThreatLevelDisplayContainer.RemoveAllChildren();
-        // foreach (var disciplineId in database.SupportedDisciplines)
-        // {
-        //     var discipline = _prototype.Index<TechDisciplinePrototype>(disciplineId);
-        //     var threatLevel = 1; // TODO;
-        //
-        //     var texture = new TextureRect
-        //     {
-        //         TextureScale = new Vector2(2, 2),
-        //         VerticalAlignment = VAlignment.Center
-        //     };
-        //     var label = new RichTextLabel();
-        //     texture.Texture = _sprite.Frame0(discipline.Icon);
-        //     label.SetMessage(Loc.GetString("research-console-tier-percentage", ("perc", threatLevel)));
-        //
-        //     var control = new BoxContainer
-        //     {
-        //         Children =
-        //         {
-        //             texture,
-        //             label,
-        //             new Control
-        //             {
-        //                 MinWidth = 10
-        //             }
-        //         }
-        //     };
-        //     ThreatLevelDisplayContainer.AddChild(control);
-        // }
     }
 
 
@@ -253,10 +235,15 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
             }
         }
 
-        // Create and add info panel with stored level
-        var control = new TerradropInfoPanel(proto, availability, _sprite, _selectedLevel);
+        // Get active instances for this map.
+        ActiveInstances.TryGetValue(proto.ID, out var instances);
+
+        // Create and add info panel with stored level and active instances.
+        var control = new TerradropInfoPanel(proto, availability, _sprite, _selectedLevel, instances);
         control.StartAction += (mapProto, level) => OnStartTerradropPressed?.Invoke(mapProto.ID, level);
         control.LevelChanged += level => _selectedLevel = level;
+        control.DisconnectAction += () => OnDisconnectPressed?.Invoke();
+        control.ReconnectAction += (mapId, idx) => OnReconnectPressed?.Invoke(mapId, idx);
         InfoContainer.AddChild(control);
     }
 

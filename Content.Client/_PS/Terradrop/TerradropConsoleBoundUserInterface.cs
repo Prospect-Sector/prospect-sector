@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Content.Shared._PS.Terradrop;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
@@ -55,6 +55,18 @@ public sealed class TerradropConsoleBoundUserInterface : BoundUserInterface
                 _sawmill.Error($"Error sending terradrop start message for {id}: {ex}");
             }
         };
+
+        _consoleMenu.OnDisconnectPressed += () =>
+        {
+            _sawmill.Debug("Sending DisconnectPortalMessage");
+            SendMessage(new DisconnectPortalMessage());
+        };
+
+        _consoleMenu.OnReconnectPressed += (mapId, instanceIndex) =>
+        {
+            _sawmill.Debug($"Sending ReconnectPortalMessage for {mapId} index {instanceIndex}");
+            SendMessage(new ReconnectPortalMessage(mapId, instanceIndex));
+        };
     }
 
     public override void OnProtoReload(PrototypesReloadedEventArgs args)
@@ -93,6 +105,9 @@ public sealed class TerradropConsoleBoundUserInterface : BoundUserInterface
 
         var availableTechs = castState.MapNodes.Count(t => t.Value == TerradropMapAvailability.Unexplored);
         _sawmill.Debug($"New maps to explore: {availableTechs}");
+
+        // Update active instances data before updating panels.
+        _consoleMenu.ActiveInstances = castState.ActiveInstances;
 
         if (!_consoleMenu.List.SequenceEqual(castState.MapNodes))
         {
