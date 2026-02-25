@@ -1,0 +1,82 @@
+# Planet icon entities for the terradrop console map list.
+# These are display-only entities with no physics or interaction.
+
+- type: entity
+  id: PSPlanetIconZeronaPrime
+  noSpawn: true
+  components:
+  - type: Sprite
+    sprite: _PS/Terradrop/planets.rsi
+    state: zerona_prime
+
+- type: entity
+  id: PSPlanetIconVeridia
+  noSpawn: true
+  components:
+  - type: Sprite
+    sprite: _PS/Terradrop/planets.rsi
+    state: veridia
+
+- type: entity
+  id: PSPlanetIconSpironis
+  noSpawn: true
+  components:
+  - type: Sprite
+    sprite: _PS/Terradrop/planets.rsi
+    state: spironis
+
+- type: entity
+  id: PSPlanetIconRecharis
+  noSpawn: true
+  components:
+  - type: Sprite
+    sprite: _PS/Terradrop/planets.rsi
+    state: recharis
+
+- type: entity
+  id: PSPlanetIconObscyra
+  noSpawn: true
+  components:
+  - type: Sprite
+    sprite: _PS/Terradrop/planets.rsi
+    state: obscyra
+
+- type: entity
+  id: PSPlanetIconEbonis
+  noSpawn: true
+  components:
+  - type: Sprite
+    sprite: _PS/Terradrop/planets.rsi
+    state: ebonis
+
+- type: entity
+  id: PSPlanetIconCrimsonis
+  noSpawn: true
+  components:
+  - type: Sprite
+    sprite: _PS/Terradrop/planets.rsi
+    state: crimsonis
+
+- type: entity
+  id: PSPlanetIconBastara
+  noSpawn: true
+  components:
+  - type: Sprite
+    sprite: _PS/Terradrop/planets.rsi
+    state: bastara
+
+- type: entity
+  id: PSPlanetIconCrownis
+  noSpawn: true
+  components:
+  - type: Sprite
+    sprite: _PS/Terradrop/planets.rsi
+    state: crownis
+
+- type: entity
+  id: PSPlanetIconFerros
+  noSpawn: true
+  components:
+  - type: Sprite
+    sprite: _PS/Terradrop/planets.rsi
+    state: ferros
