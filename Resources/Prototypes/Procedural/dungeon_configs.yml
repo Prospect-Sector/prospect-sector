@@ -403,20 +403,28 @@
   id: PSLootClutter
   table: !type:GroupSelector
     children:
-    - id: PSSpawnerLootTier1
-    - id: PSSpawnerLootTier2
+    - id: PSLootContainerTier1
+    - id: PSLootContainerTier2
       prob: 0.6
-    - id: PSSpawnerLootTier3
+    - id: PSLootContainerTier3
       prob: 0.3
+    - id: PSLootContainerMedical
+      prob: 0.8
+    - id: PSLootContainerMaterials
+      prob: 0.7
     - id: PottedPlantRandom
 
 - type: entityTable
   id: PSCaveClutter
   table: !type:GroupSelector
     children:
-    - id: PSSpawnerLootTier1
-    - id: PSSpawnerLootTier2
+    - id: PSLootContainerTier1
+    - id: PSLootContainerTier2
       prob: 0.5
+    - id: PSLootContainerMedical
+      prob: 0.7
+    - id: PSLootContainerMaterials
+      prob: 0.8
     - id: FloraStalagmite
     - id: RandomStalagmiteOrCrystal
 
@@ -424,39 +432,55 @@
   id: PSMineshaftClutter
   table: !type:GroupSelector
     children:
-    - id: PSSpawnerLootTier1
-    - id: PSSpawnerLootTier2
+    - id: PSLootContainerTier1
+    - id: PSLootContainerTier2
       prob: 0.5
+    - id: PSLootContainerMedical
+      prob: 0.7
+    - id: PSLootContainerMaterials
+      prob: 0.9
     - id: RandomStalagmiteOrCrystal
 
 - type: entityTable
   id: PSLabClutter
   table: !type:GroupSelector
     children:
-    - id: PSSpawnerLootTier1
-    - id: PSSpawnerLootTier2
+    - id: PSLootContainerTier1
+    - id: PSLootContainerTier2
       prob: 0.5
-    - id: PSSpawnerLootTier3
+    - id: PSLootContainerTier3
       prob: 0.25
+    - id: PSLootContainerMedical
+      prob: 0.8
+    - id: PSLootContainerMaterials
+      prob: 0.7
     - id: PottedPlantRandom
 
 - type: entityTable
   id: PSSnowClutter
   table: !type:GroupSelector
     children:
-    - id: PSSpawnerLootTier1
-    - id: PSSpawnerLootTier2
+    - id: PSLootContainerTier1
+    - id: PSLootContainerTier2
       prob: 0.5
-    - id: PSSpawnerLootTier3
+    - id: PSLootContainerTier3
       prob: 0.25
+    - id: PSLootContainerMedical
+      prob: 0.8
+    - id: PSLootContainerMaterials
+      prob: 0.7
     - id: PottedPlantRandom
 
 - type: entityTable
   id: PSCorridorClutter
   table: !type:GroupSelector
     children:
-    - id: PSSpawnerLootTier1
+    - id: PSLootContainerTier1
       prob: 0.3
+    - id: PSLootContainerMedical
+      prob: 0.4
+    - id: PSLootContainerMaterials
+      prob: 0.5
     - id: FloraStalagmite
 
 - type: entityTable

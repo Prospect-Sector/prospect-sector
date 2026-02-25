@@ -1,55 +1,33 @@
 # Prospect Sector - Salvage Loot Table
-# These entries add PS equipment spawners to terradrop expeditions
-# Items spawn with randomized stats based on the terradrop level
+# These entries add PS loot containers to terradrop expeditions
+# Players break crates to get loot with randomized stats based on the terradrop level
 
 - type: salvageLoot
   id: PSSalvageLoot
   loots:
     - !type:RandomSpawnsLoot
       entries:
-        # Tier 1 - Common equipment (cheap, frequent)
-        - proto: PSSpawnerLootTier1
+        # Tier 1 - Common crates (cheap, frequent)
+        - proto: PSLootContainerTier1
           cost: 1
           prob: 1.5
-        # Tier 2 - Uncommon equipment
-        - proto: PSSpawnerLootTier2
+        # Tier 2 - Uncommon crates
+        - proto: PSLootContainerTier2
           cost: 2
           prob: 1.0
-        # Tier 3 - Rare equipment
-        - proto: PSSpawnerLootTier3
+        # Tier 3 - Rare crates
+        - proto: PSLootContainerTier3
           cost: 3
           prob: 0.5
-        # Tier 4 - Exotic equipment (expensive, rare)
-        - proto: PSSpawnerLootTier4
+        # Tier 4 - Exotic crates (expensive, rare)
+        - proto: PSLootContainerTier4
           cost: 5
           prob: 0.25
-        # Weapon-specific spawners
-        - proto: PSSpawnerMeleeUncommon
-          cost: 2
-          prob: 0.8
-        - proto: PSSpawnerMeleeRare
-          cost: 3
-          prob: 0.4
-        - proto: PSSpawnerRangedPistol
-          cost: 2
-          prob: 0.6
-        - proto: PSSpawnerRangedMixed
-          cost: 3
-          prob: 0.4
-        # Armor spawners
-        - proto: PSSpawnerArmorLight
-          cost: 2
-          prob: 0.6
-        - proto: PSSpawnerArmorHeavy
-          cost: 3
-          prob: 0.3
-        - proto: PSSpawnerHelmet
-          cost: 2
-          prob: 0.5
-        # Accessory spawners
-        - proto: PSSpawnerGloves
+        # Medical supply crates
+        - proto: PSLootContainerMedical
           cost: 1
-          prob: 0.8
-        - proto: PSSpawnerMask
+          prob: 1.2
+        # Material crates
+        - proto: PSLootContainerMaterials
           cost: 1
-          prob: 0.6
+          prob: 1.0
