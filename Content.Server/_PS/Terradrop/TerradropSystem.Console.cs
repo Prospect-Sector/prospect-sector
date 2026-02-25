@@ -24,8 +24,29 @@ public sealed partial class TerradropSystem
 
         var data = EnsureComp<TerradropStationComponent>(component.StationUid.Value);
 
+        // Record the highest completed level for this planet.
+        var completedLevel = component.Level;
+        if (!data.HighestCompletedLevels.TryGetValue(component.MapPrototype.ID, out var previousBest)
+            || completedLevel > previousBest)
+        {
+            data.HighestCompletedLevels[component.MapPrototype.ID] = completedLevel;
+        }
+
+        // Mark this map as explored and unlock maps it gates.
+        if (!data.UnlockedMapNodes.Contains(component.MapPrototype.ID))
+            data.UnlockedMapNodes.Add(component.MapPrototype.ID);
+
+        foreach (var unlockId in component.MapPrototype.MapUnlocks)
+        {
+            if (!data.UnlockedMapNodes.Contains(unlockId))
+                data.UnlockedMapNodes.Add(unlockId);
+        }
+
         if (!data.ActiveMissions.TryGetValue(component.MapPrototype.ID, out var instances))
+        {
+            UpdateAllConsolesForStation(component.StationUid.Value);
             return;
+        }
 
         // Remove the specific instance matching this map entity.
         instances.RemoveAll(m => m.MapUid == mapUid);
@@ -86,7 +107,10 @@ public sealed partial class TerradropSystem
                 _audio.PlayPredicted(consoleComponent.SuccessSound, consoleUid, null, AudioParams.Default.WithMaxDistance(5f));
 
                 // Always create a NEW instance with a fresh seed so each map is unique.
-                var selectedLevel = Math.Max(message.Level, mapProto.MinLevel);
+                var globalMax = data.HighestCompletedLevels.Count > 0
+                    ? data.HighestCompletedLevels.Values.Max() + 1
+                    : 0;
+                var selectedLevel = Math.Clamp(message.Level, mapProto.MinLevel, Math.Max(mapProto.MinLevel, globalMax));
                 var instanceParams = new SalvageMissionParams
                 {
                     Index = baseMissionParams.Index,
@@ -187,6 +211,9 @@ public sealed partial class TerradropSystem
                 if (data.ActiveMissions.ContainsKey(proto.ID))
                     return TerradropMapAvailability.InProgress;
 
+                if (data.HighestCompletedLevels.ContainsKey(proto.ID))
+                    return TerradropMapAvailability.Explored;
+
                 // First map is always available.
                 if (proto.UnlockedByDefault)
                     return TerradropMapAvailability.Unexplored;
@@ -210,7 +237,11 @@ public sealed partial class TerradropSystem
             }).ToList();
         }
 
+        var globalMaxLevel = data.HighestCompletedLevels.Count > 0
+            ? data.HighestCompletedLevels.Values.Max() + 1
+            : 0;
+
         _uiSystem.SetUiState(uid, TerradropConsoleUiKey.Default,
-            new TerradropConsoleBoundInterfaceState(mapList, activeInstances));
+            new TerradropConsoleBoundInterfaceState(mapList, activeInstances, data.HighestCompletedLevels, globalMaxLevel));
     }
 }

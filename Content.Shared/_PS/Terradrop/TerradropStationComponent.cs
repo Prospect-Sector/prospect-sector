@@ -14,6 +14,13 @@ public sealed partial class TerradropStationComponent : Component
     [NonSerialized]
     public readonly Dictionary<string, List<TerradropActiveMissionData>> ActiveMissions = new();
 
+    /// <summary>
+    /// The highest level completed per terradrop map ID.
+    /// Used to compute the global max level and per-planet display.
+    /// </summary>
+    [NonSerialized]
+    public readonly Dictionary<string, int> HighestCompletedLevels = new();
+
     [ViewVariables]
     public readonly Dictionary<string, SalvageMissionParams> Missions = new();
 

@@ -106,8 +106,10 @@ public sealed class TerradropConsoleBoundUserInterface : BoundUserInterface
         var availableTechs = castState.MapNodes.Count(t => t.Value == TerradropMapAvailability.Unexplored);
         _sawmill.Debug($"New maps to explore: {availableTechs}");
 
-        // Update active instances data before updating panels.
+        // Update active instances and level data before updating panels.
         _consoleMenu.ActiveInstances = castState.ActiveInstances;
+        _consoleMenu.HighestCompletedLevels = castState.HighestCompletedLevels;
+        _consoleMenu.GlobalMaxLevel = castState.GlobalMaxLevel;
 
         if (!_consoleMenu.List.SequenceEqual(castState.MapNodes))
         {

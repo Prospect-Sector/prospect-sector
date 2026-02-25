@@ -59,11 +59,26 @@ public sealed class TerradropConsoleBoundInterfaceState : BoundUserInterfaceStat
     /// </summary>
     public Dictionary<string, List<string>> ActiveInstances;
 
+    /// <summary>
+    /// The highest completed level per planet map ID.
+    /// </summary>
+    public Dictionary<string, int> HighestCompletedLevels;
+
+    /// <summary>
+    /// The global max level any planet can be started at.
+    /// Equal to (max of all highest completed levels) + 1, or 0 if nothing completed.
+    /// </summary>
+    public int GlobalMaxLevel;
+
     public TerradropConsoleBoundInterfaceState(
         Dictionary<string, TerradropMapAvailability> mapNodes,
-        Dictionary<string, List<string>> activeInstances)
+        Dictionary<string, List<string>> activeInstances,
+        Dictionary<string, int> highestCompletedLevels,
+        int globalMaxLevel)
     {
         MapNodes = mapNodes;
         ActiveInstances = activeInstances;
+        HighestCompletedLevels = highestCompletedLevels;
+        GlobalMaxLevel = globalMaxLevel;
     }
 }

@@ -24,6 +24,12 @@ terradrop-instance-entered = You have entered {$name}.
 terradrop-instance-list-title = Active Instances
 terradrop-instance-entry = {$name} (Lv. {$level})
 
+terradrop-row-status-unexplored = Unexplored
+terradrop-row-status-in-progress = In Progress
+terradrop-row-status-explored = Explored
+terradrop-row-status-unavailable = Unavailable
+terradrop-row-highest-level = Lv. {$level} cleared
+
 terradrop-level-label = Level:
 terradrop-level-bonus = +{$bonus}% item stats
 terradrop-level-minus-ten = Decrease level by 10

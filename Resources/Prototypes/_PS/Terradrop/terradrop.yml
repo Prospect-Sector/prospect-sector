@@ -7,7 +7,7 @@
   id: ZeronaPrimeTerraDropMap
   name: terradrop-map-zerona-prime
   biome: Grasslands
-  icon: MobCarpRainbow
+  icon: PSPlanetIconZeronaPrime
   minLevel: 0
   mapUnlocks:
   - VeridiaTerraDropMap
@@ -20,7 +20,7 @@
   id: VeridiaTerraDropMap
   name: terradrop-map-veridia
   biome: Grasslands
-  icon: MobCarpRainbow
+  icon: PSPlanetIconVeridia
   minLevel: 0
   mapPrerequisites:
   - ZeronaPrimeTerraDropMap
@@ -33,7 +33,7 @@
   id: SpironisTerraDropMap
   name: terradrop-map-spironis
   biome: Grasslands
-  icon: MobCarpRainbow
+  icon: PSPlanetIconSpironis
   minLevel: 0
   mapPrerequisites:
   - ZeronaPrimeTerraDropMap
@@ -47,7 +47,7 @@
   id: RecharisTerraDropMap
   name: terradrop-map-recharis
   biome: Caves
-  icon: MobCarpRainbow
+  icon: PSPlanetIconRecharis
   minLevel: 0
   mapPrerequisites:
   - VeridiaTerraDropMap
@@ -57,7 +57,7 @@
   id: ObscyraTerraDropMap
   name: terradrop-map-obscyra
   biome: Snow
-  icon: MobCarpRainbow
+  icon: PSPlanetIconObscyra
   minLevel: 0
   mapPrerequisites:
   - VeridiaTerraDropMap
@@ -67,7 +67,7 @@
   id: EbonisTerraDropMap
   name: terradrop-map-ebonis
   biome: Lava
-  icon: MobCarpRainbow
+  icon: PSPlanetIconEbonis
   minLevel: 0
   mapPrerequisites:
   - SpironisTerraDropMap
@@ -77,7 +77,7 @@
   id: CrimsonisTerraDropMap
   name: terradrop-map-crimsonis
   biome: Snow
-  icon: MobCarpRainbow
+  icon: PSPlanetIconCrimsonis
   minLevel: 0
   mapPrerequisites:
   - SpironisTerraDropMap
@@ -88,7 +88,7 @@
   id: BastaraTerraDropMap
   name: terradrop-map-bastara
   biome: Caves
-  icon: MobCarpRainbow
+  icon: PSPlanetIconBastara
   minLevel: 0
   mapPrerequisites:
   - RecharisTerraDropMap
@@ -101,7 +101,7 @@
   id: CrownisTerraDropMap
   name: terradrop-map-crownis
   biome: Lava
-  icon: MobCarpRainbow
+  icon: PSPlanetIconCrownis
   minLevel: 0
   mapPrerequisites:
   - EbonisTerraDropMap
@@ -115,7 +115,7 @@
   id: FerrosTerraDropMap
   name: terradrop-map-ferros
   biome: Lava
-  icon: MobCarpRainbow
+  icon: PSPlanetIconFerros
   minLevel: 0
   mapPrerequisites:
   - BastaraTerraDropMap
