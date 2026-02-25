@@ -1,4 +1,4 @@
-﻿terradrop-console-menu-title = Terradrop Control Console
+terradrop-console-menu-title = Terradrop Control Console
 terradrop-console-threat-level = Threat Level:
 terradrop-console-no-portal = No Available Portal
 terradrop-console-prereqs-list-start = Requires:
@@ -14,10 +14,15 @@ terradrop-availability-unexplored = This mission has not yet been explored.
 terradrop-availability-in-progress = This mission is currently in progress.
 terradrop-availability-explored = This mission is already completed.
 terradrop-availability-unknown = Unknown mission status.
-terradrop-start-in-progress = Reconnect Portal
+terradrop-start-in-progress = Start New Instance
 terradrop-start-generic = Start Terradrop Mission
 terradrop-start-explored = Restart Terradrop Mission
 terradrop-start-unavailable = Mission Unavailable
+terradrop-disconnect = Disconnect Portal
+terradrop-reconnect = Reconnect Portal
+terradrop-instance-entered = You have entered {$name}.
+terradrop-instance-list-title = Active Instances
+terradrop-instance-entry = {$name} (Lv. {$level})
 
 terradrop-level-label = Level:
 terradrop-level-bonus = +{$bonus}% item stats

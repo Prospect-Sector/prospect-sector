@@ -14,6 +14,12 @@ public sealed partial class TerradropMapComponent : Component
     [AutoNetworkedField]
     public int Level = 0;
 
+    /// <summary>
+    /// The human-readable instance name, e.g. "Zerona Prime #1".
+    /// </summary>
+    [AutoNetworkedField]
+    public string InstanceName = string.Empty;
+
     [NonSerialized]
     public EntityUid? StationUid = null;
 

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading;
 using Content.Shared._PS.Terradrop;
 using Content.Shared.Salvage.Expeditions;
@@ -63,9 +63,6 @@ public sealed partial class TerradropSystem
                     break;
             }
         }
-
-        // Check for pads to clear.
-        ClearPadsIfNeeded();
     }
 
     private void OnJobCompleted(GenerateTerradropJob job)
@@ -76,12 +73,23 @@ public sealed partial class TerradropSystem
         Spawn("TerradropRoomMarker", new MapCoordinates(4f, 0f, job.MapId));
         var mapPortal = Spawn("PortalRed", new MapCoordinates(4f, 0f, job.MapId));
 
+        // Generate instance name: "{MapName} #{n}"
+        var mapName = Loc.GetString(job.MapPrototype.Name);
+        var existingCount = 0;
+        if (dataComponent.ActiveMissions.TryGetValue(job.MapPrototype.ID, out var existingInstances))
+            existingCount = existingInstances.Count;
+        var instanceName = $"{mapName} #{existingCount + 1}";
+
         var missionData = new TerradropActiveMissionData(
             job.MapUid,
             job.MapId,
-            mapPortal
+            mapPortal,
+            instanceName
         );
-        dataComponent.ActiveMissions.Add(job.MapPrototype.ID, missionData);
+
+        if (!dataComponent.ActiveMissions.ContainsKey(job.MapPrototype.ID))
+            dataComponent.ActiveMissions[job.MapPrototype.ID] = new List<TerradropActiveMissionData>();
+        dataComponent.ActiveMissions[job.MapPrototype.ID].Add(missionData);
 
         if (TryComp<PortalComponent>(mapPortal, out var mapPortalComponent))
             mapPortalComponent.CanTeleportToOtherMaps = true;
@@ -94,8 +102,8 @@ public sealed partial class TerradropSystem
         if (TryComp<TerradropMapComponent>(job.MapUid, out var mapComponent))
         {
             mapComponent.ReturnMarker = dataComponent.ReturnMarker;
+            mapComponent.InstanceName = instanceName;
         }
-
 
         // Ensure that if no return marker is found we can still go back to the station.
         if (dataComponent.ReturnMarker != null)
@@ -103,6 +111,8 @@ public sealed partial class TerradropSystem
         else
             _link.OneWayLink(mapPortal, job.TargetPad);
 
+        // Push UI update so open consoles show the new instance immediately.
+        UpdateAllConsolesForStation(job.Station);
     }
 
     /// <summary>
@@ -116,7 +126,6 @@ public sealed partial class TerradropSystem
         var padTransform = Transform(stationPadUid);
 
         padComponent.TeleportMapId = data.MapId;
-        padComponent.ActivatedAt = _timing.CurTime;
         padComponent.Portal = Spawn(padComponent.PortalPrototype, padTransform.Coordinates);
 
         if (TryComp<PortalComponent>(padComponent.Portal, out var portal))
@@ -125,20 +134,6 @@ public sealed partial class TerradropSystem
         _link.OneWayLink(padComponent.Portal!.Value, data.MapPortalUid);
         _audio.PlayPvs(padComponent.NewPortalSound, padTransform.Coordinates);
 
-    }
-
-    private void ClearPadsIfNeeded()
-    {
-        var pads = _entityManager.EntityQuery<TransformComponent, TerradropPadComponent>();
-        foreach (var (transform, pad) in pads.ToArray())
-        {
-            if (_timing.CurTime < pad.ActivatedAt + pad.ClearPortalDelay)
-                continue;
-            if (pad.Portal == null || Deleted(pad.Portal))
-                continue;
-            QueueDel(pad.Portal.Value);
-            _audio.PlayPvs(pad.ClearPortalSound, transform.Coordinates);
-        }
     }
 
     private void GenerateMissionParams(TerradropStationComponent component)
