@@ -28,6 +28,7 @@ terradrop-row-status-unexplored = Unexplored
 terradrop-row-status-in-progress = In Progress
 terradrop-row-status-explored = Explored
 terradrop-row-status-unavailable = Unavailable
+terradrop-row-highest-level = Lv. {$level} cleared
 
 terradrop-level-label = Level:
 terradrop-level-bonus = +{$bonus}% item stats

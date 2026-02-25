@@ -42,6 +42,16 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
     public Dictionary<string, List<string>> ActiveInstances = new();
 
     /// <summary>
+    /// Highest completed level per map ID. Updated from server state.
+    /// </summary>
+    public Dictionary<string, int> HighestCompletedLevels = new();
+
+    /// <summary>
+    /// The global max level for the level selector. Updated from server state.
+    /// </summary>
+    public int GlobalMaxLevel;
+
+    /// <summary>
     /// The currently selected level. Remembered locally across map selections.
     /// </summary>
     private int _selectedLevel;
@@ -87,7 +97,8 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
             foreach (var (proto, availability) in tier.OrderBy(x => x.Proto.Position.X))
             {
                 ActiveInstances.TryGetValue(proto.ID, out var instances);
-                var row = new TerradropMapRow(proto, availability, _sprite, _selectedLevel, instances);
+                HighestCompletedLevels.TryGetValue(proto.ID, out var highestLevel);
+                var row = new TerradropMapRow(proto, availability, _sprite, _selectedLevel, instances, highestLevel, GlobalMaxLevel);
                 WireRowEvents(row);
                 _rows[proto.ID] = row;
                 MapListContainer.AddChild(row);
@@ -152,7 +163,8 @@ public sealed partial class TerradropConsoleMenu : FancyWindow
         if (_expandedRow != null)
             _expandedRow.IsExpanded = false;
 
-        // Sync level to the newly expanded row
+        // Sync level and max to the newly expanded row
+        row.UpdateMaxLevel(GlobalMaxLevel);
         row.UpdateLevel(_selectedLevel);
         row.IsExpanded = true;
         _expandedRow = row;

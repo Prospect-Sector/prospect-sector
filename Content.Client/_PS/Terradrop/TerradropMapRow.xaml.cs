@@ -25,6 +25,7 @@ public sealed partial class TerradropMapRow : Control
 
     private int _level;
     private readonly int _minLevel;
+    private int _maxLevel;
     private List<string>? _activeInstances;
     private bool _isExpanded;
 
@@ -44,7 +45,9 @@ public sealed partial class TerradropMapRow : Control
         TerradropMapAvailability availability,
         SpriteSystem sprite,
         int initialLevel = 0,
-        List<string>? activeInstances = null)
+        List<string>? activeInstances = null,
+        int highestCompletedLevel = 0,
+        int globalMaxLevel = 0)
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
@@ -53,7 +56,8 @@ public sealed partial class TerradropMapRow : Control
         Availability = availability;
         _activeInstances = activeInstances;
         _minLevel = proto.MinLevel;
-        _level = Math.Max(initialLevel, _minLevel);
+        _maxLevel = globalMaxLevel;
+        _level = Math.Clamp(initialLevel, _minLevel, Math.Max(_minLevel, _maxLevel));
 
         var terradrop = _ent.System<TerradropSystem>();
 
@@ -72,6 +76,11 @@ public sealed partial class TerradropMapRow : Control
         };
         StatusBadge.Text = Loc.GetString(statusKey);
         StatusBadge.FontColorOverride = colors.InfoText;
+
+        // Highest completed level display
+        HighestLevelLabel.Text = highestCompletedLevel > 0
+            ? Loc.GetString("terradrop-row-highest-level", ("level", highestCompletedLevel))
+            : "";
 
         // Header click
         HeaderButton.OnPressed += _ => OnHeaderPressed?.Invoke(this);
@@ -112,7 +121,14 @@ public sealed partial class TerradropMapRow : Control
 
     public void UpdateLevel(int level)
     {
-        _level = Math.Max(_minLevel, level);
+        _level = Math.Clamp(level, _minLevel, Math.Max(_minLevel, _maxLevel));
+        UpdateLevelDisplay();
+    }
+
+    public void UpdateMaxLevel(int maxLevel)
+    {
+        _maxLevel = maxLevel;
+        _level = Math.Clamp(_level, _minLevel, Math.Max(_minLevel, _maxLevel));
         UpdateLevelDisplay();
     }
 
@@ -156,7 +172,7 @@ public sealed partial class TerradropMapRow : Control
 
     private void AdjustLevel(int delta)
     {
-        var newLevel = Math.Max(_minLevel, _level + delta);
+        var newLevel = Math.Clamp(_level + delta, _minLevel, Math.Max(_minLevel, _maxLevel));
         if (newLevel != _level)
         {
             _level = newLevel;
@@ -173,6 +189,8 @@ public sealed partial class TerradropMapRow : Control
             : "";
         LevelMinusButton.Disabled = _level <= _minLevel;
         LevelMinusTenButton.Disabled = _level <= _minLevel;
+        LevelPlusButton.Disabled = _level >= _maxLevel;
+        LevelPlusTenButton.Disabled = _level >= _maxLevel;
     }
 
     private void InitializePrerequisites(TerradropMapPrototype proto, TerradropSystem terradrop, SpriteSystem sprite)

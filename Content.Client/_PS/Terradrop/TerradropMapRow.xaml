@@ -17,6 +17,7 @@
                     <EntityPrototypeView Name="NodeIcon" Scale="1.5 1.5" VerticalAlignment="Center" Margin="4 0"/>
                     <Label Name="MapNameLabel" StyleClasses="LabelKeyText" VerticalAlignment="Center" HorizontalExpand="True"/>
                     <Label Name="StatusBadge" VerticalAlignment="Center" Margin="4 0"/>
+                    <Label Name="HighestLevelLabel" VerticalAlignment="Center" Margin="4 0" StyleClasses="LabelSubText"/>
                 </BoxContainer>
             </Button>
         </PanelContainer>
