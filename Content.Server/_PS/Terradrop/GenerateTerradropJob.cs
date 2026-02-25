@@ -320,6 +320,19 @@ public sealed class GenerateTerradropJob : Job<bool>
             }
         }
 
+        // Boss spawn — 30% chance per dungeon
+        if (random.NextDouble() < 0.30)
+        {
+            var bossRoom = dungeon.Rooms.OrderByDescending(r => r.Tiles.Count).First();
+            var bossTile = bossRoom.Tiles.ElementAt(random.Next(bossRoom.Tiles.Count));
+            var bossUid = _entManager.SpawnAtPosition("MobDragonDungeon",
+                _map.GridTileToLocal(MapUid, grid, bossTile));
+            _entManager.RemoveComponent<GhostRoleComponent>(bossUid);
+            _entManager.RemoveComponent<GhostTakeoverAvailableComponent>(bossUid);
+            _entManager.EnsureComponent<TerradropMobComponent>(bossUid);
+            _sawmill.Debug($"Boss dragon spawned in room at {bossTile} (level {_level})");
+        }
+
         // Spawn PS equipment loot with level-scaled stats
         var psLootBudget = difficultyProto.LootBudget;
         if (_prototypeManager.TryIndex<SalvageLootPrototype>("PSSalvageLoot", out var psLoot))
