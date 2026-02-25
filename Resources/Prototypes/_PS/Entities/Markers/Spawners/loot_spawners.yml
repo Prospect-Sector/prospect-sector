@@ -10,6 +10,8 @@
   - type: Sprite
     layers:
     - state: green
+  - type: PSScatterOnSpawn
+    force: 2.5
 
 # =============================================================================
 # MELEE WEAPON SPAWNERS
@@ -27,6 +29,7 @@
     - sprite: Objects/Weapons/Melee/kitchen_knife.rsi
       state: icon
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSKitchenKnife
     chance: 1.0
@@ -43,6 +46,7 @@
     - sprite: Objects/Weapons/Melee/combat_knife.rsi
       state: icon
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSKitchenKnife
     - PSCombatKnife
@@ -64,6 +68,7 @@
     - sprite: Objects/Weapons/Melee/machete.rsi
       state: icon
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSCombatKnife
     - PSMachete
@@ -86,6 +91,7 @@
     - sprite: Objects/Weapons/Melee/katana.rsi
       state: icon
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSMachete
     - PSClaymore
@@ -112,6 +118,7 @@
     - sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
       state: base
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSPistolStandard
     rarePrototypes:
@@ -131,6 +138,7 @@
     - sprite: Objects/Weapons/Guns/Rifles/lecter.rsi
       state: base
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSRifleAssault
     chance: 1.0
@@ -147,6 +155,7 @@
     - sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
       state: icon
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSShotgunPump
     chance: 1.0
@@ -163,6 +172,7 @@
     - sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
       state: base
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSPistolStandard
     - PSPistolCombat
@@ -188,6 +198,7 @@
     - sprite: Clothing/OuterClothing/Armor/security_slim.rsi
       state: icon
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSArmorVestSecurity
     - PSArmorExpeditionLight
@@ -205,6 +216,7 @@
     - sprite: Clothing/OuterClothing/Armor/security.rsi
       state: icon
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSArmorVestSecurity
     - PSArmorVestBulletproof
@@ -230,6 +242,7 @@
     - sprite: Clothing/Head/Helmets/security.rsi
       state: icon
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSHelmetSecurity
     - PSHelmetRiot
@@ -254,6 +267,7 @@
     - sprite: Clothing/Hands/Gloves/combat.rsi
       state: icon
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSGlovesStandard
     - PSGlovesTactical
@@ -275,6 +289,7 @@
     - sprite: Clothing/Mask/gas.rsi
       state: icon
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
     - PSMaskGas
     - PSMaskSecurityGas
@@ -298,11 +313,28 @@
     layers:
     - state: green
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
+    # Melee
     - PSKitchenKnife
+    # Ranged
+    - PSPistolStandard
+    # Armor
+    - PSArmorVestSecurity
+    - PSArmorExpeditionLight
+    # Helmet
+    - PSHelmetSecurity
+    # Gloves
     - PSGlovesStandard
+    # Mask
     - PSMaskGas
-    chance: 0.9
+    rarePrototypes:
+    - PSCombatKnife
+    - PSPistolCombat
+    - PSGlovesTactical
+    - PSMaskSecurityGas
+    rareChance: 0.10
+    chance: 1.0
 
 - type: entity
   name: PS loot spawner
@@ -314,18 +346,34 @@
     layers:
     - state: green
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
+    # Melee
     - PSCombatKnife
     - PSFireAxe
+    # Ranged
     - PSPistolStandard
+    - PSPistolCombat
+    # Armor
     - PSArmorVestSecurity
     - PSArmorExpeditionLight
+    - PSArmorVestBulletproof
+    # Helmet
     - PSHelmetSecurity
+    - PSHelmetRiot
+    # Gloves
     - PSGlovesTactical
+    - PSGlovesMarksman
+    # Mask
     - PSMaskSecurityGas
+    - PSMaskExpedition
     rarePrototypes:
     - PSMachete
-    - PSPistolCombat
+    - PSRifleAssault
+    - PSShotgunPump
+    - PSArmorRiot
+    - PSGlovesHeavyCombat
+    - PSMaskTactical
     rareChance: 0.20
     chance: 1.0
 
@@ -339,23 +387,31 @@
     layers:
     - state: blue
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
+    # Melee
     - PSMachete
+    - PSFireAxe
+    # Ranged
     - PSPistolCombat
     - PSRifleAssault
     - PSShotgunPump
+    # Armor
     - PSArmorVestBulletproof
     - PSArmorRiot
+    # Helmet
     - PSHelmetRiot
+    # Gloves
     - PSGlovesMarksman
+    - PSGlovesHeavyCombat
+    # Mask
     - PSMaskExpedition
+    - PSMaskTactical
     rarePrototypes:
     - PSClaymore
     - PSKatana
     - PSArmorTactical
     - PSHelmetTactical
-    - PSGlovesHeavyCombat
-    - PSMaskTactical
     rareChance: 0.25
     chance: 1.0
 
@@ -369,11 +425,86 @@
     layers:
     - state: pink
   - type: RandomSpawner
+    offset: 0.5
     prototypes:
+    # Melee
+    - PSClaymore
+    - PSKatana
+    - PSMachete
+    # Ranged
+    - PSRifleAssault
+    - PSShotgunPump
+    - PSPistolCombat
+    # Armor
+    - PSArmorTactical
+    - PSArmorRiot
+    # Helmet
+    - PSHelmetTactical
+    - PSHelmetRiot
+    # Gloves
+    - PSGlovesHeavyCombat
+    # Mask
+    - PSMaskTactical
+    rarePrototypes:
     - PSClaymore
     - PSKatana
     - PSArmorTactical
     - PSHelmetTactical
-    - PSGlovesHeavyCombat
-    - PSMaskTactical
+    rareChance: 0.35
+    chance: 1.0
+
+# =============================================================================
+# MEDICAL / SUPPLY SPAWNERS
+# =============================================================================
+
+- type: entity
+  name: PS medical supply spawner
+  id: PSSpawnerMedicalSupplies
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Specific/Medical/firstaidkits.rsi
+      state: firstaid
+  - type: RandomSpawner
+    offset: 0.5
+    prototypes:
+    - MedkitFilled
+    - MedkitBruteFilled
+    - MedkitBurnFilled
+    - Gauze
+    - Bloodpack
+    rarePrototypes:
+    - MedkitAdvancedFilled
+    - MedkitCombatFilled
+    rareChance: 0.15
+    chance: 1.0
+
+- type: entity
+  name: PS material spawner
+  id: PSSpawnerMaterials
+  parent: PSSpawnerBase
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Materials/Sheets/metal.rsi
+      state: steel_3
+  - type: RandomSpawner
+    offset: 0.5
+    prototypes:
+    - SheetSteel
+    - SheetSteel
+    - SheetGlass
+    - SheetGlass
+    - SheetPlastic
+    - CableApcStack
+    - CableHVStack
+    - CableMVStack
+    - PartRodMetal
+    rarePrototypes:
+    - SheetPlasteel
+    - SheetRGlass
+    rareChance: 0.15
     chance: 1.0
