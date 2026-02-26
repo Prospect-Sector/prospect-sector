@@ -10,6 +10,7 @@ using Content.Shared.Ghost;
 using Content.Shared.Humanoid;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Robust.Shared.Audio;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
 
@@ -22,6 +23,9 @@ namespace Content.Server._PS.Terradrop;
 public sealed partial class TerradropSystem
 {
     [Dependency] private readonly IChatManager _chatManager = default!;
+
+    private static readonly SoundPathSpecifier TeleportArrivalSound =
+        new("/Audio/Effects/teleport_arrival.ogg");
 
     private void InitializeMissionHandling()
     {
@@ -38,7 +42,16 @@ public sealed partial class TerradropSystem
         if (newMapUid == args.OldMapId)
             return;
 
-        if (newMapUid == null || !TryComp<TerradropMapComponent>(newMapUid, out var mapComp))
+        // Play teleport arrival sound when entering or leaving a terradrop map.
+        // The upstream portal system uses PlayPredicted which the client can't predict
+        // for cross-map teleports, so the teleporting player never hears the sound.
+        var enteringTerradrop = newMapUid != null && HasComp<TerradropMapComponent>(newMapUid);
+        var leavingTerradrop = args.OldMapId != null && HasComp<TerradropMapComponent>(args.OldMapId.Value);
+
+        if (enteringTerradrop || leavingTerradrop)
+            _audio.PlayPvs(TeleportArrivalSound, uid);
+
+        if (!enteringTerradrop || !TryComp<TerradropMapComponent>(newMapUid, out var mapComp))
             return;
 
         if (string.IsNullOrEmpty(mapComp.InstanceName))
