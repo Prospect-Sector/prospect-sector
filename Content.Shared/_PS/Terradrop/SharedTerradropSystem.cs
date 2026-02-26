@@ -1,4 +1,6 @@
 using System.Linq;
+using Robust.Shared.Physics.Events;
+using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
@@ -10,6 +12,18 @@ public abstract class SharedTerradropSystem : EntitySystem
     [Dependency] protected readonly IPrototypeManager PrototypeManager = default!;
 
     protected const int MissionLimit = 3;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeLocalEvent<TerradropPortalComponent, PreventCollideEvent>(OnPortalPreventCollide);
+    }
+
+    private void OnPortalPreventCollide(EntityUid uid, TerradropPortalComponent component, ref PreventCollideEvent args)
+    {
+        if (!HasComp<ActorComponent>(args.OtherEntity))
+            args.Cancelled = true;
+    }
 
     public FormattedMessage GetMapDescription(TerradropMapPrototype map)
     {
