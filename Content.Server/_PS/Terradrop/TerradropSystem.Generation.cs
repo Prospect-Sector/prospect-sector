@@ -72,6 +72,7 @@ public sealed partial class TerradropSystem
         // Spawn the room marker to make a new room where the portal will be.
         Spawn("TerradropRoomMarker", new MapCoordinates(4f, 0f, job.MapId));
         var mapPortal = Spawn("PortalRed", new MapCoordinates(4f, 0f, job.MapId));
+        EnsureComp<TerradropPortalComponent>(mapPortal);
 
         // Generate instance name: "{MapName} #{n}"
         var mapName = Loc.GetString(job.MapPrototype.Name);
@@ -127,6 +128,7 @@ public sealed partial class TerradropSystem
 
         padComponent.TeleportMapId = data.MapId;
         padComponent.Portal = Spawn(padComponent.PortalPrototype, padTransform.Coordinates);
+        EnsureComp<TerradropPortalComponent>(padComponent.Portal.Value);
 
         if (TryComp<PortalComponent>(padComponent.Portal, out var portal))
             portal.CanTeleportToOtherMaps = true;
