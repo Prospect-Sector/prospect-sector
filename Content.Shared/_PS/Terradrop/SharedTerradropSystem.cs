@@ -1,6 +1,6 @@
 using System.Linq;
-using Content.Shared.Mind.Components;
 using Robust.Shared.Physics.Events;
+using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
@@ -21,7 +21,7 @@ public abstract class SharedTerradropSystem : EntitySystem
 
     private void OnPortalPreventCollide(EntityUid uid, TerradropPortalComponent component, ref PreventCollideEvent args)
     {
-        if (!HasComp<MindContainerComponent>(args.OtherEntity))
+        if (!HasComp<ActorComponent>(args.OtherEntity))
             args.Cancelled = true;
     }
 
