@@ -1,9 +1,3 @@
----
-name: "Prospect-Sector Coding Agent"
-description: "GitHub Copilot coding agent for the Prospect-Sector SS14 game server fork."
-tools: [codebase, edit_files, run_in_terminal, create_file, read_file]
----
-
 # GitHub Copilot Instructions for Prospect-Sector
 
 ## Project Overview
