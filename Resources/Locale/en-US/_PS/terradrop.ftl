@@ -37,6 +37,10 @@ terradrop-level-minus-one = Decrease level by 1
 terradrop-level-plus-one = Increase level by 1
 terradrop-level-plus-ten = Increase level by 10
 
+terradrop-objective-announced = Objective: Eliminate {$required} targets (enemies or loot containers) to complete the mission.
+terradrop-objective-progress = Objective: {$progress}/{$required} targets eliminated.
+terradrop-objective-completed = Objective complete! All targets have been eliminated.
+
 terradrop-map-zerona-prime = Zerona Prime
 terradrop-map-veridia = Veridia
 terradrop-map-spironis = Spironis

@@ -165,6 +165,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         terradropMapComponent.StationUid = Station;
         terradropMapComponent.MapPrototype = MapPrototype;
         terradropMapComponent.Level = _level;
+        terradropMapComponent.ObjectiveRequired = 8 + 2 * _level;
 
         // Setup expedition
         var expedition = _entManager.AddComponent<SalvageExpeditionComponent>(MapUid);
@@ -303,6 +304,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         }
 
         var probSum = budgetEntries.Sum(x => x.Prob);
+        var spawnedCount = 0;
 
         while (mobBudget > 0f)
         {
@@ -312,7 +314,9 @@ public sealed class GenerateTerradropJob : Job<bool>
 
             try
             {
-                await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
+                var spawned = await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
+                if (spawned.HasValue)
+                    spawnedCount++;
             }
             catch (Exception e)
             {
@@ -330,6 +334,8 @@ public sealed class GenerateTerradropJob : Job<bool>
             _entManager.RemoveComponent<GhostRoleComponent>(bossUid);
             _entManager.RemoveComponent<GhostTakeoverAvailableComponent>(bossUid);
             _entManager.EnsureComponent<TerradropMobComponent>(bossUid);
+            _entManager.EnsureComponent<TerradropObjectiveTargetComponent>(bossUid);
+            spawnedCount++;
             _sawmill.Debug($"Boss dragon spawned in room at {bossTile} (level {_level})");
         }
 
@@ -358,7 +364,9 @@ public sealed class GenerateTerradropJob : Job<bool>
                                 break;
 
                             _sawmill.Debug($"Spawning PS loot {entry.Proto} (level {_level})");
-                            await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
+                            var spawned = await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
+                            if (spawned.HasValue)
+                                spawnedCount++;
                         }
 
                         break;
@@ -368,10 +376,31 @@ public sealed class GenerateTerradropJob : Job<bool>
             }
         }
 
+        // Guarantee enough objective targets exist to complete the mission.
+        var extraNeeded = terradropMapComponent.ObjectiveRequired - spawnedCount;
+        if (extraNeeded > 0)
+        {
+            _sawmill.Debug($"Spawning {extraNeeded} extra mobs to meet objective minimum of {terradropMapComponent.ObjectiveRequired}");
+            for (var i = 0; i < extraNeeded; i++)
+            {
+                var group = faction.MobGroups[random.Next(faction.MobGroups.Count)];
+                try
+                {
+                    var spawned = await SpawnRandomEntry((MapUid, grid), group, dungeon, random);
+                    if (spawned.HasValue)
+                        spawnedCount++;
+                }
+                catch (Exception e)
+                {
+                    _sawmill.Error($"Failed to spawn guarantee mob: {e}");
+                }
+            }
+        }
+
         return true;
     }
 
-    private async Task SpawnRandomEntry(Entity<MapGridComponent> grid,
+    private async Task<EntityUid?> SpawnRandomEntry(Entity<MapGridComponent> grid,
         IBudgetEntry entry,
         Dungeon dungeon,
         Random random)
@@ -406,12 +435,14 @@ public sealed class GenerateTerradropJob : Job<bool>
 
                 // Scale mob stats based on terradrop level
                 _entManager.EnsureComponent<TerradropMobComponent>(uid);
+                _entManager.EnsureComponent<TerradropObjectiveTargetComponent>(uid);
 
-                return;
+                return uid;
             }
         }
 
         // oh noooooooooooo
+        return null;
     }
 
     private async Task SpawnDungeonLoot(SalvageLootPrototype loot, EntityUid gridUid)
