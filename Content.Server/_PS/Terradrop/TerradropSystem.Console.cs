@@ -24,22 +24,24 @@ public sealed partial class TerradropSystem
 
         var data = EnsureComp<TerradropStationComponent>(component.StationUid.Value);
 
-        // Record the highest completed level for this planet.
-        var completedLevel = component.Level;
-        if (!data.HighestCompletedLevels.TryGetValue(component.MapPrototype.ID, out var previousBest)
-            || completedLevel > previousBest)
+        // Only record progression and unlock downstream planets when the objective was completed.
+        if (component.ObjectiveCompleted)
         {
-            data.HighestCompletedLevels[component.MapPrototype.ID] = completedLevel;
-        }
+            var completedLevel = component.Level;
+            if (!data.HighestCompletedLevels.TryGetValue(component.MapPrototype.ID, out var previousBest)
+                || completedLevel > previousBest)
+            {
+                data.HighestCompletedLevels[component.MapPrototype.ID] = completedLevel;
+            }
 
-        // Mark this map as explored and unlock maps it gates.
-        if (!data.UnlockedMapNodes.Contains(component.MapPrototype.ID))
-            data.UnlockedMapNodes.Add(component.MapPrototype.ID);
+            if (!data.UnlockedMapNodes.Contains(component.MapPrototype.ID))
+                data.UnlockedMapNodes.Add(component.MapPrototype.ID);
 
-        foreach (var unlockId in component.MapPrototype.MapUnlocks)
-        {
-            if (!data.UnlockedMapNodes.Contains(unlockId))
-                data.UnlockedMapNodes.Add(unlockId);
+            foreach (var unlockId in component.MapPrototype.MapUnlocks)
+            {
+                if (!data.UnlockedMapNodes.Contains(unlockId))
+                    data.UnlockedMapNodes.Add(unlockId);
+            }
         }
 
         if (!data.ActiveMissions.TryGetValue(component.MapPrototype.ID, out var instances))
