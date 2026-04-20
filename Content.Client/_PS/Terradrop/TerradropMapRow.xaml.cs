@@ -67,20 +67,17 @@ public sealed partial class TerradropMapRow : Control
 
         // Status badge with color
         var colors = TerradropColorScheme.GetMapItemColors(availability);
-        var statusKey = availability switch
+        StatusBadge.Text = availability switch
         {
-            TerradropMapAvailability.Unexplored => "terradrop-row-status-unexplored",
-            TerradropMapAvailability.InProgress => "terradrop-row-status-in-progress",
-            TerradropMapAvailability.Explored => "terradrop-row-status-explored",
-            _ => "terradrop-row-status-unavailable"
+            TerradropMapAvailability.Unexplored => Loc.GetString("terradrop-row-status-unexplored"),
+            TerradropMapAvailability.InProgress => Loc.GetString("terradrop-row-status-in-progress"),
+            TerradropMapAvailability.Explored => Loc.GetString("terradrop-row-status-completed", ("level", highestCompletedLevel)),
+            _ => Loc.GetString("terradrop-row-status-unavailable")
         };
-        StatusBadge.Text = Loc.GetString(statusKey);
         StatusBadge.FontColorOverride = colors.InfoText;
 
-        // Highest completed level display
-        HighestLevelLabel.Text = highestCompletedLevel > 0
-            ? Loc.GetString("terradrop-row-highest-level", ("level", highestCompletedLevel))
-            : "";
+        // Level is shown in the badge for completed maps, so hide the redundant label.
+        HighestLevelLabel.Text = "";
 
         // Header click
         HeaderButton.OnPressed += _ => OnHeaderPressed?.Invoke(this);

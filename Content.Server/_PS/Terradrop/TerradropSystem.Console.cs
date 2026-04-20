@@ -208,11 +208,11 @@ public sealed partial class TerradropSystem
             proto => proto.ID,
             proto =>
             {
-                if (data.ActiveMissions.ContainsKey(proto.ID))
-                    return TerradropMapAvailability.InProgress;
-
                 if (data.HighestCompletedLevels.ContainsKey(proto.ID))
                     return TerradropMapAvailability.Explored;
+
+                if (data.ActiveMissions.ContainsKey(proto.ID))
+                    return TerradropMapAvailability.InProgress;
 
                 // First map is always available.
                 if (proto.UnlockedByDefault)
