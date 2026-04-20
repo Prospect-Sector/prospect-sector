@@ -68,6 +68,13 @@ public sealed partial class TerradropSystem
         {
             map.ObjectiveCompleted = true;
             Announce(mapUid, Loc.GetString("terradrop-objective-completed"));
+
+            if (map.StationUid is { Valid: true } stationUid)
+            {
+                var stationData = EnsureComp<TerradropStationComponent>(stationUid);
+                RecordProgression(map, stationData);
+                UpdateAllConsolesForStation(stationUid);
+            }
         }
     }
 

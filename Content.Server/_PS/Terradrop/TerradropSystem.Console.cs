@@ -24,25 +24,8 @@ public sealed partial class TerradropSystem
 
         var data = EnsureComp<TerradropStationComponent>(component.StationUid.Value);
 
-        // Only record progression and unlock downstream planets when the objective was completed.
         if (component.ObjectiveCompleted)
-        {
-            var completedLevel = component.Level;
-            if (!data.HighestCompletedLevels.TryGetValue(component.MapPrototype.ID, out var previousBest)
-                || completedLevel > previousBest)
-            {
-                data.HighestCompletedLevels[component.MapPrototype.ID] = completedLevel;
-            }
-
-            if (!data.UnlockedMapNodes.Contains(component.MapPrototype.ID))
-                data.UnlockedMapNodes.Add(component.MapPrototype.ID);
-
-            foreach (var unlockId in component.MapPrototype.MapUnlocks)
-            {
-                if (!data.UnlockedMapNodes.Contains(unlockId))
-                    data.UnlockedMapNodes.Add(unlockId);
-            }
-        }
+            RecordProgression(component, data);
 
         if (!data.ActiveMissions.TryGetValue(component.MapPrototype.ID, out var instances))
         {
@@ -245,5 +228,30 @@ public sealed partial class TerradropSystem
 
         _uiSystem.SetUiState(uid, TerradropConsoleUiKey.Default,
             new TerradropConsoleBoundInterfaceState(mapList, activeInstances, data.HighestCompletedLevels, globalMaxLevel));
+    }
+
+    /// <summary>
+    /// Records the completed level and unlocks downstream planets. Idempotent — safe to call
+    /// both on objective completion and on map shutdown.
+    /// </summary>
+    internal void RecordProgression(TerradropMapComponent component, TerradropStationComponent data)
+    {
+        if (component.MapPrototype == null)
+            return;
+
+        if (!data.HighestCompletedLevels.TryGetValue(component.MapPrototype.ID, out var previousBest)
+            || component.Level > previousBest)
+        {
+            data.HighestCompletedLevels[component.MapPrototype.ID] = component.Level;
+        }
+
+        if (!data.UnlockedMapNodes.Contains(component.MapPrototype.ID))
+            data.UnlockedMapNodes.Add(component.MapPrototype.ID);
+
+        foreach (var unlockId in component.MapPrototype.MapUnlocks)
+        {
+            if (!data.UnlockedMapNodes.Contains(unlockId))
+                data.UnlockedMapNodes.Add(unlockId);
+        }
     }
 }
