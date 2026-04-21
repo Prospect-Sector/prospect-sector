@@ -74,11 +74,14 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
         // two sub-regions at the pair of endpoints with the shortest corridor. Endpoints are
         // either compass-midpoint doors of leaves or existing corridor tiles from deeper levels
         // — that's what turns the tree of sibling links into a branching graph instead of a snake.
-        BuildSubRegion(root, plans, dungeon, fallbackTileDef, layer.CorridorWidth);
+        // The root is special-cased so we can emit additional randomized cross-half corridors.
+        ProcessRoot(root, plans, dungeon, fallbackTileDef, layer.CorridorWidth, layer.RootExtras, random);
 
         // Post-pass: a handful of extra T-junction corridors on top of the spanning tree, so
         // the topology has some loops instead of being a strict N-1 tree.
-        AddExtraJunctions(plans, dungeon, fallbackTileDef, layer.CorridorWidth, layer.ExtraJunctions);
+        AddExtraJunctions(
+            plans, dungeon, fallbackTileDef,
+            layer.CorridorWidth, layer.ExtraJunctions, layer.MinExtraJunctionDistance);
 
         // Tiles that became corridor floor must not be walled, whether they were previously
         // tracked as room exterior (adjacent to a prefab) or corridor exterior (adjacent to a
@@ -188,6 +191,42 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
     // ------------------------------------------------------------------------------------------
 
     /// <summary>
+    /// Root-specific entry point. Builds the two halves' sub-regions recursively, emits the
+    /// deterministic closest-pair corridor between them, then emits <paramref name="extras"/>
+    /// additional random corridors across the root split. The extras are the one sanctioned
+    /// place for randomness in corridor construction — they reliably break up the big-picture
+    /// rigid-split look without touching the bottom-up deterministic tree.
+    /// </summary>
+    private void ProcessRoot(
+        BspNode root,
+        Dictionary<BspNode, LeafPlan> plans,
+        Dungeon dungeon,
+        ITileDefinition tileDef,
+        int corridorWidth,
+        int extras,
+        Random random)
+    {
+        if (root.IsLeaf)
+            return;
+
+        var leftSub = BuildSubRegion(root.Left!, plans, dungeon, tileDef, corridorWidth);
+        var rightSub = BuildSubRegion(root.Right!, plans, dungeon, tileDef, corridorWidth);
+
+        if (TryFindClosestPair(leftSub, rightSub, out var nl, out var nr))
+            EmitCorridorBetween(nl, nr, dungeon, tileDef, corridorWidth);
+
+        if (extras <= 0 || leftSub.Endpoints.Count == 0 || rightSub.Endpoints.Count == 0)
+            return;
+
+        for (var i = 0; i < extras; i++)
+        {
+            var l = leftSub.Endpoints[random.Next(leftSub.Endpoints.Count)];
+            var r = rightSub.Endpoints[random.Next(rightSub.Endpoints.Count)];
+            EmitCorridorBetween(l, r, dungeon, tileDef, corridorWidth);
+        }
+    }
+
+    /// <summary>
     /// Walks the BSP tree bottom-up. At each internal node the two child sub-regions are already
     /// internally connected; this method picks the closest pair of endpoints (one from each side)
     /// and emits a single corridor between them. Endpoints may be either leaf compass-midpoint
@@ -237,12 +276,15 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
         Dungeon dungeon,
         ITileDefinition tileDef,
         int corridorWidth,
-        int maxExtras)
+        int maxExtras,
+        int minDistance)
     {
         if (maxExtras <= 0 || dungeon.CorridorTiles.Count == 0)
             return;
 
-        // Collect every spare door with its distance to the nearest existing corridor tile.
+        // Collect every spare door with its nearest corridor tile that lies at least
+        // `minDistance` Manhattan tiles away. This filters out stubs that would only connect
+        // to a corridor already hugging the door's own leaf.
         var candidates = new List<(Endpoint Door, Vector2i Target, int Dist)>();
         foreach (var plan in plans.Values)
         {
@@ -271,6 +313,8 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
                 foreach (var corridorTile in dungeon.CorridorTiles)
                 {
                     var dist = Math.Abs(door.X - corridorTile.X) + Math.Abs(door.Y - corridorTile.Y);
+                    if (dist < minDistance)
+                        continue;
                     if (dist >= bestDist)
                         continue;
                     bestDist = dist;
@@ -296,6 +340,8 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
             EmitCorridorBetween(door, new Endpoint(target, null), dungeon, tileDef, corridorWidth);
             emitted++;
         }
+
+        _log.Debug($"BSP added {emitted}/{maxExtras} extra T-junction corridors (min distance {minDistance})");
     }
 
     private static void AddLeafDoorCandidates(LeafPlan plan, SubRegion region)
@@ -540,20 +586,24 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
         var posApproach = posDoor + posFace * DoorApproachLength;
 
         var halfW = corridorWidth / 2;
-        var corridor = new HashSet<Vector2i>();
+        var spine = new HashSet<Vector2i>();
+        var flank = new HashSet<Vector2i>();
 
-        AddDoorApproach(negDoor, negApproach, negFace, halfW, corridor);
-        AddDoorApproach(posDoor, posApproach, posFace, halfW, corridor);
-        BuildMiddleBend(negApproach, posApproach, halfW, corridor);
+        AddDoorApproach(negDoor, negApproach, negFace, halfW, spine, flank);
+        AddDoorApproach(posDoor, posApproach, posFace, halfW, spine, flank);
+        BuildMiddleBend(negApproach, posApproach, halfW, spine, flank);
 
         var emitted = new List<Vector2i>();
-        foreach (var tile in corridor)
+
+        // Spine tiles: strict. Never overwrite room interiors or exterior wall ring, except at
+        // the two sanctioned door tiles. This keeps the main axis of the corridor from punching
+        // through prefab walls.
+        foreach (var tile in spine)
         {
             if (!IsTileAvailable(tile))
                 continue;
             if (dungeon.RoomTiles.Contains(tile))
                 continue;
-            // Never overwrite a prefab's exterior wall ring except at the two sanctioned door tiles.
             if (tile != negDoor && tile != posDoor && dungeon.RoomExteriorTiles.Contains(tile))
                 continue;
 
@@ -565,7 +615,29 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
             emitted.Add(tile);
         }
 
-        foreach (var tile in corridor)
+        // Flank tiles: relaxed. Still can't overwrite a room interior, but MAY overwrite a
+        // neighbour's exterior wall ring. Without this relaxation the 3-wide corridor pinches
+        // to 1-wide wherever it brushes past a nearby prefab — and worse, the skipped flank tiles
+        // remain in RoomExteriorTiles, so BoundaryWallDunGen materialises actual wall stubs inside
+        // what the player reads as a corridor.
+        foreach (var tile in flank)
+        {
+            if (!IsTileAvailable(tile))
+                continue;
+            if (dungeon.RoomTiles.Contains(tile))
+                continue;
+            if (spine.Contains(tile))
+                continue;
+
+            if (!dungeon.CorridorTiles.Contains(tile))
+            {
+                QueueTile(tile, new Tile(tileDef.TileId));
+                dungeon.CorridorTiles.Add(tile);
+            }
+            emitted.Add(tile);
+        }
+
+        foreach (var tile in emitted)
         {
             for (var dx = -1; dx <= 1; dx++)
             {
@@ -613,9 +685,17 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
     /// <summary>
     /// Adds the straight 3-wide approach segment from a door toward its approach point. Tapers
     /// to 1 at the door tile (so airlock placement works) but stays 3-wide at the approach end
-    /// where it meets the middle bend.
+    /// where it meets the middle bend. Spine (centre line) and flank (±1 perpendicular) tiles go
+    /// into separate sets so the emission pass can apply different overlap rules to each — see
+    /// <c>EmitCorridorBetween</c> for why.
     /// </summary>
-    private static void AddDoorApproach(Vector2i door, Vector2i approach, Vector2i faceDir, int halfW, HashSet<Vector2i> output)
+    private static void AddDoorApproach(
+        Vector2i door,
+        Vector2i approach,
+        Vector2i faceDir,
+        int halfW,
+        HashSet<Vector2i> spine,
+        HashSet<Vector2i> flank)
     {
         if (faceDir == Vector2i.Zero || door == approach)
             return;
@@ -624,54 +704,76 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
         {
             var xA = Math.Min(door.X, approach.X);
             var xB = Math.Max(door.X, approach.X);
-            AddHorizontalSegment(xA, xB, door.Y, halfW, output, doorAtA: door.X == xA, doorAtB: door.X == xB);
+            AddHorizontalSegment(xA, xB, door.Y, halfW, spine, flank, doorAtA: door.X == xA, doorAtB: door.X == xB);
         }
         else
         {
             var yA = Math.Min(door.Y, approach.Y);
             var yB = Math.Max(door.Y, approach.Y);
-            AddVerticalSegment(door.X, yA, yB, halfW, output, doorAtA: door.Y == yA, doorAtB: door.Y == yB);
+            AddVerticalSegment(door.X, yA, yB, halfW, spine, flank, doorAtA: door.Y == yA, doorAtB: door.Y == yB);
         }
     }
 
     /// <summary>
     /// Connects two approach points with a straight segment or an L-bend. Both ends stay 3-wide
     /// because neither is a door — the taper lives in the door-approach segments instead.
+    /// Populates <paramref name="spine"/> and <paramref name="flank"/> separately (see
+    /// <c>EmitCorridorBetween</c> for the rationale).
     /// </summary>
-    private static void BuildMiddleBend(Vector2i a, Vector2i b, int halfW, HashSet<Vector2i> output)
+    private static void BuildMiddleBend(
+        Vector2i a,
+        Vector2i b,
+        int halfW,
+        HashSet<Vector2i> spine,
+        HashSet<Vector2i> flank)
     {
         if (a == b)
             return;
 
         if (a.X == b.X)
         {
-            AddVerticalSegment(a.X, Math.Min(a.Y, b.Y), Math.Max(a.Y, b.Y), halfW, output, doorAtA: false, doorAtB: false);
+            AddVerticalSegment(a.X, Math.Min(a.Y, b.Y), Math.Max(a.Y, b.Y), halfW, spine, flank, doorAtA: false, doorAtB: false);
             return;
         }
 
         if (a.Y == b.Y)
         {
-            AddHorizontalSegment(Math.Min(a.X, b.X), Math.Max(a.X, b.X), a.Y, halfW, output, doorAtA: false, doorAtB: false);
+            AddHorizontalSegment(Math.Min(a.X, b.X), Math.Max(a.X, b.X), a.Y, halfW, spine, flank, doorAtA: false, doorAtB: false);
             return;
         }
 
         if (a.X > b.X) (a, b) = (b, a);
         var pivotX = Math.Clamp((a.X + b.X) / 2, a.X, b.X);
 
-        AddHorizontalSegment(a.X, pivotX, a.Y, halfW, output, doorAtA: false, doorAtB: false);
-        AddVerticalSegment(pivotX, Math.Min(a.Y, b.Y), Math.Max(a.Y, b.Y), halfW, output, doorAtA: false, doorAtB: false);
-        AddHorizontalSegment(pivotX, b.X, b.Y, halfW, output, doorAtA: false, doorAtB: false);
+        AddHorizontalSegment(a.X, pivotX, a.Y, halfW, spine, flank, doorAtA: false, doorAtB: false);
+        AddVerticalSegment(pivotX, Math.Min(a.Y, b.Y), Math.Max(a.Y, b.Y), halfW, spine, flank, doorAtA: false, doorAtB: false);
+        AddHorizontalSegment(pivotX, b.X, b.Y, halfW, spine, flank, doorAtA: false, doorAtB: false);
 
-        AddPivotBlock(new Vector2i(pivotX, a.Y), halfW, output);
-        AddPivotBlock(new Vector2i(pivotX, b.Y), halfW, output);
+        AddPivotBlock(new Vector2i(pivotX, a.Y), halfW, spine, flank);
+        AddPivotBlock(new Vector2i(pivotX, b.Y), halfW, spine, flank);
     }
 
-    private static void AddHorizontalSegment(int xA, int xB, int y, int halfW, HashSet<Vector2i> output, bool doorAtA, bool doorAtB)
+    /// <summary>
+    /// Emits a horizontal corridor segment. The centre line is added to <paramref name="spine"/>
+    /// and the ±halfW perpendicular tiles go into <paramref name="flank"/>. Doors taper to 1 on
+    /// the flanking set (so the corridor narrows to the door tile only at the face that needs it).
+    /// Keeping the two sets separate lets the emission pass treat spine as the strict "wall-safe"
+    /// path and flank as a widening allowed to clip neighbours' exterior wall ring.
+    /// </summary>
+    private static void AddHorizontalSegment(
+        int xA,
+        int xB,
+        int y,
+        int halfW,
+        HashSet<Vector2i> spine,
+        HashSet<Vector2i> flank,
+        bool doorAtA,
+        bool doorAtB)
     {
         if (xA > xB) (xA, xB) = (xB, xA);
 
         for (var x = xA; x <= xB; x++)
-            output.Add(new Vector2i(x, y));
+            spine.Add(new Vector2i(x, y));
 
         var flankXStart = doorAtA ? xA + 1 : xA;
         var flankXEnd = doorAtB ? xB - 1 : xB;
@@ -679,18 +781,29 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
         {
             for (var dy = 1; dy <= halfW; dy++)
             {
-                output.Add(new Vector2i(x, y + dy));
-                output.Add(new Vector2i(x, y - dy));
+                flank.Add(new Vector2i(x, y + dy));
+                flank.Add(new Vector2i(x, y - dy));
             }
         }
     }
 
-    private static void AddVerticalSegment(int x, int yA, int yB, int halfW, HashSet<Vector2i> output, bool doorAtA, bool doorAtB)
+    /// <summary>
+    /// Vertical counterpart of <see cref="AddHorizontalSegment"/>. Same spine/flank semantics.
+    /// </summary>
+    private static void AddVerticalSegment(
+        int x,
+        int yA,
+        int yB,
+        int halfW,
+        HashSet<Vector2i> spine,
+        HashSet<Vector2i> flank,
+        bool doorAtA,
+        bool doorAtB)
     {
         if (yA > yB) (yA, yB) = (yB, yA);
 
         for (var y = yA; y <= yB; y++)
-            output.Add(new Vector2i(x, y));
+            spine.Add(new Vector2i(x, y));
 
         var flankYStart = doorAtA ? yA + 1 : yA;
         var flankYEnd = doorAtB ? yB - 1 : yB;
@@ -698,18 +811,29 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
         {
             for (var dx = 1; dx <= halfW; dx++)
             {
-                output.Add(new Vector2i(x + dx, y));
-                output.Add(new Vector2i(x - dx, y));
+                flank.Add(new Vector2i(x + dx, y));
+                flank.Add(new Vector2i(x - dx, y));
             }
         }
     }
 
-    private static void AddPivotBlock(Vector2i pivot, int halfW, HashSet<Vector2i> output)
+    /// <summary>
+    /// Smooths an L-bend pivot corner by filling the (2·halfW+1)² block around the pivot. The
+    /// centre tile is the pivot itself (spine); the surrounding 8 act as flank-widening so the
+    /// corner isn't a single-tile pinch. Kept separate so spine/flank overlap rules still apply.
+    /// </summary>
+    private static void AddPivotBlock(Vector2i pivot, int halfW, HashSet<Vector2i> spine, HashSet<Vector2i> flank)
     {
         for (var dx = -halfW; dx <= halfW; dx++)
         {
             for (var dy = -halfW; dy <= halfW; dy++)
-                output.Add(new Vector2i(pivot.X + dx, pivot.Y + dy));
+            {
+                var tile = new Vector2i(pivot.X + dx, pivot.Y + dy);
+                if (dx == 0 && dy == 0)
+                    spine.Add(tile);
+                else
+                    flank.Add(tile);
+            }
         }
     }
 

@@ -76,11 +76,29 @@ public sealed partial class BspDungeonDunGen : IDunGenLayer
     /// <summary>
     /// After the spanning tree of sibling corridors is built, this many additional T-junction
     /// corridors are added — each from an unused leaf compass-midpoint door to the nearest
-    /// existing corridor tile, shortest-first (deterministic). Produces branching loops so the
-    /// topology isn't a pure tree. Set to 0 to disable.
+    /// existing corridor tile that's at least <see cref="MinExtraJunctionDistance"/> tiles away.
+    /// Deterministic (shortest-first among valid candidates). Produces loop branches on top of
+    /// the tree. Set to 0 to disable.
     /// </summary>
     [DataField]
-    public int ExtraJunctions = 3;
+    public int ExtraJunctions = 1;
+
+    /// <summary>
+    /// Minimum Manhattan distance (in tiles) between an extra-junction door and its target
+    /// corridor tile. Guarantees the extra corridor actually spans new ground rather than
+    /// stubbing to a corridor already hugging the door's own leaf.
+    /// </summary>
+    [DataField]
+    public int MinExtraJunctionDistance = 8;
+
+    /// <summary>
+    /// Additional random corridors between the root's two child sub-regions, on top of the
+    /// single deterministic closest-pair connection. Endpoints (door or corridor tile) are
+    /// picked uniformly at random from each half — this is the one spot where randomness is
+    /// intentional, to break up the otherwise rigid big-picture split of the dungeon.
+    /// </summary>
+    [DataField]
+    public int RootExtras = 1;
 
     /// <summary>
     /// When true, a post-pass thickens the outer walls at random so the dungeon silhouette is not
