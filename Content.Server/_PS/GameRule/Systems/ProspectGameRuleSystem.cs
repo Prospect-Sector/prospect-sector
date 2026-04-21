@@ -7,7 +7,6 @@ namespace Content.Server._PS.GameRule.Systems;
 
 public sealed class ProspectGameRuleSystem : GameRuleSystem<ProspectGameRuleComponent>
 {
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
 
     public override void Initialize()
     {

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Content.Shared._PS.Terradrop;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
@@ -38,22 +38,34 @@ public sealed class TerradropConsoleBoundUserInterface : BoundUserInterface
         _consoleMenu.SetEntity(owner);
         _consoleMenu.OnClose += () => _consoleMenu = null;
 
-        // Set up technology unlock handler
-        _consoleMenu.OnStartTerradropPressed += id =>
+        // Set up terradrop start handler
+        _consoleMenu.OnStartTerradropPressed += (id, level) =>
         {
             try
             {
-                _sawmill.Debug($"Sending ConsoleUnlockTechnologyMessage for tech ID: {id}");
+                _sawmill.Debug($"Sending StartTerradropMessage for map ID: {id}, level: {level}");
 
-                // Create and send the message
-                var message = new StartTerradropMessage(id);
+                // Create and send the message with level
+                var message = new StartTerradropMessage(id, level);
                 SendMessage(message);
-                _sawmill.Info($"Sent unlock message for technology: {id}"); // Log success
+                _sawmill.Info($"Sent start message for terradrop: {id} at level {level}");
             }
-            catch (Exception ex) // Log any exceptions that occur during message sending
+            catch (Exception ex)
             {
-                _sawmill.Error($"Error sending technology unlock message for {id}: {ex}");
+                _sawmill.Error($"Error sending terradrop start message for {id}: {ex}");
             }
+        };
+
+        _consoleMenu.OnDisconnectPressed += () =>
+        {
+            _sawmill.Debug("Sending DisconnectPortalMessage");
+            SendMessage(new DisconnectPortalMessage());
+        };
+
+        _consoleMenu.OnReconnectPressed += (mapId, instanceIndex) =>
+        {
+            _sawmill.Debug($"Sending ReconnectPortalMessage for {mapId} index {instanceIndex}");
+            SendMessage(new ReconnectPortalMessage(mapId, instanceIndex));
         };
     }
 
@@ -93,6 +105,11 @@ public sealed class TerradropConsoleBoundUserInterface : BoundUserInterface
 
         var availableTechs = castState.MapNodes.Count(t => t.Value == TerradropMapAvailability.Unexplored);
         _sawmill.Debug($"New maps to explore: {availableTechs}");
+
+        // Update active instances and level data before updating panels.
+        _consoleMenu.ActiveInstances = castState.ActiveInstances;
+        _consoleMenu.HighestCompletedLevels = castState.HighestCompletedLevels;
+        _consoleMenu.GlobalMaxLevel = castState.GlobalMaxLevel;
 
         if (!_consoleMenu.List.SequenceEqual(castState.MapNodes))
         {

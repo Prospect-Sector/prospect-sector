@@ -18,4 +18,4 @@ flavor_text = true
 
 [hub]
 tags = "lang:en-US,rp:med,region:me,no_tag_infer"
-hub_urls = "https://hub.spacestation14.com/,https://web.networkgamez.com/,https://hub.singularity14.co.uk/"
+hub_urls = "https://hub.spacestation14.com/,https://hub.singularity14.co.uk/"

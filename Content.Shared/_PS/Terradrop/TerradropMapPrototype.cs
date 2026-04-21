@@ -7,7 +7,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._PS.Terradrop;
 
 [Prototype]
-public sealed class TerradropMapPrototype: IPrototype
+public sealed partial class TerradropMapPrototype: IPrototype
 {
     /// <inheritdoc/>
     [IdDataField]
@@ -88,5 +88,12 @@ public sealed class TerradropMapPrototype: IPrototype
 
     [DataField("unlockedByDefault")]
     public bool UnlockedByDefault = false;
+
+    /// <summary>
+    /// The minimum level required to play this map.
+    /// Players can select any level at or above this value.
+    /// </summary>
+    [DataField("minLevel")]
+    public int MinLevel = 0;
 }
 

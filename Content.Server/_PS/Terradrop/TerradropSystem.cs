@@ -36,7 +36,7 @@ public sealed partial class TerradropSystem : SharedTerradropSystem
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly GameTicker _gameTicker = default!;
+
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly EntityStorageSystem _entityStorageSystem = default!;
     [Dependency] private readonly DamageableSystem _damageableSystem = default!;

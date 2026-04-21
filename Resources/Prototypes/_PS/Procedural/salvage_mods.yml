@@ -1,0 +1,31 @@
+# Prospect Sector - Salvage Modifiers
+# These override biome dungeon selection for terradrops
+
+# PS Dungeon mods - one for each biome
+- type: salvageDungeonMod
+  id: PSGeneric
+  desc: salvage-dungeon-mod-experiment
+  proto: PSDungeonGeneric
+  biomes:
+    - Grasslands
+
+- type: salvageDungeonMod
+  id: PSCaves
+  desc: salvage-dungeon-mod-mineshaft
+  proto: PSDungeonCaves
+  biomes:
+    - Caves
+
+- type: salvageDungeonMod
+  id: PSLava
+  desc: salvage-dungeon-mod-lava-brig
+  proto: PSDungeonLava
+  biomes:
+    - Lava
+
+- type: salvageDungeonMod
+  id: PSSnow
+  desc: salvage-dungeon-mod-snowy-labs
+  proto: PSDungeonSnow
+  biomes:
+    - Snow

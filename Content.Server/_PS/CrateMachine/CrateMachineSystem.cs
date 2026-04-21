@@ -32,7 +32,7 @@ public sealed partial class CrateMachineSystem : SharedCrateMachineSystem
     {
         if (!TryComp(crateMachineUid, out TransformComponent? crateMachineTransform))
             return true;
-        if (!EntityManager.TryGetComponent<MapGridComponent>(crateMachineTransform.GridUid, out var mapGrid))
+        if (!TryComp<MapGridComponent>(crateMachineTransform.GridUid, out var mapGrid))
             return true;
         var tileRef = _mapSystem.GetTileRef(crateMachineTransform.GridUid.Value, mapGrid, crateMachineTransform.Coordinates);
         if (!ignoreAnimation && (component.OpeningTimeRemaining > 0 || component.ClosingTimeRemaining > 0f))

@@ -1,84 +1,22 @@
-﻿<controls:FancyWindow xmlns="https://spacestation14.io"
+<controls:FancyWindow xmlns="https://spacestation14.io"
                       xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
-                      xmlns:ps="clr-namespace:Content.Client._PS.Terradrop"
-                      SetSize="1000 600"
-                      MinSize="800 400"
+                      SetSize="700 600"
+                      MinSize="500 400"
                       Title="{Loc 'terradrop-console-menu-title'}">
-    <BoxContainer Orientation="Vertical"
-                  HorizontalExpand="True"
-                  VerticalExpand="True">
-        <BoxContainer Orientation="Horizontal"
-                      HorizontalExpand="True"
-                      VerticalExpand="False"
-                      MinHeight="60"
-                      Margin="10">
-            <BoxContainer Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True">
-                <Control VerticalExpand="True" />
-                <BoxContainer Name="ThreatLevelDisplayContainer" Orientation="Horizontal" HorizontalExpand="True"
-                              VerticalAlignment="Bottom" />
-            </BoxContainer>
-        </BoxContainer>
-        <BoxContainer Orientation="Horizontal"
-                      HorizontalExpand="True"
-                      VerticalExpand="True">
-            <BoxContainer Orientation="Vertical"
-                          VerticalExpand="True"
-                          HorizontalExpand="True"
-                          SizeFlagsStretchRatio="3"
-                          Margin="0 0 0 10">
-                <PanelContainer Name="MapNodesContainer" VerticalExpand="True" HorizontalExpand="True">
-                    <PanelContainer.PanelOverride>
-                        <gfx:StyleBoxFlat BackgroundColor="#0F1419" />
-                    </PanelContainer.PanelOverride>
-                    <!-- Add ScrollContainer - vertical only -->
-                    <ScrollContainer
-                        Name="MapNodesScrollContainer"
-                        Access="Public"
-                        HorizontalExpand="True"
-                        VerticalExpand="True"
-                        HScrollEnabled="False"
-                        VScrollEnabled="True"
-                        ReserveScrollbarSpace="True"
-                        StyleClasses="PdaScrollContainer">
-                        <ps:TerradropContainerPanel
-                            HorizontalExpand="True"
-                            VerticalExpand="True"
-                            Name="DragContainer"
-                            MouseFilter="Pass"
-                            RectClipContent="True"
-                            HorizontalAlignment="Left">
-                            <!-- There lives all of the map nodes -->
-                        </ps:TerradropContainerPanel>
-                    </ScrollContainer>
-                    <Button Name="RecenterButton" Text="{Loc 'terradrop-console-menu-recenter-button'}" MinHeight="40"
-                            HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5 -5" />
-                </PanelContainer>
-            </BoxContainer>
-            <PanelContainer SizeFlagsStretchRatio="2">
-                <PanelContainer.PanelOverride>
-                    <gfx:StyleBoxFlat BackgroundColor="#1B1B1E" />
-                </PanelContainer.PanelOverride>
-                <BoxContainer Name="InfoContainer"
-                              Orientation="Vertical"
-                              VerticalExpand="True"
-                              HorizontalExpand="True"
-                              SizeFlagsStretchRatio="1"
-                              Margin="0">
-                    <Control
-                        Margin="5"
-                        MinWidth="350"
-                        VerticalExpand="True"
-                        HorizontalExpand="True" />
-                </BoxContainer>
-            </PanelContainer>
-        </BoxContainer>
-        <BoxContainer Name="ContentFooter" HorizontalExpand="True" SetHeight="28" Margin="1 0 2 1">
-            <controls:StripeBack HasBottomEdge="False" HasMargins="False" HorizontalExpand="True">
-                <Label Text="Robust#OS ™" VerticalAlignment="Center" HorizontalAlignment="Right"
-                       HorizontalExpand="True"
-                       Margin="6 0" StyleClasses="PdaContentFooterText" />
-            </controls:StripeBack>
-        </BoxContainer>
-    </BoxContainer>
+    <PanelContainer HorizontalExpand="True" VerticalExpand="True">
+        <PanelContainer.PanelOverride>
+            <gfx:StyleBoxFlat BackgroundColor="#12151A" />
+        </PanelContainer.PanelOverride>
+        <ScrollContainer
+            HorizontalExpand="True"
+            VerticalExpand="True"
+            HScrollEnabled="False"
+            VScrollEnabled="True"
+            Margin="4">
+            <BoxContainer Name="MapListContainer"
+                          Orientation="Vertical"
+                          HorizontalExpand="True"/>
+        </ScrollContainer>
+    </PanelContainer>
 </controls:FancyWindow>

@@ -15,7 +15,7 @@ namespace Content.Server._PS.CargoStorage.Systems;
 public sealed partial class CargoStorageSystem
 {
     [Dependency] private readonly CrateMachineSystem _crateMachine = default!;
-    [Dependency] private readonly ILogManager _logMan = default!;
+
     private ISawmill _sawmill = default!;
 
     private void InitializeCrateMachine()

@@ -1,9 +1,24 @@
-﻿namespace Content.Shared._PS.Terradrop;
+using Robust.Shared.GameStates;
 
-[RegisterComponent]
+namespace Content.Shared._PS.Terradrop;
+
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class TerradropMapComponent : Component
 {
     public int ThreatLevel = 1;
+
+    /// <summary>
+    /// The level of this terradrop map. Higher levels increase stat rolls on spawned items.
+    /// Level 10 = 10% better stats, Level 50 = 50% better stats, etc.
+    /// </summary>
+    [AutoNetworkedField]
+    public int Level = 0;
+
+    /// <summary>
+    /// The human-readable instance name, e.g. "Zerona Prime #1".
+    /// </summary>
+    [AutoNetworkedField]
+    public string InstanceName = string.Empty;
 
     [NonSerialized]
     public EntityUid? StationUid = null;
@@ -13,5 +28,4 @@ public sealed partial class TerradropMapComponent : Component
 
     [NonSerialized]
     public EntityUid? ReturnMarker = null;
-
 }

@@ -17,7 +17,7 @@
 Small fixes/refactors are exempt. Media may be used in SS14 progress reports with credit. -->
 
 ## Requirements
-<!-- Confirm the following by placing an X in the brackets [X]: -->
+<!-- Confirm the following by placing an X in the brackets without spaces inside (for example: [X] ): -->
 - [ ] I have read [CONTRIBUTING.md](https://github.com/Prospect-Sector/prospect-sector/blob/main/CONTRIBUTING.md) and am following the [Pull Request and Changelog Guidelines](https://docs.spacestation14.com/en/general-development/codebase-info/pull-request-guidelines.html).
 - [ ] I have added media to this PR or it does not require an in-game showcase.
 - [ ] The content in this PR is my own work or properly attributed to the original authors.

@@ -1,4 +1,4 @@
-﻿using Content.Shared.Salvage.Expeditions;
+using Content.Shared.Salvage.Expeditions;
 using Robust.Shared.GameStates;
 using Robust.Shared.Map;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.List;
@@ -12,7 +12,14 @@ namespace Content.Shared._PS.Terradrop;
 public sealed partial class TerradropStationComponent : Component
 {
     [NonSerialized]
-    public readonly Dictionary<string, TerradropActiveMissionData> ActiveMissions = new();
+    public readonly Dictionary<string, List<TerradropActiveMissionData>> ActiveMissions = new();
+
+    /// <summary>
+    /// The highest level completed per terradrop map ID.
+    /// Used to compute the global max level and per-planet display.
+    /// </summary>
+    [NonSerialized]
+    public readonly Dictionary<string, int> HighestCompletedLevels = new();
 
     [ViewVariables]
     public readonly Dictionary<string, SalvageMissionParams> Missions = new();

@@ -1,0 +1,163 @@
+# Test items for the stats system
+# These can be spawned to verify stats display in examine tooltip
+
+- type: entity
+  id: TestStatsSwordUncommon
+  parent: BaseItem
+  name: Uncommon Test Sword
+  description: A test sword with Uncommon (T1) rarity stats.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
+    state: icon
+  - type: Item
+    size: Normal
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 10
+  - type: ItemStats
+    rarity: Uncommon
+    weaponDamageMultiplier: 1.03
+    statBonuses:
+      Strength: 2
+
+- type: entity
+  id: TestStatsSwordRare
+  parent: BaseItem
+  name: Rare Test Sword
+  description: A test sword with Rare (T2) rarity stats.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
+    state: icon
+  - type: Item
+    size: Normal
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 10
+  - type: ItemStats
+    rarity: Rare
+    weaponDamageMultiplier: 1.10
+    statBonuses:
+      Strength: 3
+      Dexterity: 1
+    affixes:
+    - affixId: MeleeDamage
+      value: 3.5
+
+- type: entity
+  id: TestStatsSwordExotic
+  parent: BaseItem
+  name: Exotic Test Sword
+  description: A test sword with Exotic (T3) rarity stats.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
+    state: icon
+  - type: Item
+    size: Normal
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 10
+  - type: ItemStats
+    rarity: Exotic
+    weaponDamageMultiplier: 1.22
+    statBonuses:
+      Strength: 4
+      Dexterity: 2
+    affixes:
+    - affixId: MeleeDamage
+      value: 4.2
+    - affixId: CritChance
+      value: 2.8
+
+- type: entity
+  id: TestStatsSwordBluespaced
+  parent: BaseItem
+  name: Bluespaced Test Sword
+  description: A test sword with Bluespaced (T4) rarity stats.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
+    state: icon
+  - type: Item
+    size: Normal
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 10
+  - type: ItemStats
+    rarity: Bluespaced
+    weaponDamageMultiplier: 1.38
+    statBonuses:
+      Strength: 5
+      Dexterity: 3
+      Agility: 2
+    affixes:
+    - affixId: MeleeDamage
+      value: 4.8
+    - affixId: CritChance
+      value: 3.5
+
+- type: entity
+  id: TestStatsSwordAnomalous
+  parent: BaseItem
+  name: Anomalous Test Sword
+  description: A test sword with Anomalous (T5) rarity stats.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/combat_knife.rsi
+    state: icon
+  - type: Item
+    size: Normal
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 10
+  - type: ItemStats
+    rarity: Anomalous
+    weaponDamageMultiplier: 1.52
+    statBonuses:
+      Strength: 7
+      Dexterity: 4
+      Agility: 3
+      Luck: 2
+    affixes:
+    - affixId: MeleeDamage
+      value: 5.0
+    - affixId: CritChance
+      value: 4.2
+    - affixId: ElementalDamage
+      value: 8.5
+
+- type: entity
+  id: TestStatsArmorExotic
+  parent: ClothingOuterBase
+  name: Exotic Test Armor
+  description: Test armor with Exotic (T3) rarity stats.
+  components:
+  - type: Sprite
+    sprite: Clothing/OuterClothing/Armor/security.rsi
+  - type: Clothing
+    sprite: Clothing/OuterClothing/Armor/security.rsi
+  - type: Armor
+    modifiers:
+      coefficients:
+        Blunt: 0.8
+        Slash: 0.8
+        Piercing: 0.8
+  - type: ItemStats
+    rarity: Exotic
+    softcritBonus: 6
+    deathThresholdBonus: 6
+    statBonuses:
+      Fortitude: 3
+      Strength: 2
+    affixes:
+    - affixId: Armor
+      value: 3.2
+    - affixId: HpThreshold
+      value: 2

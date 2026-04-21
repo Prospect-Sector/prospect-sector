@@ -25,7 +25,6 @@ public sealed class ProspectEmergencyArrivalsSystem : SharedProspectEmergencyArr
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly MapLoaderSystem _loader = default!;
     [Dependency] private readonly ShuttleSystem _shuttles = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
 
     /// <summary>
     ///     The first arrival is a little early, to save everyone 10s

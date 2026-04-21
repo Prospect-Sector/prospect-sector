@@ -1,6 +1,8 @@
-﻿using System.Numerics;
+using System.Numerics;
+using Content.Server.Chat.Managers;
 using Content.Server.Salvage.Expeditions;
 using Content.Shared._PS.Terradrop;
+using Content.Shared.Chat;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.FixedPoint;
@@ -8,6 +10,7 @@ using Content.Shared.Ghost;
 using Content.Shared.Humanoid;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Robust.Shared.Audio;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
 
@@ -19,9 +22,49 @@ namespace Content.Server._PS.Terradrop;
 /// </summary>
 public sealed partial class TerradropSystem
 {
+    [Dependency] private readonly IChatManager _chatManager = default!;
+
+    private static readonly SoundPathSpecifier TeleportArrivalSound =
+        new("/Audio/Effects/teleport_arrival.ogg");
+
     private void InitializeMissionHandling()
     {
         SubscribeLocalEvent<SalvageExpeditionComponent, EntityTerminatingEvent>(OnMapTerminating);
+        SubscribeLocalEvent<ActorComponent, EntParentChangedMessage>(OnActorParentChanged);
+    }
+
+    private void OnActorParentChanged(EntityUid uid, ActorComponent actor, ref EntParentChangedMessage args)
+    {
+        var xform = args.Transform;
+        var newMapUid = xform.MapUid;
+
+        // Only care about actual map changes.
+        if (newMapUid == args.OldMapId)
+            return;
+
+        // Play teleport arrival sound when entering or leaving a terradrop map.
+        // The upstream portal system uses PlayPredicted which the client can't predict
+        // for cross-map teleports, so the teleporting player never hears the sound.
+        var enteringTerradrop = newMapUid != null && HasComp<TerradropMapComponent>(newMapUid);
+        var leavingTerradrop = args.OldMapId != null && HasComp<TerradropMapComponent>(args.OldMapId.Value);
+
+        if (enteringTerradrop || leavingTerradrop)
+            _audio.PlayPvs(TeleportArrivalSound, uid);
+
+        if (!enteringTerradrop || !TryComp<TerradropMapComponent>(newMapUid, out var mapComp))
+            return;
+
+        if (string.IsNullOrEmpty(mapComp.InstanceName))
+            return;
+
+        var message = Loc.GetString("terradrop-instance-entered", ("name", mapComp.InstanceName));
+        _chatManager.ChatMessageToOne(
+            ChatChannel.Server,
+            message,
+            message,
+            source: EntityUid.Invalid,
+            hideChat: false,
+            client: actor.PlayerSession.Channel);
     }
 
     // Send ghosts back to the default map so they don't lose their stuff.
@@ -45,7 +88,7 @@ public sealed partial class TerradropSystem
         }
 
         var players =
-            AllEntityQuery<HumanoidAppearanceComponent, ActorComponent, MobStateComponent, TransformComponent>();
+            AllEntityQuery<HumanoidProfileComponent, ActorComponent, MobStateComponent, TransformComponent>();
         while (players.MoveNext(out var playerUid, out _, out _, out _, out var xform))
         {
             if (xform.MapUid == uid)

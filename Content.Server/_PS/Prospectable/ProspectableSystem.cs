@@ -6,7 +6,6 @@ namespace Content.Server._PS.Prospectable;
 public sealed class ProspectableSystem: SharedProspectableSystem
 {
     [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly ILogManager _log = default!;
 
     public override void Initialize()
     {

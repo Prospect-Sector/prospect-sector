@@ -356,15 +356,20 @@ namespace Content.Client.Examine
 
                 var button = new ExamineButton(examine, _sprite);
 
-                if (examine.HoverVerb)
+                // Prospect: AlignRight support for examine verbs
+                var alignRight = examine.AlignRight || !examine.HoverVerb;
+
+                if (alignRight)
                 {
-                    hoverExamineBox.AddChild(button);
+                    if (!examine.HoverVerb)
+                        button.OnPressed += VerbButtonPressed;
+                    clickExamineBox.AddChild(button);
                 }
                 else
                 {
-                    button.OnPressed += VerbButtonPressed;
-                    clickExamineBox.AddChild(button);
+                    hoverExamineBox.AddChild(button);
                 }
+                // Prospect: End
             }
 
             var vbox = _examineTooltipOpen?.GetChild(0).GetChild(0);

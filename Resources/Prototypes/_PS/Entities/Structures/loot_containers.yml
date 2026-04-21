@@ -1,0 +1,253 @@
+# Prospect Sector - Loot Containers
+# Breakable crates placed in terradrop dungeons.
+# Players smash them open; destruction spawns loot.
+
+# Abstract base - no EntityStorage, purely a breakable prop
+- type: entity
+  id: PSLootContainerBase
+  abstract: true
+  parent: BaseStructure
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: Structures/Storage/Crates/generic.rsi
+    layers:
+    - state: base
+    - state: closed
+  - type: Icon
+    sprite: Structures/Storage/Crates/generic.rsi
+    state: icon
+  - type: InteractionOutline
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.4,-0.4,0.4,0.29"
+        density: 50
+        mask:
+        - CrateMask
+        layer:
+        - MachineLayer
+  - type: Damageable
+    damageContainer: StructuralInorganic
+    damageModifierSet: Metallic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 10
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+
+# Tier 1 - Common (generic crate, 2-3 items)
+- type: entity
+  parent: PSLootContainerBase
+  id: PSLootContainerTier1
+  name: supply crate
+  suffix: Tier 1
+  description: A dusty supply crate. Looks like it could be broken open.
+  components:
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 10
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          PSSpawnerLootTier1:
+            min: 2
+            max: 3
+        offset: 0
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+
+# Tier 2 - Uncommon (engineering crate, 2-3 items)
+- type: entity
+  parent: PSLootContainerBase
+  id: PSLootContainerTier2
+  name: reinforced crate
+  suffix: Tier 2
+  description: A sturdy reinforced crate. Something valuable might be inside.
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: Structures/Storage/Crates/engineering.rsi
+    layers:
+    - state: base
+    - state: closed
+  - type: Icon
+    sprite: Structures/Storage/Crates/engineering.rsi
+    state: icon
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 10
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          PSSpawnerLootTier2:
+            min: 2
+            max: 3
+        offset: 0
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+
+# Tier 3 - Rare (weapon crate, 2-4 items)
+- type: entity
+  parent: PSLootContainerBase
+  id: PSLootContainerTier3
+  name: weapons crate
+  suffix: Tier 3
+  description: A heavy weapons crate. The contents must be valuable.
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: Structures/Storage/Crates/weapon.rsi
+    layers:
+    - state: base
+    - state: closed
+  - type: Icon
+    sprite: Structures/Storage/Crates/weapon.rsi
+    state: icon
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 10
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          PSSpawnerLootTier3:
+            min: 2
+            max: 4
+        offset: 0
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+
+# Tier 4 - Exotic (syndicate crate, 3-4 items)
+- type: entity
+  parent: PSLootContainerBase
+  id: PSLootContainerTier4
+  name: syndicate crate
+  suffix: Tier 4
+  description: A suspicious-looking crate bearing syndicate markings. Whatever is inside must be extremely valuable.
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: Structures/Storage/Crates/syndicate.rsi
+    layers:
+    - state: base
+    - state: closed
+  - type: Icon
+    sprite: Structures/Storage/Crates/syndicate.rsi
+    state: icon
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 10
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          PSSpawnerLootTier4:
+            min: 3
+            max: 4
+        offset: 0
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+
+# Medical supply crate - drops healing items when broken
+- type: entity
+  parent: PSLootContainerBase
+  id: PSLootContainerMedical
+  name: medical supply crate
+  description: A crate marked with a medical cross. Contains emergency supplies.
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: Structures/Storage/Crates/medical.rsi
+    layers:
+    - state: base
+    - state: closed
+  - type: Icon
+    sprite: Structures/Storage/Crates/medical.rsi
+    state: icon
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 10
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          PSSpawnerMedicalSupplies:
+            min: 2
+            max: 3
+        offset: 0
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Brutepack:
+            min: 2
+            max: 3
+          Ointment:
+            min: 2
+            max: 3
+        offset: 0.5
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+
+# Material crate - drops full stacks of crafting materials
+- type: entity
+  parent: PSLootContainerBase
+  id: PSLootContainerMaterials
+  name: salvage crate
+  description: A heavy crate full of raw materials. Could be useful for repairs.
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: Structures/Storage/Crates/plastic.rsi
+    layers:
+    - state: base
+    - state: closed
+  - type: Icon
+    sprite: Structures/Storage/Crates/plastic.rsi
+    state: icon
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 10
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          PSSpawnerMaterials:
+            min: 3
+            max: 4
+        offset: 0
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]

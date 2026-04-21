@@ -3,6 +3,7 @@ using Content.Server._PS.Prospectable;  // Prospect
 using Content.Server.GameTicking;
 using Content.Server.Spawners.Components;
 using Content.Shared._PS.Prospectable; // Prospect
+using Content.Shared._PS.ScatterOnSpawn; // Prospect
 using Content.Shared.EntityTable;
 using Content.Shared.GameTicking.Components;
 using JetBrains.Annotations;
@@ -104,7 +105,17 @@ namespace Content.Server.Spawners.EntitySystems
         {
             if (component.RarePrototypes.Count > 0 && (component.RareChance == 1.0f || _robustRandom.Prob(component.RareChance)))
             {
-                Spawn(_robustRandom.Pick(component.RarePrototypes), Transform(uid).Coordinates);
+                // Prospect: apply offset, scatter, and raise event for rare spawns so they get level-based stats
+                var rareOffset = component.Offset;
+                var rareXOffset = _robustRandom.NextFloat(-rareOffset, rareOffset);
+                var rareYOffset = _robustRandom.NextFloat(-rareOffset, rareOffset);
+                var rareCoordinates = Transform(uid).Coordinates.Offset(new Vector2(rareXOffset, rareYOffset));
+                var rareEntity = Spawn(_robustRandom.Pick(component.RarePrototypes), rareCoordinates);
+                if (TryComp<PSScatterOnSpawnComponent>(uid, out var rareScatter))
+                    AddComp(rareEntity, new PSScatterOnSpawnComponent { Force = rareScatter.Force });
+                var rareItemSpawnedEvent = new RandomItemSpawnedEvent(rareEntity);
+                RaiseLocalEvent(ref rareItemSpawnedEvent);
+                // Prospect: End
                 return;
             }
 
@@ -126,8 +137,10 @@ namespace Content.Server.Spawners.EntitySystems
 
             var coordinates = Transform(uid).Coordinates.Offset(new Vector2(xOffset, yOffset));
 
-            // Prospect: Jack spawns to events to add comps
+            // Prospect: Jack spawns to events to add comps and scatter
             var entity = Spawn(_robustRandom.Pick(component.Prototypes), coordinates);
+            if (TryComp<PSScatterOnSpawnComponent>(uid, out var scatter))
+                AddComp(entity, new PSScatterOnSpawnComponent { Force = scatter.Force });
             var randomItemSpawnedEvent = new RandomItemSpawnedEvent(entity);
             RaiseLocalEvent(ref randomItemSpawnedEvent);
             // End Prospect
@@ -139,16 +152,17 @@ namespace Content.Server.Spawners.EntitySystems
                 return;
 
             var coords = Transform(ent).Coordinates;
+            var offset = ent.Comp.Offset;
 
             var spawns = _entityTable.GetSpawns(ent.Comp.Table);
             foreach (var proto in spawns)
             {
-                var xOffset = _robustRandom.NextFloat(-ent.Comp.Offset, ent.Comp.Offset);
-                var yOffset = _robustRandom.NextFloat(-ent.Comp.Offset, ent.Comp.Offset);
+                var xOffset = _robustRandom.NextFloat(-offset, offset);
+                var yOffset = _robustRandom.NextFloat(-offset, offset);
                 var trueCoords = coords.Offset(new Vector2(xOffset, yOffset));
 
                 // Prospect: Jack spawns to events to add comps
-                var entity = SpawnAtPosition(proto, trueCoords);
+                var entity = SpawnAttachedTo(proto, trueCoords);
                 var randomItemSpawnedEvent = new RandomItemSpawnedEvent(entity);
                 RaiseLocalEvent(ref randomItemSpawnedEvent);
                 // End Prospect

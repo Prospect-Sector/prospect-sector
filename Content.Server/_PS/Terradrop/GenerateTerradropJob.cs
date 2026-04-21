@@ -2,7 +2,7 @@
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
-using Content.Server.Atmos.Components;
+using Content.Shared.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Ghost.Roles.Components;
 using Content.Server.Parallax;
@@ -50,6 +50,7 @@ public sealed class GenerateTerradropJob : Job<bool>
     public MapId MapId;
     public EntityUid MapUid;
     private readonly SalvageMissionParams _missionParams;
+    private readonly int _level;
 
     private readonly ISawmill _sawmill;
 
@@ -71,6 +72,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         TerradropMapPrototype terradropMapPrototype,
         SalvageMissionParams missionParams,
         Tile padTile,
+        int level,
         CancellationToken cancellation = default) : base(maxTime, cancellation)
     {
         _entManager = entManager;
@@ -86,6 +88,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         MapPrototype = terradropMapPrototype;
         _missionParams = missionParams;
         _padTile = padTile;
+        _level = level;
         _sawmill = logManager.GetSawmill("salvage_job");
 #if !DEBUG
         _sawmill.Level = LogLevel.Info;
@@ -141,7 +144,7 @@ public sealed class GenerateTerradropJob : Job<bool>
             // If the proto cannot be found use RoomTemp as a fallback.
             var temperature = _prototypeManager.TryIndex(MapPrototype.Temperature, out var tempProto)
                 ? tempProto
-                : _prototypeManager.Index<SalvageTemperatureMod>("RoomTemp");
+                : _prototypeManager.Index(new ProtoId<SalvageTemperatureMod>("RoomTemp"));
             _entManager.System<AtmosphereSystem>().SetMapSpace(MapUid, atmosphere.Space, atmos);
             _entManager.System<AtmosphereSystem>()
                 .SetMapGasMixture(MapUid, new GasMixture(moles, temperature.Temperature), atmos);
@@ -161,6 +164,7 @@ public sealed class GenerateTerradropJob : Job<bool>
         var terradropMapComponent = _entManager.EnsureComponent<TerradropMapComponent>(MapUid);
         terradropMapComponent.StationUid = Station;
         terradropMapComponent.MapPrototype = MapPrototype;
+        terradropMapComponent.Level = _level;
 
         // Setup expedition
         var expedition = _entManager.AddComponent<SalvageExpeditionComponent>(MapUid);
@@ -178,8 +182,29 @@ public sealed class GenerateTerradropJob : Job<bool>
         var dungeonOffsetDistance = minDungeonOffset + (maxDungeonOffset - minDungeonOffset) * random.NextFloat();
         var dungeonOffset = new Vector2(0f, dungeonOffsetDistance);
         dungeonOffset = dungeonRotation.RotateVec(dungeonOffset);
-        var dungeonMod = _prototypeManager.Index<SalvageDungeonModPrototype>(mission.Dungeon);
-        var dungeonConfig = _prototypeManager.Index(dungeonMod.Proto);
+
+        // Use PS-specific dungeon configs instead of upstream ones with mapped items
+        // This avoids spawning illegal weapons/armor from prefab rooms
+        var biomeId = MapPrototype.Biome.Id;
+        var psDungeonId = biomeId switch
+        {
+            "Caves" => "PSDungeonCaves",
+            "Lava" => "PSDungeonLava",
+            "Snow" => "PSDungeonSnow",
+            "Grasslands" => "PSDungeonGeneric",
+            "LowDesert" => "PSDungeonCaves",
+            "Volcanic" => "PSDungeonLava",
+            "Continental" => "PSDungeonLab",
+            "Shadow" => "PSDungeonHaunted",
+            _ => null
+        };
+
+        if (psDungeonId == null)
+        {
+            _sawmill.Warning($"Unknown biome '{biomeId}' for terradrop dungeon, falling back to PSDungeonGeneric");
+            psDungeonId = "PSDungeonGeneric";
+        }
+        var dungeonConfig = _prototypeManager.Index<DungeonConfigPrototype>(psDungeonId);
         var dungeons = await WaitAsyncTask(
             _dungeon.GenerateDungeonAsync(
                 dungeonConfig,
@@ -192,10 +217,33 @@ public sealed class GenerateTerradropJob : Job<bool>
 
         var dungeon = dungeons.First();
 
-        // Aborty
-        if (dungeon.Rooms.Count == 0)
+        // PS dungeons use procedural generation without rooms, so we check for tiles instead
+        if (dungeon.Rooms.Count == 0 && dungeon.AllTiles.Count == 0)
         {
+            _sawmill.Warning("Dungeon generation produced no rooms or tiles, aborting");
             return false;
+        }
+
+        // If we have tiles but no rooms, create a pseudo-room from corridor tiles for loot spawning
+        if (dungeon.Rooms.Count == 0 && dungeon.AllTiles.Count > 0)
+        {
+            _sawmill.Debug($"Dungeon has {dungeon.AllTiles.Count} tiles but no rooms, creating pseudo-room for spawning");
+
+            // Use corridor tiles, or all tiles if no corridors
+            var spawnTiles = dungeon.CorridorTiles.Count > 0
+                ? dungeon.CorridorTiles.ToHashSet()
+                : dungeon.AllTiles.ToHashSet();
+
+            // Calculate bounds and center
+            var minX = spawnTiles.Min(t => t.X);
+            var maxX = spawnTiles.Max(t => t.X);
+            var minY = spawnTiles.Min(t => t.Y);
+            var maxY = spawnTiles.Max(t => t.Y);
+            var bounds = new Box2i(minX, minY, maxX, maxY);
+            var center = new Vector2((minX + maxX) / 2f, (minY + maxY) / 2f);
+
+            var pseudoRoom = new DungeonRoom(spawnTiles, center, bounds, new HashSet<Vector2i>());
+            dungeon.AddRoom(pseudoRoom);
         }
 
         expedition.DungeonLocation = dungeonOffset;
@@ -272,36 +320,51 @@ public sealed class GenerateTerradropJob : Job<bool>
             }
         }
 
-        var allLoot = _prototypeManager.Index(SharedSalvageSystem.ExpeditionsLootProto);
-        var lootBudget = difficultyProto.LootBudget;
-
-        foreach (var rule in allLoot.LootRules)
+        // Boss spawn — 30% chance per dungeon
+        if (random.NextDouble() < 0.30)
         {
-            switch (rule)
+            var bossRoom = dungeon.Rooms.OrderByDescending(r => r.Tiles.Count).First();
+            var bossTile = bossRoom.Tiles.ElementAt(random.Next(bossRoom.Tiles.Count));
+            var bossUid = _entManager.SpawnAtPosition("MobDragonDungeon",
+                _map.GridTileToLocal(MapUid, grid, bossTile));
+            _entManager.RemoveComponent<GhostRoleComponent>(bossUid);
+            _entManager.RemoveComponent<GhostTakeoverAvailableComponent>(bossUid);
+            _entManager.EnsureComponent<TerradropMobComponent>(bossUid);
+            _sawmill.Debug($"Boss dragon spawned in room at {bossTile} (level {_level})");
+        }
+
+        // Spawn PS equipment loot with level-scaled stats
+        var psLootBudget = difficultyProto.LootBudget;
+        if (_prototypeManager.TryIndex(new ProtoId<SalvageLootPrototype>("PSSalvageLoot"), out var psLoot))
+        {
+            foreach (var rule in psLoot.LootRules)
             {
-                case RandomSpawnsLoot randomLoot:
-                    budgetEntries.Clear();
+                switch (rule)
+                {
+                    case RandomSpawnsLoot randomLoot:
+                        budgetEntries.Clear();
 
-                    foreach (var entry in randomLoot.Entries)
-                    {
-                        budgetEntries.Add(entry);
-                    }
+                        foreach (var entry in randomLoot.Entries)
+                        {
+                            budgetEntries.Add(entry);
+                        }
 
-                    probSum = budgetEntries.Sum(x => x.Prob);
+                        probSum = budgetEntries.Sum(x => x.Prob);
 
-                    while (lootBudget > 0f)
-                    {
-                        var entry = randomSystem.GetBudgetEntry(ref lootBudget, ref probSum, budgetEntries, random);
-                        if (entry == null)
-                            break;
+                        while (psLootBudget > 0f)
+                        {
+                            var entry = randomSystem.GetBudgetEntry(ref psLootBudget, ref probSum, budgetEntries, random);
+                            if (entry == null)
+                                break;
 
-                        _sawmill.Debug($"Spawning dungeon loot {entry.Proto}");
-                        await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
-                    }
+                            _sawmill.Debug($"Spawning PS loot {entry.Proto} (level {_level})");
+                            await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
+                        }
 
-                    break;
-                default:
-                    throw new NotImplementedException();
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
         }
 
@@ -340,6 +403,10 @@ public sealed class GenerateTerradropJob : Job<bool>
                 var uid = _entManager.SpawnAtPosition(entry.Proto, _map.GridTileToLocal(grid, grid, tile));
                 _entManager.RemoveComponent<GhostRoleComponent>(uid);
                 _entManager.RemoveComponent<GhostTakeoverAvailableComponent>(uid);
+
+                // Scale mob stats based on terradrop level
+                _entManager.EnsureComponent<TerradropMobComponent>(uid);
+
                 return;
             }
         }

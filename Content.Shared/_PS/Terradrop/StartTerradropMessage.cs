@@ -7,8 +7,15 @@ public sealed class StartTerradropMessage : BoundUserInterfaceMessage
 {
     public string TerradropMapId;
 
-    public StartTerradropMessage(string terradropMapId)
+    /// <summary>
+    /// The level selected by the player. Higher levels = better loot stats.
+    /// Level 10 = 10% better stats, Level 50 = 50% better stats, etc.
+    /// </summary>
+    public int Level;
+
+    public StartTerradropMessage(string terradropMapId, int level = 0)
     {
         TerradropMapId = terradropMapId;
+        Level = level;
     }
-};
+}

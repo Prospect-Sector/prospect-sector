@@ -347,6 +347,7 @@ namespace Content.Shared.Verbs
 
         public bool ShowOnExamineTooltip = true;
         public bool HoverVerb = false; // aligned to the left, gives text on hover
+        public bool AlignRight = false; // Prospect: overrides default alignment - if true, aligns hover verbs to the right
     }
 
     /// <summary>
