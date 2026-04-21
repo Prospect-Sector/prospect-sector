@@ -206,7 +206,7 @@ public sealed partial class TerradropSystem
                 if (unlockedMaps.Contains(proto.ID))
                     return TerradropMapAvailability.Unexplored;
 
-                var prereqsMet = proto.MapPrerequisites.All(p => unlockedMaps.Contains(p));
+                var prereqsMet = proto.MapPrerequisites.All(p => data.HighestCompletedLevels.ContainsKey(p));
 
                 return prereqsMet ? TerradropMapAvailability.Unexplored : TerradropMapAvailability.Unavailable;
             });
