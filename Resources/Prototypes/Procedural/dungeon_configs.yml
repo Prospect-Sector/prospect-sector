@@ -485,21 +485,21 @@
 
 - type: entityTable
   id: PSBaseAirlock
-  table: !type:GroupSelector
+  table: !type:AllSelector
     children:
     - id: CableApcExtension
     - id: AirlockGlass
 
 - type: entityTable
   id: PSBaseWindow
-  table: !type:GroupSelector
+  table: !type:AllSelector
     children:
     - id: Grille
     - id: Window
 
 - type: entityTable
   id: PSSecurityAirlock
-  table: !type:GroupSelector
+  table: !type:AllSelector
     children:
     - id: CableApcExtension
     - id: AirlockSecurityGlassLocked
@@ -528,23 +528,19 @@
     - id: IntercomCommon
       prob: 0.1
 
-# PS Dungeon Configs
+# PS Dungeon Configs — BSP-based (replaces PrefabDunGen + WormCorridorDunGen pipelines)
 - type: dungeonConfig
   id: PSDungeonGeneric
   layers:
-  - !type:PrefabDunGen
+  - !type:BspDungeonDunGen
+    bounds: 60,60
+    minLeafSize: 13,13
+    maxLeafSize: 24,24
+    corridorWidth: 3
+    fallbackTile: FloorSteel
     roomWhitelist:
       tags:
       - SalvageExperiment
-    presets:
-    - Bucket
-    - Wow
-    - SpaceShip
-    - Tall
-
-  - !type:WormCorridorDunGen
-    width: 3
-    tile: FloorSteel
 
   - !type:DungeonEntranceDunGen
     count: 2
@@ -571,16 +567,6 @@
     wall: WallSolid
     cornerWall: WallReinforced
     tile: FloorSteel
-
-  - !type:JunctionDunGen
-    width: 1
-    tile: FloorSteel
-    contents: PSBaseAirlock
-
-  - !type:JunctionDunGen
-    width: 3
-    tile: FloorSteel
-    contents: PSBaseAirlock
 
   - !type:AutoCablingDunGen
     entity: CableApcExtension
@@ -608,19 +594,22 @@
 - type: dungeonConfig
   id: PSDungeonCaves
   layers:
-  - !type:PrefabDunGen
+  - !type:BspDungeonDunGen
+    bounds: 70,70
+    minLeafSize: 13,13
+    maxLeafSize: 24,24
+    corridorWidth: 3
+    fallbackTile: FloorCave
+    irregularize: true
+    irregularizeChance: 0.4
+    irregularizePasses: 3
     roomWhitelist:
       tags:
       - Haunted
-    presets:
-    - Bucket
-    - Wow
-    - SpaceShip
-    - Tall
 
-  - !type:WormCorridorDunGen
-    width: 4
+  - !type:RoomEntranceDunGen
     tile: FloorCave
+    contents: PSBaseAirlock
 
   - !type:CorridorClutterDunGen
     contents: PSCorridorClutter
@@ -635,19 +624,15 @@
 - type: dungeonConfig
   id: PSDungeonLava
   layers:
-  - !type:PrefabDunGen
+  - !type:BspDungeonDunGen
+    bounds: 60,60
+    minLeafSize: 13,13
+    maxLeafSize: 24,24
+    corridorWidth: 3
+    fallbackTile: FloorDark
     roomWhitelist:
       tags:
       - LavaBrig
-    presets:
-    - Bucket
-    - Wow
-    - SpaceShip
-    - Tall
-
-  - !type:WormCorridorDunGen
-    width: 3
-    tile: FloorDark
 
   - !type:DungeonEntranceDunGen
     count: 2
@@ -675,16 +660,6 @@
     cornerWall: WallReinforced
     tile: FloorDark
 
-  - !type:JunctionDunGen
-    width: 1
-    tile: FloorDark
-    contents: PSBaseAirlock
-
-  - !type:JunctionDunGen
-    width: 3
-    tile: FloorDark
-    contents: PSBaseAirlock
-
   - !type:AutoCablingDunGen
     entity: CableApcExtension
 
@@ -711,19 +686,15 @@
 - type: dungeonConfig
   id: PSDungeonSnow
   layers:
-  - !type:PrefabDunGen
+  - !type:BspDungeonDunGen
+    bounds: 60,60
+    minLeafSize: 13,13
+    maxLeafSize: 24,24
+    corridorWidth: 3
+    fallbackTile: FloorSteel
     roomWhitelist:
       tags:
       - SnowyLabs
-    presets:
-    - Bucket
-    - Wow
-    - SpaceShip
-    - Tall
-
-  - !type:WormCorridorDunGen
-    width: 3
-    tile: FloorSteel
 
   - !type:DungeonEntranceDunGen
     count: 2
@@ -750,16 +721,6 @@
     wall: WallSilver
     tile: FloorSteel
 
-  - !type:JunctionDunGen
-    width: 1
-    tile: FloorSteel
-    contents: PSBaseAirlock
-
-  - !type:JunctionDunGen
-    width: 3
-    tile: FloorSteel
-    contents: PSBaseAirlock
-
   - !type:AutoCablingDunGen
     entity: CableApcExtension
 
@@ -769,19 +730,18 @@
 - type: dungeonConfig
   id: PSDungeonMineshaft
   layers:
-  - !type:PrefabDunGen
+  - !type:BspDungeonDunGen
+    bounds: 65,65
+    minLeafSize: 13,13
+    maxLeafSize: 24,24
+    corridorWidth: 3
+    fallbackTile: FloorCaveDrought
+    irregularize: true
+    irregularizeChance: 0.3
+    irregularizePasses: 2
     roomWhitelist:
       tags:
       - Mineshaft
-    presets:
-    - Bucket
-    - Wow
-    - SpaceShip
-    - Tall
-
-  - !type:WormCorridorDunGen
-    width: 3
-    tile: FloorCaveDrought
 
   - !type:DungeonEntranceDunGen
     count: 2
@@ -800,16 +760,6 @@
     tile: FloorCaveDrought
     contents: PSWoodWall
 
-  - !type:JunctionDunGen
-    width: 1
-    tile: FloorCaveDrought
-    contents: PSWoodSupport
-
-  - !type:JunctionDunGen
-    width: 3
-    tile: FloorCaveDrought
-    contents: PSWoodSupport
-
   - !type:AutoCablingDunGen
     entity: Catwalk
 
@@ -819,19 +769,15 @@
 - type: dungeonConfig
   id: PSDungeonLab
   layers:
-  - !type:PrefabDunGen
+  - !type:BspDungeonDunGen
+    bounds: 60,60
+    minLeafSize: 13,13
+    maxLeafSize: 24,24
+    corridorWidth: 3
+    fallbackTile: FloorSteel
     roomWhitelist:
       tags:
       - SalvageExperiment
-    presets:
-    - Bucket
-    - Wow
-    - SpaceShip
-    - Tall
-
-  - !type:WormCorridorDunGen
-    width: 3
-    tile: FloorSteel
 
   - !type:DungeonEntranceDunGen
     count: 2
@@ -859,16 +805,6 @@
     cornerWall: WallReinforced
     tile: FloorSteel
 
-  - !type:JunctionDunGen
-    width: 1
-    tile: FloorSteel
-    contents: PSBaseAirlock
-
-  - !type:JunctionDunGen
-    width: 3
-    tile: FloorSteel
-    contents: PSBaseAirlock
-
   - !type:AutoCablingDunGen
     entity: CableApcExtension
 
@@ -895,19 +831,22 @@
 - type: dungeonConfig
   id: PSDungeonHaunted
   layers:
-  - !type:PrefabDunGen
+  - !type:BspDungeonDunGen
+    bounds: 60,60
+    minLeafSize: 13,13
+    maxLeafSize: 24,24
+    corridorWidth: 3
+    fallbackTile: FloorCaveDrought
+    irregularize: true
+    irregularizeChance: 0.45
+    irregularizePasses: 3
     roomWhitelist:
       tags:
       - Haunted
-    presets:
-    - Bucket
-    - Wow
-    - SpaceShip
-    - Tall
 
-  - !type:WormCorridorDunGen
-    width: 3
+  - !type:RoomEntranceDunGen
     tile: FloorCaveDrought
+    contents: PSBaseAirlock
 
   - !type:CorridorClutterDunGen
     contents: PSCorridorClutter
@@ -918,3 +857,20 @@
 
   - !type:CornerClutterDunGen
     contents: PSCaveClutter
+
+# Prospect: BSP partition test config. Visualize partition output only — no prefabs yet.
+# Usage: admin command `dungengen <mapId> PSDungeonBspTest 0 0`
+- type: dungeonConfig
+  id: PSDungeonBspTest
+  layers:
+  - !type:BspDungeonDunGen
+    bounds: 60,60
+    minLeafSize: 13,13
+    maxLeafSize: 24,24
+    fallbackTile: FloorSteel
+
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: FloorSteel
+# Prospect: End

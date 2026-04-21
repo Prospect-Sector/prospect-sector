@@ -1,4 +1,5 @@
 using Content.Server._PS.Procedural.Generation;
+using Content.Shared._PS.Procedural;
 using Content.Shared._PS.Procedural.StationGeneration;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.DungeonGenerators;
@@ -67,6 +68,9 @@ public sealed class LayerExecutorRegistry
 
         // Voronoi Station Generation
         Register<VoronoiStationDunGen>(new VoronoiStationDunGenExecutor(_context, _log));
+
+        // BSP Dungeon Generation
+        Register<BspDungeonDunGen>(new BspDungeonDunGenExecutor(_context, _log));
     }
 
     private void Register<TLayer>(ILayerExecutor executor) where TLayer : IDunGenLayer

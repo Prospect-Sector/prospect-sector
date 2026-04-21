@@ -217,33 +217,10 @@ public sealed class GenerateTerradropJob : Job<bool>
 
         var dungeon = dungeons.First();
 
-        // PS dungeons use procedural generation without rooms, so we check for tiles instead
-        if (dungeon.Rooms.Count == 0 && dungeon.AllTiles.Count == 0)
+        if (dungeon.Rooms.Count == 0)
         {
-            _sawmill.Warning("Dungeon generation produced no rooms or tiles, aborting");
+            _sawmill.Warning("Dungeon generation produced no rooms, aborting");
             return false;
-        }
-
-        // If we have tiles but no rooms, create a pseudo-room from corridor tiles for loot spawning
-        if (dungeon.Rooms.Count == 0 && dungeon.AllTiles.Count > 0)
-        {
-            _sawmill.Debug($"Dungeon has {dungeon.AllTiles.Count} tiles but no rooms, creating pseudo-room for spawning");
-
-            // Use corridor tiles, or all tiles if no corridors
-            var spawnTiles = dungeon.CorridorTiles.Count > 0
-                ? dungeon.CorridorTiles.ToHashSet()
-                : dungeon.AllTiles.ToHashSet();
-
-            // Calculate bounds and center
-            var minX = spawnTiles.Min(t => t.X);
-            var maxX = spawnTiles.Max(t => t.X);
-            var minY = spawnTiles.Min(t => t.Y);
-            var maxY = spawnTiles.Max(t => t.Y);
-            var bounds = new Box2i(minX, minY, maxX, maxY);
-            var center = new Vector2((minX + maxX) / 2f, (minY + maxY) / 2f);
-
-            var pseudoRoom = new DungeonRoom(spawnTiles, center, bounds, new HashSet<Vector2i>());
-            dungeon.AddRoom(pseudoRoom);
         }
 
         expedition.DungeonLocation = dungeonOffset;
