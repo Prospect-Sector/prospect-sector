@@ -8,6 +8,7 @@ terradrop-console-unlocks-list-entry = - [color=yellow]{$name}[/color]
 terradrop-console-menu-recenter-button = Recenter
 terradrop-console-required-text = Required to unlock:
 terradrop-console-no-requirements = This mission has no prerequisites.
+terradrop-console-prereq-level = Global completion level {$level} required
 terradrop-console-unlocks-text = Unlocks the following:
 terradrop-availability-unavailable = This mission is currently unavailable.
 terradrop-availability-unexplored = This mission has not yet been explored.
