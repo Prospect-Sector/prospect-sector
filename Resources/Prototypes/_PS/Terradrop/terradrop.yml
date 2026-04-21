@@ -49,6 +49,7 @@
   biome: Caves
   icon: PSPlanetIconRecharis
   minLevel: 0
+  minUnlockLevel: 2
   mapPrerequisites:
   - VeridiaTerraDropMap
   position: 3,7
@@ -59,6 +60,7 @@
   biome: Snow
   icon: PSPlanetIconObscyra
   minLevel: 0
+  minUnlockLevel: 2
   mapPrerequisites:
   - VeridiaTerraDropMap
   position: 4,7
@@ -69,6 +71,7 @@
   biome: Lava
   icon: PSPlanetIconEbonis
   minLevel: 0
+  minUnlockLevel: 2
   mapPrerequisites:
   - SpironisTerraDropMap
   position: 6,7
@@ -79,6 +82,7 @@
   biome: Snow
   icon: PSPlanetIconCrimsonis
   minLevel: 0
+  minUnlockLevel: 2
   mapPrerequisites:
   - SpironisTerraDropMap
   position: 7,7
@@ -90,6 +94,7 @@
   biome: Caves
   icon: PSPlanetIconBastara
   minLevel: 0
+  minUnlockLevel: 5
   mapPrerequisites:
   - RecharisTerraDropMap
   - ObscyraTerraDropMap
@@ -103,6 +108,7 @@
   biome: Lava
   icon: PSPlanetIconCrownis
   minLevel: 0
+  minUnlockLevel: 5
   mapPrerequisites:
   - EbonisTerraDropMap
   - CrimsonisTerraDropMap
@@ -117,6 +123,7 @@
   biome: Lava
   icon: PSPlanetIconFerros
   minLevel: 0
+  minUnlockLevel: 10
   mapPrerequisites:
   - BastaraTerraDropMap
   - CrownisTerraDropMap

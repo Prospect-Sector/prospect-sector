@@ -189,6 +189,10 @@ public sealed partial class TerradropSystem
         Dictionary<string, TerradropMapAvailability> mapList;
 
         var unlockedMaps = new HashSet<string>(data.UnlockedMapNodes);
+        var highestCompleted = data.HighestCompletedLevels.Count > 0
+            ? data.HighestCompletedLevels.Values.Max()
+            : 0;
+
         mapList = allTechs.ToDictionary(
             proto => proto.ID,
             proto =>
@@ -199,16 +203,20 @@ public sealed partial class TerradropSystem
                 if (data.ActiveMissions.ContainsKey(proto.ID))
                     return TerradropMapAvailability.InProgress;
 
-                // First map is always available.
+                // First map is always available regardless of level.
                 if (proto.UnlockedByDefault)
                     return TerradropMapAvailability.Unexplored;
 
                 if (unlockedMaps.Contains(proto.ID))
-                    return TerradropMapAvailability.Unexplored;
+                    return highestCompleted >= proto.MinUnlockLevel
+                        ? TerradropMapAvailability.Unexplored
+                        : TerradropMapAvailability.Unavailable;
 
                 var prereqsMet = proto.MapPrerequisites.All(p => data.HighestCompletedLevels.ContainsKey(p));
 
-                return prereqsMet ? TerradropMapAvailability.Unexplored : TerradropMapAvailability.Unavailable;
+                return prereqsMet && highestCompleted >= proto.MinUnlockLevel
+                    ? TerradropMapAvailability.Unexplored
+                    : TerradropMapAvailability.Unavailable;
             });
 
         // Build active instances dictionary for the reconnect popup.

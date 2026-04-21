@@ -95,5 +95,12 @@ public sealed partial class TerradropMapPrototype: IPrototype
     /// </summary>
     [DataField("minLevel")]
     public int MinLevel = 0;
+
+    /// <summary>
+    /// The minimum global completion level required to unlock this map.
+    /// The player must have completed any mission at or above this level.
+    /// </summary>
+    [DataField("minUnlockLevel")]
+    public int MinUnlockLevel = 0;
 }
 
