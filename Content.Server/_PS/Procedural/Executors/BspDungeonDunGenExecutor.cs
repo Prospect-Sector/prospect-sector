@@ -362,6 +362,7 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
         // `minDistance` Manhattan tiles away. This filters out stubs that would only connect
         // to a corridor already hugging the door's own leaf.
         var candidates = new List<(Endpoint Door, Vector2i Target, int Dist)>();
+        Span<Vector2i> doors = stackalloc Vector2i[4];
         foreach (var plan in plans.Values)
         {
             if (plan.Room == null)
@@ -371,13 +372,10 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
             var midX = (b.Left + b.Right) / 2;
             var midY = (b.Bottom + b.Top) / 2;
 
-            Span<Vector2i> doors = stackalloc Vector2i[4]
-            {
-                new(b.Right + 1, midY),
-                new(b.Left - 1, midY),
-                new(midX, b.Top + 1),
-                new(midX, b.Bottom - 1),
-            };
+            doors[0] = new(b.Right + 1, midY);
+            doors[1] = new(b.Left - 1, midY);
+            doors[2] = new(midX, b.Top + 1);
+            doors[3] = new(midX, b.Bottom - 1);
 
             foreach (var door in doors)
             {

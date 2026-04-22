@@ -34,7 +34,6 @@ public sealed class ProspectDungeonSystem : EntitySystem
     [Dependency] private readonly ITileDefinitionManager _tileDef = default!;
     [Dependency] private readonly SharedMapSystem _maps = default!;
     [Dependency] private readonly DecalSystem _decals = default!;
-    [Dependency] private readonly MapLoaderSystem _loader = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly EntityTableSystem _entityTable = default!;
     [Dependency] private readonly DungeonSystem _dungeon = default!;

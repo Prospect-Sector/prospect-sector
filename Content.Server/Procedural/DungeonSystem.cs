@@ -119,12 +119,14 @@ public sealed partial class DungeonSystem : SharedDungeonSystem
     }
 
     // Prospect: benchmark dungeon generation
+    private static readonly ProtoId<DungeonConfigPrototype> BenchmarkConfig = "Experiment";
+
     private async void RunBenchmark(int count)
     {
         Log.Info($"[Benchmark] Starting dungeon generation benchmark ({count} dungeons)...");
 
         // Get a dungeon config to test with
-        if (!_prototype.TryIndex<DungeonConfigPrototype>("Experiment", out var config))
+        if (!_prototype.TryIndex(BenchmarkConfig, out var config))
         {
             Log.Warning("[Benchmark] Could not find 'Experiment' dungeon config for benchmark");
             return;
