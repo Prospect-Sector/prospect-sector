@@ -68,6 +68,17 @@ public sealed partial class BspDungeonDunGen : IDunGenLayer
     public EntityWhitelist? RoomWhitelist;
 
     /// <summary>
+    /// If set, this specific prefab is force-placed in exactly one leaf, overriding the normal
+    /// whitelist-driven pick for that leaf. Used to guarantee a landing/entry room (e.g. the
+    /// Terradrop7x7a prefab with its TerradropPad) lands somewhere inside the generated dungeon
+    /// instead of being spawned separately at a hardcoded map position.
+    /// The leaf chosen is the one whose centre is closest to the dungeon centre, among leaves
+    /// where the prefab fits with either 0° or 90° rotation and the current <see cref="PrefabMargin"/>.
+    /// </summary>
+    [DataField]
+    public ProtoId<DungeonRoomPrototype>? GuaranteedPrefab;
+
+    /// <summary>
     /// Tile used to fill leaves and corridors.
     /// </summary>
     [DataField]

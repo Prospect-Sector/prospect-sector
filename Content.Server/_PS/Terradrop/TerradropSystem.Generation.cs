@@ -69,9 +69,10 @@ public sealed partial class TerradropSystem
     {
         var dataComponent = Comp<TerradropStationComponent>(job.Station);
 
-        // Spawn the room marker to make a new room where the portal will be.
-        Spawn("TerradropRoomMarker", new MapCoordinates(4f, 0f, job.MapId));
-        var mapPortal = Spawn("PortalRed", new MapCoordinates(4f, 0f, job.MapId));
+        // The landing prefab (containing a TerradropPad) is now placed by the BSP generator via
+        // BspDungeonDunGen.GuaranteedPrefab, so we just anchor the return portal at whichever pad
+        // landed on the freshly-generated map. Falls back to map origin if (somehow) no pad exists.
+        var mapPortal = SpawnReturnPortalAtPad(job.MapId);
         EnsureComp<TerradropPortalComponent>(mapPortal);
 
         // Generate instance name: "{MapName} #{n}"
@@ -136,6 +137,28 @@ public sealed partial class TerradropSystem
         _link.OneWayLink(padComponent.Portal!.Value, data.MapPortalUid);
         _audio.PlayPvs(padComponent.NewPortalSound, padTransform.Coordinates);
 
+    }
+
+    /// <summary>
+    /// Finds the <see cref="TerradropPadComponent"/> on the given destination map (spawned as
+    /// part of the BSP-placed landing prefab) and spawns the return portal on top of it. If no
+    /// pad exists (e.g. the guaranteed prefab didn't fit any leaf) the portal is spawned at map
+    /// origin so the mission is still enterable, even if the landing area looks wrong.
+    /// </summary>
+    private EntityUid SpawnReturnPortalAtPad(MapId mapId)
+    {
+        var padQuery = EntityQueryEnumerator<TerradropPadComponent, TransformComponent>();
+        while (padQuery.MoveNext(out var padUid, out _, out var xform))
+        {
+            if (xform.MapID != mapId)
+                continue;
+
+            var coords = _transform.GetMapCoordinates(padUid, xform);
+            return Spawn("PortalRed", coords);
+        }
+
+        Log.Warning($"Terradrop: no TerradropPad found on map {mapId}, spawning return portal at origin.");
+        return Spawn("PortalRed", new MapCoordinates(0f, 0f, mapId));
     }
 
     private void GenerateMissionParams(TerradropStationComponent component)

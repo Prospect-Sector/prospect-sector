@@ -61,6 +61,16 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
             plans[leaf] = PlanLeaf(leaf, pool, layer.PrefabMargin, random);
         }
 
+        // If the config asks for a specific prefab to be guaranteed-placed somewhere in the
+        // dungeon (e.g. a landing/portal room that must exist), pick the leaf whose centre is
+        // closest to the dungeon centre and override its plan. This replaces the older pattern
+        // of spawning the landing prefab separately at a hardcoded map coordinate.
+        if (layer.GuaranteedPrefab is { } guaranteedId
+            && Context.Prototype.TryIndex<DungeonRoomPrototype>(guaranteedId, out var guaranteedProto))
+        {
+            ForcePlaceGuaranteedPrefab(guaranteedProto, plans, layer.PrefabMargin, position, random);
+        }
+
         var fallbackTileDef = Context.TileDef[layer.FallbackTile];
 
         // Commit placements first so prefab bounds (and thus compass midpoint doors) exist
@@ -164,6 +174,72 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
         // Fallback: no prefab fits. The leaf will be filled with plain floor.
         plan.Prefab = null;
         return plan;
+    }
+
+    /// <summary>
+    /// Overrides one leaf's plan to place the supplied prefab, picking the leaf whose centre is
+    /// closest (Manhattan) to the dungeon centre and where the prefab fits with either rotation.
+    /// If no leaf fits the prefab at the current margin, the guarantee is silently skipped — the
+    /// dungeon still generates, it just won't contain this specific prefab.
+    /// </summary>
+    private void ForcePlaceGuaranteedPrefab(
+        DungeonRoomPrototype proto,
+        Dictionary<BspNode, LeafPlan> plans,
+        int prefabMargin,
+        Vector2i dungeonCenter,
+        Random random)
+    {
+        LeafPlan? bestPlan = null;
+        Angle bestRotation = Angle.Zero;
+        Vector2i bestDestSize = default;
+        int bestCxMin = 0, bestCxMax = 0, bestCyMin = 0, bestCyMax = 0;
+        var bestDist = int.MaxValue;
+
+        foreach (var plan in plans.Values)
+        {
+            var leafCenter = new Vector2i(
+                (plan.Leaf.Bounds.Left + plan.Leaf.Bounds.Right) / 2,
+                (plan.Leaf.Bounds.Bottom + plan.Leaf.Bounds.Top) / 2);
+            var dist = Math.Abs(leafCenter.X - dungeonCenter.X) + Math.Abs(leafCenter.Y - dungeonCenter.Y);
+            if (dist >= bestDist)
+                continue;
+
+            foreach (var rotation in RotationOptions)
+            {
+                var rotated = rotation != Angle.Zero;
+                var destSize = rotated ? new Vector2i(proto.Size.Y, proto.Size.X) : proto.Size;
+
+                if (!TryComputeCenterRange(plan.Leaf.Bounds, destSize, prefabMargin, out var cxMin, out var cxMax, out var cyMin, out var cyMax))
+                    continue;
+
+                bestDist = dist;
+                bestPlan = plan;
+                bestRotation = rotation;
+                bestDestSize = destSize;
+                bestCxMin = cxMin;
+                bestCxMax = cxMax;
+                bestCyMin = cyMin;
+                bestCyMax = cyMax;
+                break; // prefer 0° rotation if both fit — more predictable layout
+            }
+        }
+
+        if (bestPlan == null)
+        {
+            _log.Warning($"BSP: no leaf fit guaranteed prefab '{proto.ID}' with margin {prefabMargin}");
+            return;
+        }
+
+        bestPlan.Prefab = proto;
+        bestPlan.Rotation = bestRotation;
+        bestPlan.DestSize = bestDestSize;
+        bestPlan.CxMin = bestCxMin;
+        bestPlan.CxMax = bestCxMax;
+        bestPlan.CyMin = bestCyMin;
+        bestPlan.CyMax = bestCyMax;
+        bestPlan.Center = new Vector2i(
+            random.Next(bestCxMin, bestCxMax + 1),
+            random.Next(bestCyMin, bestCyMax + 1));
     }
 
     private static bool TryComputeCenterRange(
