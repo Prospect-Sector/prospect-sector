@@ -39,7 +39,7 @@ entities:
     - type: Transform
     - type: Map
       mapPaused: True
-    - type: GridTree
+    - type: GridTreemed
     - type: Broadphase
     - type: OccluderTree
     - type: MapGrid
