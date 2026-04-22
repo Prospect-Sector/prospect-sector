@@ -615,11 +615,13 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
             emitted.Add(tile);
         }
 
-        // Flank tiles: relaxed. Still can't overwrite a room interior, but MAY overwrite a
-        // neighbour's exterior wall ring. Without this relaxation the 3-wide corridor pinches
-        // to 1-wide wherever it brushes past a nearby prefab — and worse, the skipped flank tiles
-        // remain in RoomExteriorTiles, so BoundaryWallDunGen materialises actual wall stubs inside
-        // what the player reads as a corridor.
+        // Flank tiles: relaxed vs spine, but not unconditionally. A flank may overwrite a
+        // neighbour's exterior ring ONLY if that ring tile isn't cardinally adjacent to a prefab
+        // interior — i.e., only CORNER exterior tiles, whose purpose is cosmetic, not protective.
+        // Edge exterior tiles stand between the corridor and the prefab interior: overwriting one
+        // replaces the wall with corridor floor immediately adjacent to the room floor, giving an
+        // unintended side entry into the prefab. The cardinal-neighbour test is what tells the two
+        // cases apart.
         foreach (var tile in flank)
         {
             if (!IsTileAvailable(tile))
@@ -627,6 +629,8 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
             if (dungeon.RoomTiles.Contains(tile))
                 continue;
             if (spine.Contains(tile))
+                continue;
+            if (HasCardinalRoomTileNeighbor(dungeon, tile))
                 continue;
 
             if (!dungeon.CorridorTiles.Contains(tile))
@@ -842,6 +846,19 @@ public sealed class BspDungeonDunGenExecutor : LayerExecutorBase<BspDungeonDunGe
         if (!room.Entrances.Contains(pos))
             room.Entrances.Add(pos);
         dungeon.Entrances.Add(pos);
+    }
+
+    /// <summary>
+    /// True if any of the 4 cardinal neighbours of <paramref name="tile"/> is a prefab interior
+    /// tile. Used to keep corridor flanks from overwriting edge exterior walls, which would otherwise
+    /// leave corridor floor sitting directly next to room floor with no wall between them.
+    /// </summary>
+    private static bool HasCardinalRoomTileNeighbor(Dungeon dungeon, Vector2i tile)
+    {
+        return dungeon.RoomTiles.Contains(new Vector2i(tile.X + 1, tile.Y))
+            || dungeon.RoomTiles.Contains(new Vector2i(tile.X - 1, tile.Y))
+            || dungeon.RoomTiles.Contains(new Vector2i(tile.X, tile.Y + 1))
+            || dungeon.RoomTiles.Contains(new Vector2i(tile.X, tile.Y - 1));
     }
 
     // ------------------------------------------------------------------------------------------
