@@ -90,12 +90,6 @@ public sealed class DungeonGenerationContext : IDisposable
     /// </summary>
     public ConcurrentQueue<RoomSpawnCommand> RoomSpawnCommands { get; } = new();
 
-    /// <summary>
-    /// Positions to clear of blocking entities after room spawns complete.
-    /// Used by Voronoi generator to remove walls at door positions.
-    /// </summary>
-    public ConcurrentQueue<Vector2i> DoorClearPositions { get; } = new();
-
     // Object pools to reduce allocations
     private readonly ObjectPool<HashSet<Vector2i>> _hashSetPool;
     private readonly ObjectPool<List<Vector2i>> _listPool;
@@ -303,31 +297,6 @@ public sealed class DungeonGenerationContext : IDisposable
                     EntityManager.QueueDeleteEntity(ent);
                 }
             }
-        }
-    }
-
-    /// <summary>
-    /// Clears all blocking entities at a specific tile position.
-    /// Use this for clearing walls at door positions in Voronoi generation.
-    /// </summary>
-    public void ClearTile(Vector2i indices, bool strict = false)
-    {
-        var flags = strict
-            ? LookupFlags.Dynamic | LookupFlags.Static | LookupFlags.StaticSundries
-            : LookupFlags.Dynamic | LookupFlags.Static;
-
-        var tilePos = Maps.GridTileToLocal(GridUid, Grid, indices);
-
-        foreach (var ent in Lookup.GetEntitiesIntersecting(tilePos, flags))
-        {
-            if (!PhysicsQuery.TryGetComponent(ent, out var physics) ||
-                !physics.CanCollide ||
-                !physics.Hard)
-            {
-                continue;
-            }
-
-            EntityManager.QueueDeleteEntity(ent);
         }
     }
 

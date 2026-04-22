@@ -142,22 +142,7 @@ public sealed class ParallelDungeonGenerator
                 cmd.ReservedTiles);
         }
 
-        // After rooms are spawned, clear walls at door positions
-        FlushDoorClearPositions();
-
         return Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Clears blocking entities (walls) at queued door positions.
-    /// Must run after room spawns since room prototypes include walls.
-    /// </summary>
-    private void FlushDoorClearPositions()
-    {
-        while (_context.DoorClearPositions.TryDequeue(out var position))
-        {
-            _context.ClearTile(position, strict: true);
-        }
     }
 
     private Task FlushTileCommandsAsync()
