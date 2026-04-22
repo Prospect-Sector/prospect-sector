@@ -24,23 +24,8 @@ public sealed partial class TerradropSystem
 
         var data = EnsureComp<TerradropStationComponent>(component.StationUid.Value);
 
-        // Record the highest completed level for this planet.
-        var completedLevel = component.Level;
-        if (!data.HighestCompletedLevels.TryGetValue(component.MapPrototype.ID, out var previousBest)
-            || completedLevel > previousBest)
-        {
-            data.HighestCompletedLevels[component.MapPrototype.ID] = completedLevel;
-        }
-
-        // Mark this map as explored and unlock maps it gates.
-        if (!data.UnlockedMapNodes.Contains(component.MapPrototype.ID))
-            data.UnlockedMapNodes.Add(component.MapPrototype.ID);
-
-        foreach (var unlockId in component.MapPrototype.MapUnlocks)
-        {
-            if (!data.UnlockedMapNodes.Contains(unlockId))
-                data.UnlockedMapNodes.Add(unlockId);
-        }
+        if (component.ObjectiveCompleted)
+            RecordProgression(component, data);
 
         if (!data.ActiveMissions.TryGetValue(component.MapPrototype.ID, out var instances))
         {
@@ -204,26 +189,34 @@ public sealed partial class TerradropSystem
         Dictionary<string, TerradropMapAvailability> mapList;
 
         var unlockedMaps = new HashSet<string>(data.UnlockedMapNodes);
+        var highestCompleted = data.HighestCompletedLevels.Count > 0
+            ? data.HighestCompletedLevels.Values.Max()
+            : 0;
+
         mapList = allTechs.ToDictionary(
             proto => proto.ID,
             proto =>
             {
-                if (data.ActiveMissions.ContainsKey(proto.ID))
-                    return TerradropMapAvailability.InProgress;
-
                 if (data.HighestCompletedLevels.ContainsKey(proto.ID))
                     return TerradropMapAvailability.Explored;
 
-                // First map is always available.
+                if (data.ActiveMissions.ContainsKey(proto.ID))
+                    return TerradropMapAvailability.InProgress;
+
+                // First map is always available regardless of level.
                 if (proto.UnlockedByDefault)
                     return TerradropMapAvailability.Unexplored;
 
                 if (unlockedMaps.Contains(proto.ID))
-                    return TerradropMapAvailability.Unexplored;
+                    return highestCompleted >= proto.MinUnlockLevel
+                        ? TerradropMapAvailability.Unexplored
+                        : TerradropMapAvailability.Unavailable;
 
-                var prereqsMet = proto.MapPrerequisites.All(p => unlockedMaps.Contains(p));
+                var prereqsMet = proto.MapPrerequisites.All(p => data.HighestCompletedLevels.ContainsKey(p));
 
-                return prereqsMet ? TerradropMapAvailability.Unexplored : TerradropMapAvailability.Unavailable;
+                return prereqsMet && highestCompleted >= proto.MinUnlockLevel
+                    ? TerradropMapAvailability.Unexplored
+                    : TerradropMapAvailability.Unavailable;
             });
 
         // Build active instances dictionary for the reconnect popup.
@@ -243,5 +236,30 @@ public sealed partial class TerradropSystem
 
         _uiSystem.SetUiState(uid, TerradropConsoleUiKey.Default,
             new TerradropConsoleBoundInterfaceState(mapList, activeInstances, data.HighestCompletedLevels, globalMaxLevel));
+    }
+
+    /// <summary>
+    /// Records the completed level and unlocks downstream planets. Idempotent — safe to call
+    /// both on objective completion and on map shutdown.
+    /// </summary>
+    internal void RecordProgression(TerradropMapComponent component, TerradropStationComponent data)
+    {
+        if (component.MapPrototype == null)
+            return;
+
+        if (!data.HighestCompletedLevels.TryGetValue(component.MapPrototype.ID, out var previousBest)
+            || component.Level > previousBest)
+        {
+            data.HighestCompletedLevels[component.MapPrototype.ID] = component.Level;
+        }
+
+        if (!data.UnlockedMapNodes.Contains(component.MapPrototype.ID))
+            data.UnlockedMapNodes.Add(component.MapPrototype.ID);
+
+        foreach (var unlockId in component.MapPrototype.MapUnlocks)
+        {
+            if (!data.UnlockedMapNodes.Contains(unlockId))
+                data.UnlockedMapNodes.Add(unlockId);
+        }
     }
 }

@@ -5,6 +5,7 @@ using Content.Shared._PS.Terradrop;
 using Content.Shared.Chat;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
+using Content.Shared.Destructible;
 using Content.Shared.FixedPoint;
 using Content.Shared.Ghost;
 using Content.Shared.Humanoid;
@@ -12,6 +13,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Robust.Shared.Audio;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Player;
 
 namespace Content.Server._PS.Terradrop;
@@ -31,6 +33,61 @@ public sealed partial class TerradropSystem
     {
         SubscribeLocalEvent<SalvageExpeditionComponent, EntityTerminatingEvent>(OnMapTerminating);
         SubscribeLocalEvent<ActorComponent, EntParentChangedMessage>(OnActorParentChanged);
+        SubscribeLocalEvent<TerradropObjectiveTargetComponent, MobStateChangedEvent>(OnTargetMobStateChanged);
+        SubscribeLocalEvent<TerradropObjectiveTargetComponent, DestructionEventArgs>(OnTargetDestroyed);
+    }
+
+    private void Announce(EntityUid mapUid, string text)
+    {
+        var mapId = Comp<MapComponent>(mapUid).MapId;
+        _chatManager.ChatMessageToManyFiltered(
+            Filter.BroadcastMap(mapId),
+            ChatChannel.Radio,
+            text,
+            text,
+            _mapSystem.GetMapOrInvalid(mapId),
+            false,
+            true,
+            null);
+    }
+
+    private void HandleObjectiveProgress(EntityUid uid)
+    {
+        var xform = Transform(uid);
+        if (xform.MapUid is not { } mapUid || !TryComp<TerradropMapComponent>(mapUid, out var map))
+            return;
+        if (map.ObjectiveCompleted)
+            return;
+
+        map.ObjectiveProgress++;
+        Announce(mapUid, Loc.GetString("terradrop-objective-progress",
+            ("progress", map.ObjectiveProgress),
+            ("required", map.ObjectiveRequired)));
+
+        if (map.ObjectiveProgress >= map.ObjectiveRequired)
+        {
+            map.ObjectiveCompleted = true;
+            Announce(mapUid, Loc.GetString("terradrop-objective-completed"));
+
+            if (map.StationUid is { Valid: true } stationUid)
+            {
+                var stationData = EnsureComp<TerradropStationComponent>(stationUid);
+                RecordProgression(map, stationData);
+                UpdateAllConsolesForStation(stationUid);
+            }
+        }
+    }
+
+    private void OnTargetMobStateChanged(EntityUid uid, TerradropObjectiveTargetComponent _, ref MobStateChangedEvent args)
+    {
+        if (args.NewMobState != MobState.Dead)
+            return;
+        HandleObjectiveProgress(uid);
+    }
+
+    private void OnTargetDestroyed(EntityUid uid, TerradropObjectiveTargetComponent _, DestructionEventArgs args)
+    {
+        HandleObjectiveProgress(uid);
     }
 
     private void OnActorParentChanged(EntityUid uid, ActorComponent actor, ref EntParentChangedMessage args)
@@ -54,17 +111,24 @@ public sealed partial class TerradropSystem
         if (!enteringTerradrop || !TryComp<TerradropMapComponent>(newMapUid, out var mapComp))
             return;
 
-        if (string.IsNullOrEmpty(mapComp.InstanceName))
-            return;
+        if (!string.IsNullOrEmpty(mapComp.InstanceName))
+        {
+            var message = Loc.GetString("terradrop-instance-entered", ("name", mapComp.InstanceName));
+            _chatManager.ChatMessageToOne(
+                ChatChannel.Server,
+                message,
+                message,
+                source: EntityUid.Invalid,
+                hideChat: false,
+                client: actor.PlayerSession.Channel);
+        }
 
-        var message = Loc.GetString("terradrop-instance-entered", ("name", mapComp.InstanceName));
-        _chatManager.ChatMessageToOne(
-            ChatChannel.Server,
-            message,
-            message,
-            source: EntityUid.Invalid,
-            hideChat: false,
-            client: actor.PlayerSession.Channel);
+        if (!mapComp.ObjectiveAnnounced)
+        {
+            mapComp.ObjectiveAnnounced = true;
+            Announce(newMapUid.Value, Loc.GetString("terradrop-objective-announced",
+                ("required", mapComp.ObjectiveRequired)));
+        }
     }
 
     // Send ghosts back to the default map so they don't lose their stuff.

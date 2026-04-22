@@ -28,4 +28,22 @@ public sealed partial class TerradropMapComponent : Component
 
     [NonSerialized]
     public EntityUid? ReturnMarker = null;
+
+    /// <summary>
+    /// Number of kills/destructions required to complete the mission objective.
+    /// Set at generation time: 8 + (2 * Level).
+    /// </summary>
+    public int ObjectiveRequired = 0;
+
+    /// <summary>
+    /// How many objective targets have been killed or destroyed so far.
+    /// </summary>
+    public int ObjectiveProgress = 0;
+
+    public bool ObjectiveCompleted = false;
+
+    /// <summary>
+    /// Prevents announcing the objective more than once (set true on first player entry).
+    /// </summary>
+    public bool ObjectiveAnnounced = false;
 }

@@ -8,6 +8,7 @@ terradrop-console-unlocks-list-entry = - [color=yellow]{$name}[/color]
 terradrop-console-menu-recenter-button = Recenter
 terradrop-console-required-text = Required to unlock:
 terradrop-console-no-requirements = This mission has no prerequisites.
+terradrop-console-prereq-level = Global completion level {$level} required
 terradrop-console-unlocks-text = Unlocks the following:
 terradrop-availability-unavailable = This mission is currently unavailable.
 terradrop-availability-unexplored = This mission has not yet been explored.
@@ -26,9 +27,8 @@ terradrop-instance-entry = {$name} (Lv. {$level})
 
 terradrop-row-status-unexplored = Unexplored
 terradrop-row-status-in-progress = In Progress
-terradrop-row-status-explored = Explored
+terradrop-row-status-completed = Completed (Lv. {$level})
 terradrop-row-status-unavailable = Unavailable
-terradrop-row-highest-level = Lv. {$level} cleared
 
 terradrop-level-label = Level:
 terradrop-level-bonus = +{$bonus}% item stats
@@ -36,6 +36,10 @@ terradrop-level-minus-ten = Decrease level by 10
 terradrop-level-minus-one = Decrease level by 1
 terradrop-level-plus-one = Increase level by 1
 terradrop-level-plus-ten = Increase level by 10
+
+terradrop-objective-announced = Objective: Eliminate {$required} targets (enemies or loot containers) to complete the mission.
+terradrop-objective-progress = Objective: {$progress}/{$required} targets eliminated.
+terradrop-objective-completed = Objective complete! All targets have been eliminated.
 
 terradrop-map-zerona-prime = Zerona Prime
 terradrop-map-veridia = Veridia
