@@ -1,0 +1,17 @@
+# Used by TerradropThreatSystem to drop escalating hostile mob spawners into the
+# biome around the BSP dungeon. The Prototypes list is populated in code from the
+# mission's SalvageFactionPrototype; intervals are rewritten per-instance based on
+# mission progress.
+- type: entity
+  id: TerradropThreatSpawner
+  parent: MarkerBase
+  name: incursion beacon
+  suffix: Terradrop
+  noSpawn: true
+  components:
+    - type: Sprite
+      sprite: Markers/cross.rsi
+      drawdepth: Overdoors
+      layers:
+        - state: red
+    - type: TerradropThreatSpawner

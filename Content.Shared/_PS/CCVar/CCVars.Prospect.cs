@@ -89,4 +89,14 @@ public sealed partial class CCVars
     /// </summary>
     public static readonly CVarDef<int> TerradropMobScalingCap =
         CVarDef.Create("terradrop.mob_scaling_cap", 100, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Global multiplier applied to outside-the-dungeon threat spawning on a
+    /// terradrop map. Scales placement cadence, per-spawner fire rate, burst
+    /// sizes, and the hard cap on active spawners. Stored as int, divided by
+    /// 100 at runtime (100 = 1.0x baseline, 500 = 5.0x → spawners appear five
+    /// times faster, each fires five times as often, burst sizes 5x, cap 5x).
+    /// </summary>
+    public static readonly CVarDef<int> TerradropThreatMultiplier =
+        CVarDef.Create("terradrop.threat_multiplier", 150, CVar.SERVERONLY);
 }

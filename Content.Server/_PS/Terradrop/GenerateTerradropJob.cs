@@ -16,6 +16,7 @@ using Content.Shared.Construction.EntitySystems;
 using Content.Shared.Gravity;
 using Content.Shared.Parallax.Biomes;
 using Content.Shared.Physics;
+using Content.Shared._PS.Procedural;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.Loot;
 using Content.Shared.Random;
@@ -226,6 +227,28 @@ public sealed class GenerateTerradropJob : Job<bool>
 
         expedition.DungeonLocation = dungeonOffset;
 
+        // Identify the room that contains the landing prefab's TerradropPad. The
+        // guaranteed prefab has already materialised during GenerateDungeonAsync,
+        // so any TerradropPadComponent on this map sits inside that room. Any
+        // DungeonRoom whose tile set contains the pad tile is the arrival room
+        // — we exclude those from mob spawning so players never arrive on top
+        // of hostiles.
+        var portalRooms = new HashSet<DungeonRoom>();
+        var padQuery = _entManager.EntityQueryEnumerator<TerradropPadComponent, TransformComponent>();
+        while (padQuery.MoveNext(out _, out _, out var padXform))
+        {
+            if (padXform.MapUid != MapUid)
+                continue;
+            var padTile = new Vector2i(
+                (int)MathF.Floor(padXform.LocalPosition.X),
+                (int)MathF.Floor(padXform.LocalPosition.Y));
+            foreach (var room in dungeon.Rooms)
+            {
+                if (room.Tiles.Contains(padTile))
+                    portalRooms.Add(room);
+            }
+        }
+
         List<Vector2i> reservedTiles = new();
 
         // Setup the landing pad
@@ -291,7 +314,7 @@ public sealed class GenerateTerradropJob : Job<bool>
 
             try
             {
-                var spawned = await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
+                var spawned = await SpawnRandomEntry((MapUid, grid), entry, dungeon, random, portalRooms);
                 if (spawned.HasValue)
                     spawnedCount++;
             }
@@ -341,7 +364,7 @@ public sealed class GenerateTerradropJob : Job<bool>
                                 break;
 
                             _sawmill.Debug($"Spawning PS loot {entry.Proto} (level {_level})");
-                            var spawned = await SpawnRandomEntry((MapUid, grid), entry, dungeon, random);
+                            var spawned = await SpawnRandomEntry((MapUid, grid), entry, dungeon, random, portalRooms);
                             if (spawned.HasValue)
                                 spawnedCount++;
                         }
@@ -353,6 +376,22 @@ public sealed class GenerateTerradropJob : Job<bool>
             }
         }
 
+        // Hand off continuous outdoor threat escalation to TerradropThreatSystem.
+        // Bounds come from the PS dungeon config (same one used for GenerateDungeonAsync).
+        var bspGen = dungeonConfig.Layers.OfType<BspDungeonDunGen>().FirstOrDefault();
+        var dungeonBounds = bspGen?.Bounds ?? new Vector2i(60, 60);
+        var threat = _entManager.EnsureComponent<TerradropThreatComponent>(MapUid);
+        threat.StartTime = _timing.CurTime;
+        // Kick the first placement 15s after arrival so players get quick feedback that
+        // the map is actively hostile; subsequent placements use StartPlacementInterval.
+        threat.NextPlacement = _timing.CurTime + TimeSpan.FromSeconds(15);
+        threat.FactionId = mission.Faction;
+        threat.DungeonCenter = (Vector2i)dungeonOffset;
+        threat.DungeonBounds = dungeonBounds;
+        threat.LandingPadRadius = landingPadRadius;
+        threat.Level = _level;
+        _sawmill.Info($"Terradrop threat armed: faction={threat.FactionId}, center={threat.DungeonCenter}, bounds={threat.DungeonBounds}, first placement in 15s");
+
         // Guarantee enough objective targets exist to complete the mission.
         var extraNeeded = terradropMapComponent.ObjectiveRequired - spawnedCount;
         if (extraNeeded > 0)
@@ -363,7 +402,7 @@ public sealed class GenerateTerradropJob : Job<bool>
                 var group = faction.MobGroups[random.Next(faction.MobGroups.Count)];
                 try
                 {
-                    var spawned = await SpawnRandomEntry((MapUid, grid), group, dungeon, random);
+                    var spawned = await SpawnRandomEntry((MapUid, grid), group, dungeon, random, portalRooms);
                     if (spawned.HasValue)
                         spawnedCount++;
                 }
@@ -380,11 +419,18 @@ public sealed class GenerateTerradropJob : Job<bool>
     private async Task<EntityUid?> SpawnRandomEntry(Entity<MapGridComponent> grid,
         IBudgetEntry entry,
         Dungeon dungeon,
-        Random random)
+        Random random,
+        HashSet<DungeonRoom>? excludedRooms = null)
     {
         await SuspendIfOutOfTime();
 
-        var availableRooms = new ValueList<DungeonRoom>(dungeon.Rooms);
+        var availableRooms = new ValueList<DungeonRoom>(dungeon.Rooms.Count);
+        foreach (var room in dungeon.Rooms)
+        {
+            if (excludedRooms != null && excludedRooms.Contains(room))
+                continue;
+            availableRooms.Add(room);
+        }
         var availableTiles = new List<Vector2i>();
 
         while (availableRooms.Count > 0)

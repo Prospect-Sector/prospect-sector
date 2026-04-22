@@ -154,6 +154,18 @@ public sealed partial class TerradropSystem
                 continue;
 
             var coords = _transform.GetMapCoordinates(padUid, xform);
+
+            // Record the portal room position on the threat component so the
+            // threat spawner system can carve out an exclusion around it.
+            var mapUid = _mapSystem.GetMapOrInvalid(mapId);
+            if (TryComp<Content.Server._PS.Terradrop.TerradropThreatComponent>(mapUid, out var threat))
+            {
+                var pos = xform.LocalPosition;
+                threat.PortalRoomPosition = new Vector2i(
+                    (int)MathF.Round(pos.X),
+                    (int)MathF.Round(pos.Y));
+            }
+
             return Spawn("PortalRed", coords);
         }
 

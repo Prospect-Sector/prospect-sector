@@ -1,0 +1,29 @@
+# Forced hunt HTN for terradrop-spawned mobs.
+# Skips MeleeCombatCompound's NearbyMeleeTargets UtilityOperator — that operator
+# was collapsing the plan to IdleCompound whenever the query returned no hits,
+# and TerradropThreatSystem already force-writes Target + TargetCoordinates on
+# the blackboard every second. By jumping straight to MeleeAttackTargetCompound
+# (which only requires KeyExistsPrecondition(Target)) we guarantee the mob
+# plans MoveTo → Juke → Melee as long as a player is alive on the map.
+- type: htnCompound
+  id: TerradropHuntCompound
+  branches:
+    - preconditions:
+        # Flipped every 15s by TerradropThreatSystem — keeps pack behaviour
+        # staggered so a crowd doesn't all charge simultaneously.
+        - !type:KeyBoolEqualsPrecondition
+          key: TerradropHuntEngaged
+          value: true
+        - !type:KeyExistsPrecondition
+          key: Target
+      tasks:
+        - !type:HTNCompoundTask
+          task: MeleeAttackTargetCompound
+    # IdleSpinCompound instead of IdleCompound — the latter's MoveToOperator
+    # runs with the default removeKeyOnFinish=true and wipes TargetCoordinates
+    # from the real blackboard, which then makes the next engaged plan's
+    # MoveToOperator.Startup crash on missing key. IdleSpin only touches
+    # RotateTarget / IdleTime.
+    - tasks:
+        - !type:HTNCompoundTask
+          task: IdleSpinCompound

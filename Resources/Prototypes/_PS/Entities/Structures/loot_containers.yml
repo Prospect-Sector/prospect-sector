@@ -8,6 +8,9 @@
   abstract: true
   parent: BaseStructure
   components:
+  # Breaking a crate counts toward the terradrop mission objective — same hook
+  # as killing an objective mob (see TerradropSystem.Missions).
+  - type: TerradropObjectiveTarget
   - type: Sprite
     noRot: true
     sprite: Structures/Storage/Crates/generic.rsi
