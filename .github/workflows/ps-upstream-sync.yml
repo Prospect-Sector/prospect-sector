@@ -1,0 +1,174 @@
+name: "PS: Upstream Sync"
+
+# Manually triggered sync with upstream space-wizards/space-station-14.
+# It merges the upstream branch into a new sync branch and opens a draft PR.
+# If the merge conflicts, the conflict markers are committed as-is so an AI
+# assistant (see AGENTS.md) can resolve them inside the pull request.
+
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_branch:
+        description: "Upstream branch to sync from"
+        required: true
+        default: "stable"
+        type: string
+      base_branch:
+        description: "Branch of this repository to merge upstream into"
+        required: true
+        default: "master"
+        type: string
+      draft:
+        description: "Open the pull request as a draft"
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: ps-upstream-sync
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO: https://github.com/space-wizards/space-station-14.git
+  UPSTREAM_BRANCH: ${{ inputs.upstream_branch }}
+  BASE_BRANCH: ${{ inputs.base_branch }}
+
+jobs:
+  sync:
+    name: Merge upstream
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.BOT_TOKEN || secrets.GITHUB_TOKEN }}
+          ref: ${{ inputs.base_branch }}
+          fetch-depth: 0
+          submodules: false
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "${{ vars.CHANGELOG_USER || 'github-actions[bot]' }}"
+          git config --global user.email "${{ vars.CHANGELOG_EMAIL || '41898282+github-actions[bot]@users.noreply.github.com' }}"
+        shell: bash
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream "$UPSTREAM_REPO" || git remote set-url upstream "$UPSTREAM_REPO"
+          git fetch --no-tags upstream "$UPSTREAM_BRANCH"
+        shell: bash
+
+      - name: Create sync branch
+        id: branch
+        run: |
+          BRANCH="task/upstream-sync-$(date -u +'%Y-%m-%d-%H%M%S')"
+          git checkout -b "$BRANCH"
+          echo "name=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "upstream_sha=$(git rev-parse --short upstream/$UPSTREAM_BRANCH)" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: Merge upstream
+        id: merge
+        run: |
+          set +e
+          git merge --no-ff --no-commit "upstream/$UPSTREAM_BRANCH"
+          MERGE_STATUS=$?
+          set -e
+
+          if [ "$MERGE_STATUS" -eq 0 ] && git diff --cached --quiet && [ ! -f .git/MERGE_HEAD ]; then
+            echo "Already up to date with upstream/$UPSTREAM_BRANCH."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+          CONFLICTS=$(git diff --name-only --diff-filter=U || true)
+          if [ -n "$CONFLICTS" ]; then
+            echo "conflicts=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "conflict_list<<EOF"
+              echo "$CONFLICTS" | sed 's|^|- `|;s|$|`|'
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "conflicts=false" >> "$GITHUB_OUTPUT"
+            echo "conflict_list=" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Commit whatever came out of the merge, including conflict markers,
+          # so the resolution can happen in the pull request.
+          git add -A
+          git commit --no-verify -m "Merge upstream/$UPSTREAM_BRANCH into $BASE_BRANCH" \
+            -m "Upstream: $UPSTREAM_REPO ($UPSTREAM_BRANCH @ $(git rev-parse --short upstream/$UPSTREAM_BRANCH))"
+        shell: bash
+
+      - name: Push sync branch
+        if: steps.merge.outputs.changed == 'true'
+        run: git push origin "${{ steps.branch.outputs.name }}"
+        shell: bash
+
+      - name: Open pull request
+        if: steps.merge.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BOT_TOKEN || secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+          CONFLICTS: ${{ steps.merge.outputs.conflicts }}
+          CONFLICT_LIST: ${{ steps.merge.outputs.conflict_list }}
+          UPSTREAM_SHA: ${{ steps.branch.outputs.upstream_sha }}
+          DRAFT: ${{ inputs.draft }}
+        run: |
+          BODY_FILE="$(mktemp)"
+          {
+            echo "Automated merge of \`space-wizards/space-station-14@$UPSTREAM_BRANCH\` (\`$UPSTREAM_SHA\`) into \`$BASE_BRANCH\`."
+            echo
+            if [ "$CONFLICTS" = "true" ]; then
+              echo "## :warning: Conflicts need resolving"
+              echo
+              echo "The merge commit on this branch contains **unresolved conflict markers**."
+              echo "Resolve them following the conventions in \`AGENTS.md\`:"
+              echo
+              echo "- Keep all Prospect changes (\`_PS\` folders and \`# Prospect\` / \`// Prospect\` marked blocks)."
+              echo "- Take upstream changes for everything else, re-applying Prospect markers where needed."
+              echo "- Make sure no \`<<<<<<<\`, \`=======\` or \`>>>>>>>\` markers remain."
+              echo
+              echo "### Conflicted files"
+              echo
+              echo "$CONFLICT_LIST"
+            else
+              echo "The merge applied cleanly, no conflicts to resolve."
+            fi
+            echo
+            echo "### Checklist"
+            echo
+            echo "- [ ] Conflict markers resolved"
+            echo "- [ ] \`dotnet build\` succeeds"
+            echo "- [ ] YAML linter passes"
+          } > "$BODY_FILE"
+
+          DRAFT_FLAG=""
+          if [ "$DRAFT" = "true" ]; then
+            DRAFT_FLAG="--draft"
+          fi
+
+          gh pr create \
+            --base "$BASE_BRANCH" \
+            --head "$BRANCH" \
+            --title "Merge upstream $UPSTREAM_BRANCH into $BASE_BRANCH ($UPSTREAM_SHA)" \
+            --body-file "$BODY_FILE" \
+            $DRAFT_FLAG
+        shell: bash
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.merge.outputs.changed }}" != "true" ]; then
+            echo "Nothing to sync: $BASE_BRANCH is already up to date with upstream/$UPSTREAM_BRANCH." >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ steps.merge.outputs.conflicts }}" = "true" ]; then
+            echo "Sync branch \`${{ steps.branch.outputs.name }}\` pushed with **conflicts** to resolve." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Sync branch \`${{ steps.branch.outputs.name }}\` pushed, merge was clean." >> "$GITHUB_STEP_SUMMARY"
+          fi
+        shell: bash
