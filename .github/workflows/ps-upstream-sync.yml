@@ -88,6 +88,25 @@ jobs:
 
           CONFLICTS=$(git diff --name-only --diff-filter=U || true)
           if [ -n "$CONFLICTS" ]; then
+            # Binary, modify/delete and submodule conflicts leave no text markers,
+            # so committing them would silently keep one side. Stop instead.
+            UNMARKED=""
+            while IFS= read -r FILE; do
+              if [ ! -f "$FILE" ] || ! grep -q '^<<<<<<< ' "$FILE"; then
+                UNMARKED+="$FILE"$'\n'
+              fi
+            done <<< "$CONFLICTS"
+
+            if [ -n "$UNMARKED" ]; then
+              {
+                echo "Merge stopped: these conflicts have no text markers and must be resolved manually."
+                echo
+                printf '%s' "$UNMARKED" | sed 's|^|- `|;s|$|`|'
+              } >> "$GITHUB_STEP_SUMMARY"
+              printf '%s' "$UNMARKED" | sed 's|^|::error::Conflict without text markers: |'
+              exit 1
+            fi
+
             echo "conflicts=true" >> "$GITHUB_OUTPUT"
             {
               echo "conflict_list<<EOF"
