@@ -13,7 +13,7 @@ concurrency:
 jobs:
   this_aint_right:
     name: Submodule update in pr found
-    if: github.actor != 'PJBot' && github.event.pull_request.draft == false
+    if: github.actor != 'PJBot' && github.event.pull_request.draft == false && !startsWith(github.head_ref, 'task/upstream-sync-') # Prospect: allow upstream sync PRs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
