@@ -92,24 +92,42 @@ jobs:
 
           CONFLICTS=$(git diff --name-only --diff-filter=U || true)
           if [ -n "$CONFLICTS" ]; then
-            # Files Prospect deleted and upstream modified: keep our deletion.
-            # Other conflicts without text markers (binary, submodule, deleted
-            # upstream) are listed in the PR so they get resolved by hand.
+            # - Files Prospect deleted and upstream modified (stages 1 and 3, no
+            #   stage 2): keep our deletion. Stage-3-only paths (for example an
+            #   upstream file added in a folder Prospect renamed) are NOT deletions.
+            # - Submodule conflicts: submodules are not checked out, so `git add`
+            #   cannot stage them. Stage the upstream commit provisionally
+            #   (Prospect follows the upstream engine) and list it for review.
+            # - Other conflicts without text markers (binary, deleted upstream,
+            #   stage-3-only) are listed in the PR so they get resolved by hand.
             UNMARKED=""
             KEPT=""
             while IFS= read -r FILE; do
-              if ! git ls-files -u -- "$FILE" | grep -q ' 2'$'\t'; then
+              STAGES=$(git ls-files -u -- "$FILE")
+              has_stage() { printf '%s\n' "$STAGES" | awk -v s="$1" '$3 == s { found = 1 } END { exit !found }'; }
+              stage_sha() { printf '%s\n' "$STAGES" | awk -v s="$1" '$3 == s { print $2; exit }'; }
+
+              if printf '%s\n' "$STAGES" | grep -q '^160000 '; then
+                SHA=$(stage_sha 3)
+                SIDE="upstream"
+                if [ -z "$SHA" ]; then
+                  SHA=$(stage_sha 2)
+                  SIDE="Prospect"
+                fi
+                git update-index --cacheinfo "160000,$SHA,$FILE"
+                UNMARKED+="- \`$FILE\` (submodule: $SIDE commit \`${SHA:0:10}\` staged provisionally)"$'\n'
+              elif has_stage 1 && has_stage 3 && ! has_stage 2; then
                 git rm -q -f -- "$FILE"
                 echo "Kept Prospect deletion of $FILE"
                 KEPT+="$FILE"$'\n'
                 CONFLICTS=$(printf '%s\n' "$CONFLICTS" | grep -vxF -- "$FILE" || true)
               elif [ ! -f "$FILE" ] || ! grep -q '^<<<<<<< ' "$FILE"; then
-                UNMARKED+="$FILE"$'\n'
+                UNMARKED+="- \`$FILE\`"$'\n'
               fi
             done <<< "$CONFLICTS"
 
             echo "unmarked<<EOF" >> "$GITHUB_OUTPUT"
-            printf '%s' "$UNMARKED" | sed 's|^|- `|;s|$|`|' >> "$GITHUB_OUTPUT"
+            printf '%s' "$UNMARKED" >> "$GITHUB_OUTPUT"
             echo "EOF" >> "$GITHUB_OUTPUT"
 
             echo "kept_deletions<<EOF" >> "$GITHUB_OUTPUT"
@@ -174,7 +192,7 @@ jobs:
                 echo
                 echo "### Conflicts without text markers"
                 echo
-                echo "These have no \`<<<<<<<\` markers (binary, submodule or deleted upstream). Pick the correct side explicitly:"
+                echo "These have no \`<<<<<<<\` markers (binary, submodule, deleted upstream, or an upstream file in a folder Prospect renamed). Pick the correct side explicitly:"
                 echo
                 echo "$UNMARKED_LIST"
               fi
