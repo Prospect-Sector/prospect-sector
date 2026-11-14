@@ -11,14 +11,12 @@ public sealed partial class CargoPalletMenu : FancyWindow
 {
     public Action? SellRequested;
     public Action? AppraiseRequested;
-    public Action? StoreRequested; // Prospect
 
     public CargoPalletMenu()
     {
         RobustXamlLoader.Load(this);
         SellButton.OnPressed += OnSellPressed;
         AppraiseButton.OnPressed += OnAppraisePressed;
-        StoreButton.OnPressed += OnStorePressed; // Prospect
     }
 
     public void SetAppraisal(int amount)
@@ -45,11 +43,4 @@ public sealed partial class CargoPalletMenu : FancyWindow
     {
         AppraiseRequested?.Invoke();
     }
-
-    // Prospect: Add store button
-    private void OnStorePressed(BaseButton.ButtonEventArgs obj)
-    {
-        StoreRequested?.Invoke();
-    }
-    // Prospect: End
 }

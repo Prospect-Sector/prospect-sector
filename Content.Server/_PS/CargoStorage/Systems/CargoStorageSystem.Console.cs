@@ -12,7 +12,6 @@ using Content.Shared._PS.CargoStorage.BUI;
 using Content.Shared._PS.CargoStorage.Data;
 using Content.Shared._PS.CargoStorage.Events;
 using Content.Shared._PS.CargoStorage.Systems;
-using Content.Shared.Storage.Components;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._PS.CargoStorage.Systems;
@@ -24,7 +23,7 @@ public sealed partial class CargoStorageSystem
 
     private void InitializeConsole()
     {
-        SubscribeLocalEvent<EntityStoredEvent>(OnEntityStoredEvent);
+        SubscribeLocalEvent<EntitySoldEvent>(OnEntitySoldEvent);
         SubscribeLocalEvent<CargoStorageConsoleComponent, BoundUIOpenedEvent>(OnConsoleUiOpened);
         SubscribeLocalEvent<CargoStorageConsoleComponent, CargoStorageCartMessage>(OnCartMessage);
         SubscribeLocalEvent<CargoStorageConsoleComponent, PowerChangedEvent>(OnPowerChanged);
@@ -40,17 +39,17 @@ public sealed partial class CargoStorageSystem
     /// <summary>
     /// This event signifies that something has been sold at a cargo pallet.
     /// </summary>
-    /// <param name="entityStoredEvent">The details of the event</param>
-    private void OnEntityStoredEvent(ref EntityStoredEvent entityStoredEvent)
+    /// <param name="entitySoldEvent">The details of the event</param>
+    private void OnEntitySoldEvent(ref EntitySoldEvent entitySoldEvent)
     {
-        var station = _station.GetOwningStation(entityStoredEvent.Station);
+        var station = _station.GetOwningStation(entitySoldEvent.Station);
         if (station is null ||
             !_entityManager.TryGetComponent<CargoStorageDataComponent>(station, out var dataComponent))
         {
             return;
         }
 
-        foreach (var sold in entityStoredEvent.Stored)
+        foreach (var sold in entitySoldEvent.Sold)
         {
             UpsertEntity(dataComponent, sold);
         }
