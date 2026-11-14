@@ -1,5 +1,5 @@
 ﻿using Content.Server._PS.GameRule.Components;
-using Content.Server.GameTicking.Rules;
+using Content.Shared.GameTicking.Rules;
 using Content.Shared.GameTicking.Components;
 using Robust.Shared.Timing;
 
