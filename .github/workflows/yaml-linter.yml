@@ -12,9 +12,15 @@ concurrency:
   cancel-in-progress: ${{ github.event_name != 'merge_group' }}
 
 jobs:
+  # Prospect: skip the linter when Stomper already ran it locally
+  stomper:
+    uses: ./.github/workflows/ps-stomper.yml
+  # Prospect: End
+
   build:
     name: YAML Linter
-    if: github.actor != 'ProspectBot' && github.event.pull_request.draft == false # Prospect: PJBot<ProspectBot
+    needs: stomper # Prospect
+    if: github.actor != 'ProspectBot' && github.event.pull_request.draft == false && needs.stomper.outputs.skip != 'true' # Prospect: PJBot<ProspectBot, Stomper
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

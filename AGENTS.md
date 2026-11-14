@@ -38,6 +38,23 @@ dotnet run --project Content.YAMLLinter
 dotnet run --project Content.Benchmarks -c Release
 ```
 
+## Stomper (local CI stamp)
+
+Before you push a branch for a PR, run Stomper:
+
+```bash
+python Tools/_PS/stomper/stomper.py
+```
+
+Stomper runs the same checks as CI: the build, `Content.Tests`, `Content.IntegrationTests` and the YAML linter. If all checks pass, it adds a `Stomper: <tree-hash> build,unit,integration,yaml` trailer to the commit. On the PR, the "Build & Test Debug" and "YAML Linter" workflows read the trailer and skip their heavy jobs.
+
+- The working tree must be clean and the submodules must match the commit.
+- If HEAD is not pushed, Stomper amends HEAD. If HEAD is pushed, Stomper adds an empty commit.
+- The stamp is bound to the git tree. A new change, merge or rebase that changes the tree makes the stamp invalid, so run Stomper again.
+- CI accepts the stamp only if the branch contains the latest base commit, and only for branches in this repository (not forks).
+- Do not write the trailer by hand. Only add it through Stomper, after the checks pass.
+- Run `python Tools/_PS/stomper/stomper.py --verify` to check the stamp on HEAD.
+
 ## Architecture
 
 ### Project Structure

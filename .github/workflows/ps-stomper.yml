@@ -1,0 +1,73 @@
+# Prospect: Stomper check.
+# Reads the `Stomper:` trailer that Tools/_PS/stomper/stomper.py writes after
+# it runs the build, unit tests, integration tests and YAML linter locally.
+# Other workflows call this one and skip their heavy jobs when `skip` is true.
+#
+# The stamp is accepted only if all of these are true:
+#   - The event is a pull request from a branch in this repository (not a fork).
+#   - The PR head commit has a Stomper trailer for its own git tree.
+#   - The PR head contains the current base commit. Then the merge result has
+#     the same tree as the head, so the local checks tested the merged code.
+name: Stomper
+
+on:
+  workflow_call:
+    outputs:
+      skip:
+        description: "true if the PR head has a valid Stomper stamp"
+        value: ${{ jobs.check.outputs.skip }}
+
+jobs:
+  check:
+    name: Stomper stamp
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.verify.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v7
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          submodules: false
+
+      - name: Verify stamp
+        id: verify
+        env:
+          EVENT: ${{ github.event_name }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+
+          result() {
+            echo "skip=$1" >> "$GITHUB_OUTPUT"
+            echo "$2"
+            echo "### Stomper" >> "$GITHUB_STEP_SUMMARY"
+            echo "$2" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          }
+
+          if [ "$EVENT" != "pull_request" ]; then
+            result false "Not a pull request. CI runs all checks."
+          fi
+          if [ "$HEAD_REPO" != "$REPO" ]; then
+            result false "The PR comes from a fork. CI runs all checks."
+          fi
+
+          stamp="$(git log -1 --format='%(trailers:key=Stomper,valueonly)' "$HEAD_SHA" | sed '/^\s*$/d' | tail -n1 | awk '{print $1}')"
+          tree="$(git rev-parse "$HEAD_SHA^{tree}")"
+
+          if [ -z "$stamp" ]; then
+            result false "The head commit has no Stomper stamp. CI runs all checks."
+          fi
+          if [ "$stamp" != "$tree" ]; then
+            result false "The stamp is for tree \`$stamp\`, but the head has tree \`$tree\`. CI runs all checks."
+          fi
+          if ! git merge-base --is-ancestor "$BASE_SHA" "$HEAD_SHA"; then
+            result false "The stamp is valid, but the branch does not contain the latest base commit. Merge or rebase, then run Stomper again. CI runs all checks."
+          fi
+
+          result true "Stomper stamp is valid for tree \`$tree\` (build, unit, integration, yaml ran locally). CI skips these checks."
