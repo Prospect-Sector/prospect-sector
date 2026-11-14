@@ -59,14 +59,17 @@ jobs:
             result false "The PR comes from a fork. CI runs all checks."
           fi
 
-          behind="$(gh api "repos/$REPO/compare/$BASE_SHA...$HEAD_SHA" --jq .behind_by)"
+          # An API error must never skip checks: on any error, run everything.
+          if ! behind="$(gh api "repos/$REPO/compare/$BASE_SHA...$HEAD_SHA" --jq .behind_by)"; then
+            result false "Could not compare the branch with the base. CI runs all checks."
+          fi
           if [ "$behind" != "0" ]; then
             result false "The branch is $behind commit(s) behind the base. Merge or rebase, then run Stomper again. CI runs all checks."
           fi
 
           deadline=$(( $(date +%s) + WAIT_S ))
           while :; do
-            state="$(gh api "repos/$REPO/commits/$HEAD_SHA/status" --jq '[.statuses[] | select(.context=="Stomper")][0].state // ""')"
+            state="$(gh api "repos/$REPO/commits/$HEAD_SHA/status" --jq '[.statuses[] | select(.context=="Stomper")][0].state // ""' || echo "")"
             if [ "$state" = "success" ]; then
               result true "The head commit \`${HEAD_SHA:0:10}\` has a valid Stomper status (build, unit, integration, yaml ran locally). CI skips these checks."
             fi

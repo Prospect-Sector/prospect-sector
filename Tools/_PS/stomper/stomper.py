@@ -24,10 +24,13 @@ Used by the hook:
 Requirements: the GitHub CLI (`gh`), logged in with write access to the repo.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -150,6 +153,8 @@ def repo_from_url(url: str) -> str | None:
 
 
 def gh(*args: str) -> subprocess.CompletedProcess:
+    if shutil.which("gh") is None:
+        return subprocess.CompletedProcess(["gh", *args], 127, "", "the GitHub CLI (gh) is not installed")
     return subprocess.run(["gh", *args], capture_output=True, text=True)
 
 
@@ -170,6 +175,10 @@ def post_status(repo: str, sha: str, tree: str) -> bool:
 
 
 def pid_alive(pid: int) -> bool:
+    if os.name == "nt":
+        # On Windows, os.kill() terminates the process, and $PPID from Git
+        # Bash is not a Windows PID. Do not wait; retry longer instead.
+        return False
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
@@ -184,9 +193,12 @@ def pid_alive(pid: int) -> bool:
 def stampable(shas: list[str]) -> list[tuple[str, str]]:
     found = []
     for sha in shas:
-        tree = tree_of(sha)
-        if has_passed(tree):
-            found.append((sha, tree))
+        commit = git("rev-parse", "--verify", "--quiet", f"{sha}^{{commit}}", check=False)
+        if not commit:
+            continue
+        tree = tree_of(commit)
+        if has_passed(tree) and (commit, tree) not in found:
+            found.append((commit, tree))
     return found
 
 
@@ -217,11 +229,14 @@ def cmd_post(url: str, git_pid: int, shas: list[str]) -> None:
     while pid_alive(git_pid) and time.monotonic() < deadline:
         time.sleep(1)
 
+    # Without a PID to wait for (Windows), allow time for the push itself.
+    known_timeout = KNOWN_TIMEOUT_S if os.name != "nt" else KNOWN_TIMEOUT_S + 5 * 60
+
     for sha, tree in stampable(shas):
-        known_deadline = time.monotonic() + KNOWN_TIMEOUT_S
+        known_deadline = time.monotonic() + known_timeout
         while not commit_known(repo, sha):
             if time.monotonic() >= known_deadline:
-                print(f"stomper: GitHub does not know {sha[:10]} after {KNOWN_TIMEOUT_S} s. "
+                print(f"stomper: GitHub does not know {sha[:10]} after {known_timeout} s. "
                       "Was the push rejected? Nothing is stamped.")
                 break
             time.sleep(2)
