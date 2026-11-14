@@ -8,13 +8,13 @@
   maxRandomOffset: 0
   stations:
     Prospect:
-      stationProto: StandardProspectStation
+      stationProto: StandardNanotrasenStation
       components:
       - type: StationNameSetup
-        mapNameTemplate: '{0} Prospector {1}'
+        mapNameTemplate: '{0}Prospector {1}'
         nameGenerator:
           !type:NanotrasenNameGenerator
-          prefixCreator: 'PS'
+          prefixCreator: 'E-'
       - type: StationJobs
         availableJobs:
           Passenger: [ -1, -1 ]
