@@ -6,8 +6,11 @@ concurrency:
 
 on:
   workflow_dispatch:
-  schedule: # Prospect: Enable
-  - cron: '0 */8 * * *' # Prospect
+  # Prospect: publish on each release (merge of develop into main). A schedule would run
+  # from the default branch (develop), not from main.
+  push:
+    branches: [ main ]
+  # Prospect: End
 
 # Prospect: guard step permissions
 permissions:

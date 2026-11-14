@@ -6,6 +6,13 @@ This file provides guidance to AI coding agents (GitHub Copilot, Claude Code, et
 
 Prospect-Sector is a shallow copy of [space-wizards/space-station-14](https://github.com/space-wizards/space-station-14) (fork without forking). The repository is synced monthly with upstream's `stable` branch. It uses C# for game logic, YAML for prototypes/entities, and XML for UI.
 
+## Branches
+
+- `develop` is the default branch. All work happens here: open every PR against `develop`.
+- `main` is the release branch. To release, open a PR from `develop` into `main`. The "Publish" workflow runs on each push to `main`.
+- The full CI (build and integration tests) runs only on PRs into `main`. Run Stomper before you push, so problems show up before the release PR.
+- Upstream syncs ("PS: Upstream Sync") merge into `develop`.
+
 ## Build Commands
 
 ```bash

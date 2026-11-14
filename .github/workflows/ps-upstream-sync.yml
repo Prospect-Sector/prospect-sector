@@ -16,7 +16,7 @@ on:
       base_branch:
         description: "Branch of this repository to merge upstream into"
         required: true
-        default: "main"
+        default: "develop"
         type: string
       draft:
         description: "Open the pull request as a draft"
@@ -74,7 +74,11 @@ jobs:
         id: merge
         run: |
           set +e
-          git merge --no-ff --no-commit "upstream/$UPSTREAM_BRANCH"
+          # Large upstream merges exceed git's default rename limit. Without rename
+          # detection, a file Prospect moved looks deleted, and the upstream change to it
+          # would be dropped by the "keep our deletion" rule below.
+          git -c merge.renameLimit=999999 -c diff.renameLimit=999999 \
+            merge --no-ff --no-commit "upstream/$UPSTREAM_BRANCH"
           MERGE_STATUS=$?
           set -e
 
@@ -88,25 +92,50 @@ jobs:
 
           CONFLICTS=$(git diff --name-only --diff-filter=U || true)
           if [ -n "$CONFLICTS" ]; then
-            # Binary, modify/delete and submodule conflicts leave no text markers,
-            # so committing them would silently keep one side. Stop instead.
+            # - Files Prospect deleted and upstream modified (stages 1 and 3, no
+            #   stage 2): keep our deletion. Stage-3-only paths (for example an
+            #   upstream file added in a folder Prospect renamed) are NOT deletions.
+            # - Submodule conflicts: submodules are not checked out, so `git add`
+            #   cannot stage them. Stage the upstream commit provisionally
+            #   (Prospect follows the upstream engine) and list it for review.
+            # - Other conflicts without text markers (binary, deleted upstream,
+            #   stage-3-only) are listed in the PR so they get resolved by hand.
             UNMARKED=""
+            KEPT=""
             while IFS= read -r FILE; do
-              if [ ! -f "$FILE" ] || ! grep -q '^<<<<<<< ' "$FILE"; then
-                UNMARKED+="$FILE"$'\n'
+              STAGES=$(git ls-files -u -- "$FILE")
+              has_stage() { printf '%s\n' "$STAGES" | awk -v s="$1" '$3 == s { found = 1 } END { exit !found }'; }
+              stage_sha() { printf '%s\n' "$STAGES" | awk -v s="$1" '$3 == s { print $2; exit }'; }
+
+              if printf '%s\n' "$STAGES" | grep -q '^160000 '; then
+                SHA=$(stage_sha 3)
+                SIDE="upstream"
+                if [ -z "$SHA" ]; then
+                  SHA=$(stage_sha 2)
+                  SIDE="Prospect"
+                fi
+                git update-index --cacheinfo "160000,$SHA,$FILE"
+                UNMARKED+="- \`$FILE\` (submodule: $SIDE commit \`${SHA:0:10}\` staged provisionally)"$'\n'
+              elif has_stage 1 && has_stage 3 && ! has_stage 2; then
+                git rm -q -f -- "$FILE"
+                echo "Kept Prospect deletion of $FILE"
+                KEPT+="$FILE"$'\n'
+                CONFLICTS=$(printf '%s\n' "$CONFLICTS" | grep -vxF -- "$FILE" || true)
+              elif [ ! -f "$FILE" ] || ! grep -q '^<<<<<<< ' "$FILE"; then
+                UNMARKED+="- \`$FILE\`"$'\n'
               fi
             done <<< "$CONFLICTS"
 
-            if [ -n "$UNMARKED" ]; then
-              {
-                echo "Merge stopped: these conflicts have no text markers and must be resolved manually."
-                echo
-                printf '%s' "$UNMARKED" | sed 's|^|- `|;s|$|`|'
-              } >> "$GITHUB_STEP_SUMMARY"
-              printf '%s' "$UNMARKED" | sed 's|^|::error::Conflict without text markers: |'
-              exit 1
-            fi
+            echo "unmarked<<EOF" >> "$GITHUB_OUTPUT"
+            printf '%s' "$UNMARKED" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
 
+            echo "kept_deletions<<EOF" >> "$GITHUB_OUTPUT"
+            printf '%s' "$KEPT" | sed 's|^|- `|;s|$|`|' >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -n "$CONFLICTS" ]; then
             echo "conflicts=true" >> "$GITHUB_OUTPUT"
             {
               echo "conflict_list<<EOF"
@@ -137,6 +166,8 @@ jobs:
           BRANCH: ${{ steps.branch.outputs.name }}
           CONFLICTS: ${{ steps.merge.outputs.conflicts }}
           CONFLICT_LIST: ${{ steps.merge.outputs.conflict_list }}
+          UNMARKED_LIST: ${{ steps.merge.outputs.unmarked }}
+          KEPT_LIST: ${{ steps.merge.outputs.kept_deletions }}
           UPSTREAM_SHA: ${{ steps.branch.outputs.upstream_sha }}
           DRAFT: ${{ inputs.draft }}
         run: |
@@ -157,13 +188,38 @@ jobs:
               echo "### Conflicted files"
               echo
               echo "$CONFLICT_LIST"
+              if [ -n "$UNMARKED_LIST" ]; then
+                echo
+                echo "### Conflicts without text markers"
+                echo
+                echo "These have no \`<<<<<<<\` markers (binary, submodule, deleted upstream, or an upstream file in a folder Prospect renamed). Pick the correct side explicitly:"
+                echo
+                echo "$UNMARKED_LIST"
+              fi
+            elif [ -n "$KEPT_LIST" ]; then
+              echo "The merge has no text conflicts, but some upstream changes were dropped. Review the list below."
             else
               echo "The merge applied cleanly, no conflicts to resolve."
+            fi
+            if [ -n "$KEPT_LIST" ]; then
+              echo
+              echo "### Prospect deletions kept (upstream changes dropped)"
+              echo
+              echo "Upstream changed these files, but Prospect deleted them, so the deletion was kept and the upstream change was dropped."
+              echo "If Prospect moved a file instead of deleting it, port the upstream change to the new path."
+              echo
+              echo "$KEPT_LIST"
             fi
             echo
             echo "### Checklist"
             echo
             echo "- [ ] Conflict markers resolved"
+            if [ -n "$UNMARKED_LIST" ]; then
+              echo "- [ ] Conflicts without text markers resolved"
+            fi
+            if [ -n "$KEPT_LIST" ]; then
+              echo "- [ ] Kept deletions reviewed"
+            fi
             echo "- [ ] \`dotnet build\` succeeds"
             echo "- [ ] YAML linter passes"
           } > "$BODY_FILE"
@@ -179,6 +235,10 @@ jobs:
             --title "Merge upstream $UPSTREAM_BRANCH into $BASE_BRANCH ($UPSTREAM_SHA)" \
             --body-file "$BODY_FILE" \
             $DRAFT_FLAG
+
+          if [ "$CONFLICTS" = "true" ]; then
+            gh pr comment "$BRANCH" --body "@copilot Please resolve all merge conflicts in this pull request following the conventions in \`AGENTS.md\` and the instructions in the description: keep Prospect changes, take upstream otherwise, and leave no conflict markers. Then make sure the build and YAML linter pass."
+          fi
         shell: bash
 
       - name: Summary

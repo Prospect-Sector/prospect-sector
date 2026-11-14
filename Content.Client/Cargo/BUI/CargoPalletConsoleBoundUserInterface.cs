@@ -22,7 +22,6 @@ public sealed class CargoPalletConsoleBoundUserInterface : BoundUserInterface
         _menu = this.CreateWindow<CargoPalletMenu>();
         _menu.AppraiseRequested += OnAppraisal;
         _menu.SellRequested += OnSell;
-        _menu.StoreRequested += OnStore; // Prospect
     }
 
     private void OnAppraisal()
@@ -34,13 +33,6 @@ public sealed class CargoPalletConsoleBoundUserInterface : BoundUserInterface
     {
         SendMessage(new CargoPalletSellMessage());
     }
-
-    // Prospect: Add store button
-    private void OnStore()
-    {
-        SendMessage(new CargoPalletStoreMessage());
-    }
-    // Prospect: End
 
     protected override void UpdateState(BoundUserInterfaceState state)
     {

@@ -1,8 +1,7 @@
-<!-- Prospect: SetSize and MinSize 150 -> 180 -->
 <controls:FancyWindow xmlns="https://spacestation14.io"
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
-                      SetSize="300 180"
-                      MinSize="300 180"
+            SetSize="300 150"
+            MinSize="300 150"
                       Title="{Loc 'cargo-pallet-console-menu-title'}">
     <BoxContainer Orientation="Vertical" Margin="5">
         <BoxContainer Orientation="Horizontal">
@@ -19,10 +18,6 @@
         </BoxContainer>
         <Button Name="AppraiseButton"
                 Text="{Loc 'cargo-pallet-appraise-button'}"/>
-        <!-- Prospect: Add store button -->
-        <Button Name="StoreButton"
-                Text="{Loc 'cargo-pallet-store-button'}"/>
-        <!-- Prospect: End -->
         <Button Name="SellButton"
                 Text="{Loc 'cargo-pallet-sell-button'}"/>
         <TextureButton VerticalExpand="True" />

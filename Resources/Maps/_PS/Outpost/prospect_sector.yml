@@ -5,7 +5,7 @@
   forkId: ""
   forkVersion: ""
   time: 08/18/2025 17:21:08
-  entityCount: 828
+  entityCount: 826
 maps:
 - 1
 grids:
@@ -2629,13 +2629,6 @@ entities:
     - type: Transform
       pos: -14.513798,-0.3820923
       parent: 4
-- proto: ComputerCargoStorageConsole
-  entities:
-  - uid: 123
-    components:
-    - type: Transform
-      pos: -13.5,3.5
-      parent: 4
 - proto: ComputerPalletConsole
   entities:
   - uid: 6
@@ -2673,13 +2666,6 @@ entities:
     components:
     - type: Transform
       pos: 6.5,5.5
-      parent: 4
-- proto: CrateMachine
-  entities:
-  - uid: 124
-    components:
-    - type: Transform
-      pos: -12.5,3.5
       parent: 4
 - proto: CryogenicSleepUnitSpawner
   entities:
