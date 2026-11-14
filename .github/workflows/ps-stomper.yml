@@ -1,0 +1,80 @@
+# Prospect: Stomper check.
+# Tools/_PS/stomper/stomper.py runs the build, unit tests, integration tests
+# and YAML linter locally. After the push, the pre-push hook posts a
+# "Stomper" commit status on the pushed commit. Other workflows call this one
+# and skip their heavy jobs when `skip` is true.
+#
+# The status is accepted only if all of these are true:
+#   - The event is a pull request from a branch in this repository (not a fork).
+#   - The PR head commit has a successful "Stomper" status.
+#   - The PR head contains the current base commit. Then the merge result has
+#     the same tree as the head, so the local checks tested the merged code.
+#
+# The hook posts the status a few seconds after the push, and CI can start
+# before that. So this check waits for the status for up to WAIT_S seconds.
+name: Stomper
+
+on:
+  workflow_call:
+    outputs:
+      skip:
+        description: "true if the PR head has a valid Stomper status"
+        value: ${{ jobs.check.outputs.skip }}
+
+jobs:
+  check:
+    name: Stomper stamp
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      statuses: read
+    outputs:
+      skip: ${{ steps.verify.outputs.skip }}
+    steps:
+      - name: Verify stamp
+        id: verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          WAIT_S: 45
+        run: |
+          set -euo pipefail
+
+          result() {
+            echo "skip=$1" >> "$GITHUB_OUTPUT"
+            echo "$2"
+            echo "### Stomper" >> "$GITHUB_STEP_SUMMARY"
+            echo "$2" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          }
+
+          if [ "$EVENT" != "pull_request" ]; then
+            result false "Not a pull request. CI runs all checks."
+          fi
+          if [ "$HEAD_REPO" != "$REPO" ]; then
+            result false "The PR comes from a fork. CI runs all checks."
+          fi
+
+          # An API error must never skip checks: on any error, run everything.
+          if ! behind="$(gh api "repos/$REPO/compare/$BASE_SHA...$HEAD_SHA" --jq .behind_by)"; then
+            result false "Could not compare the branch with the base. CI runs all checks."
+          fi
+          if [ "$behind" != "0" ]; then
+            result false "The branch is $behind commit(s) behind the base. Merge or rebase, then run Stomper again. CI runs all checks."
+          fi
+
+          deadline=$(( $(date +%s) + WAIT_S ))
+          while :; do
+            state="$(gh api "repos/$REPO/commits/$HEAD_SHA/status" --jq '[.statuses[] | select(.context=="Stomper")][0].state // ""' || echo "")"
+            if [ "$state" = "success" ]; then
+              result true "The head commit \`${HEAD_SHA:0:10}\` has a valid Stomper status (build, unit, integration, yaml ran locally). CI skips these checks."
+            fi
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              result false "No Stomper status on \`${HEAD_SHA:0:10}\` after ${WAIT_S} s. CI runs all checks."
+            fi
+            sleep 5
+          done

@@ -45,6 +45,24 @@ dotnet run --project Content.YAMLLinter
 dotnet run --project Content.Benchmarks -c Release
 ```
 
+## Stomper (local CI stamp)
+
+Before you push a branch for a PR, run Stomper:
+
+```bash
+python Tools/_PS/stomper/stomper.py
+```
+
+Stomper runs the same checks as CI: the build, `Content.Tests`, `Content.IntegrationTests` and the YAML linter. If all checks pass, it records the git tree of HEAD in `.git/stomper/`. When you push, the `pre-push` hook (installed by `BuildChecker` on build) waits until the push is done. Then it posts a "Stomper" commit status on GitHub, and it retries for 30 s until GitHub knows the commit. On the PR, the "Build & Test Debug" and "YAML Linter" workflows see the status and skip their heavy jobs.
+
+- The working tree must be clean and the submodules must match the commit.
+- The record is bound to the git tree. A new change, merge or rebase that changes the tree needs a new run.
+- If HEAD is already on GitHub, Stomper posts the status at once.
+- CI accepts the status only if the branch contains the latest base commit, and only for branches in this repository (not forks).
+- Stomper needs the GitHub CLI (`gh`), logged in with write access. The background log is `.git/stomper/post.log`.
+- Do not post the "Stomper" status by hand. Only Stomper posts it, after the checks pass.
+- Run `python Tools/_PS/stomper/stomper.py status` to see the state of HEAD.
+
 ## Architecture
 
 ### Project Structure
