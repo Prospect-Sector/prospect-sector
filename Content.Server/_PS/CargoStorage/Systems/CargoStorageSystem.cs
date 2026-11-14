@@ -3,7 +3,7 @@
 namespace Content.Server._PS.CargoStorage.Systems;
 
 using Content.Server.Stack;
-using Content.Server.Station.Systems;
+using Content.Shared.Station.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Whitelist;
 using Robust.Server.GameObjects;

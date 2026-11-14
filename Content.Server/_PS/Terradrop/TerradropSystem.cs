@@ -2,7 +2,7 @@
 using Content.Server.Parallax;
 using Content.Server.Popups;
 using Content.Server.Procedural;
-using Content.Server.Station.Systems;
+using Content.Shared.Station.Systems;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared._PS.Terradrop;
 using Content.Shared.Buckle;
