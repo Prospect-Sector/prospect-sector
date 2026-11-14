@@ -15,6 +15,9 @@ jobs:
   # Prospect: skip the linter when Stomper already ran it locally
   stomper:
     uses: ./.github/workflows/ps-stomper.yml
+    permissions:
+      contents: read
+      statuses: read
   # Prospect: End
 
   build:

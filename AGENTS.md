@@ -46,14 +46,15 @@ Before you push a branch for a PR, run Stomper:
 python Tools/_PS/stomper/stomper.py
 ```
 
-Stomper runs the same checks as CI: the build, `Content.Tests`, `Content.IntegrationTests` and the YAML linter. If all checks pass, it adds a `Stomper: <tree-hash> build,unit,integration,yaml` trailer to the commit. On the PR, the "Build & Test Debug" and "YAML Linter" workflows read the trailer and skip their heavy jobs.
+Stomper runs the same checks as CI: the build, `Content.Tests`, `Content.IntegrationTests` and the YAML linter. If all checks pass, it records the git tree of HEAD in `.git/stomper/`. When you push, the `pre-push` hook (installed by `BuildChecker` on build) waits until the push is done. Then it posts a "Stomper" commit status on GitHub, and it retries for 30 s until GitHub knows the commit. On the PR, the "Build & Test Debug" and "YAML Linter" workflows see the status and skip their heavy jobs.
 
 - The working tree must be clean and the submodules must match the commit.
-- If HEAD is not pushed, Stomper amends HEAD. If HEAD is pushed, Stomper adds an empty commit.
-- The stamp is bound to the git tree. A new change, merge or rebase that changes the tree makes the stamp invalid, so run Stomper again.
-- CI accepts the stamp only if the branch contains the latest base commit, and only for branches in this repository (not forks).
-- Do not write the trailer by hand. Only add it through Stomper, after the checks pass.
-- Run `python Tools/_PS/stomper/stomper.py --verify` to check the stamp on HEAD.
+- The record is bound to the git tree. A new change, merge or rebase that changes the tree needs a new run.
+- If HEAD is already on GitHub, Stomper posts the status at once.
+- CI accepts the status only if the branch contains the latest base commit, and only for branches in this repository (not forks).
+- Stomper needs the GitHub CLI (`gh`), logged in with write access. The background log is `.git/stomper/post.log`.
+- Do not post the "Stomper" status by hand. Only Stomper posts it, after the checks pass.
+- Run `python Tools/_PS/stomper/stomper.py status` to see the state of HEAD.
 
 ## Architecture
 
