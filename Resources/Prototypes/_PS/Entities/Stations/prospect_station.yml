@@ -9,4 +9,3 @@
     - BaseStationMagnet
     - BaseStationRecords
   categories: [ HideSpawnMenu ]
-  components:
