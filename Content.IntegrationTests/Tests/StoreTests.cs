@@ -32,6 +32,7 @@ public sealed class StoreTests : GameTest
 ";
 
     [Test]
+    [Ignore("Prospect: the uplink catalog is in Resources/IgnoredPrototypes/ignoredPrototypes.yml")] // Prospect
     public async Task StoreDiscountAndRefund()
     {
         var pair = Pair;

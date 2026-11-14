@@ -6,19 +6,9 @@
   placement:
     mode: SnapgridCenter
   components:
-  - type: Sprite
-    layers:
-    - map: ["computerLayerBody"]
-      state: computer
-    - map: ["computerLayerKeyboard"]
-      state: generic_keyboard
-    - map: ["computerLayerScreen"]
-      sprite: Structures/Machines/computers.rsi
-      state: generic
-    - map: ["computerLayerKeys"]
-      state: tech_key
-    - map: [ "enum.WiresVisualLayers.MaintenancePanel" ]
-      state: generic_panel_open
+  - type: ComputerVisuals
+    stateScreen: generic
+    stateKeys: tech_key
   - type: ActivatableUI
     key: enum.TerradropConsoleUiKey.Default
   - type: UserInterface
