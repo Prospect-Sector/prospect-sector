@@ -8,4 +8,10 @@ public sealed partial class ProspectEmergencyShuttleComponent : Component
 {
     [DataField("station")]
     public EntityUid Station;
+
+    /// <summary>
+    /// The temporary map the shuttle was loaded on. Deleted when the first FTL completes.
+    /// </summary>
+    [DataField]
+    public EntityUid? StartMap;
 }

@@ -14,7 +14,6 @@ using Robust.Shared.Configuration;
 using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
-using Robust.Shared.Spawners;
 using Robust.Shared.Timing;
 
 namespace Content.Server._PS.Shuttles;
@@ -70,13 +69,35 @@ public sealed partial class ProspectEmergencyArrivalsSystem : SharedProspectEmer
             var shuttleComp = Comp<ShuttleComponent>(component.Shuttle);
             var arrivalsComp = EnsureComp<ProspectEmergencyShuttleComponent>(component.Shuttle);
             arrivalsComp.Station = uid;
+            arrivalsComp.StartMap = dummpMapEntity;
             EnsureComp<ProtectedGridComponent>(component.Shuttle);
+            // Don't start the arrivals shuttle immediately docked so power has a time to stabilise?
             _shuttles.FTLToDock(component.Shuttle, shuttleComp, uid, hyperspaceTime: RoundStartFTLDuration);
+            return;
         }
 
-        // Don't start the arrivals shuttle immediately docked so power has a time to stabilise?
-        var timer = AddComp<TimedDespawnComponent>(dummpMapEntity);
-        timer.Lifetime = 15f;
+        Del(dummpMapEntity);
+    }
+
+    /// <summary>
+    /// Deletes the temporary start map once the shuttle's FTL is fully over. A fixed timer is not
+    /// safe: the FTL (startup + travel + arrival + cooldown) can take longer, and until the
+    /// FTLComponent is removed its networked state still references the start map.
+    /// </summary>
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        var query = EntityQueryEnumerator<ProspectEmergencyShuttleComponent>();
+        while (query.MoveNext(out var uid, out var comp))
+        {
+            if (comp.StartMap is not { } startMap || HasComp<FTLComponent>(uid))
+                continue;
+
+            comp.StartMap = null;
+            if (!TerminatingOrDeleted(startMap))
+                QueueDel(startMap);
+        }
     }
 
     public void HandlePlayerSpawning(PlayerSpawningEvent ev)
