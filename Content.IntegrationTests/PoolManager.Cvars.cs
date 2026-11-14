@@ -24,6 +24,7 @@ public static partial class PoolManager
         (CCVars.GridFill.Name,                "false"),
         (CCVars.PreloadGrids.Name,            "false"),
         (CCVars.ArrivalsShuttles.Name,        "false"),
+        (CCVars.EmergencyArrivalsShuttle.Name, "false"), // Prospect: same reason as ArrivalsShuttles
         (CCVars.EmergencyShuttleEnabled.Name, "false"),
         (CCVars.ProcgenPreload.Name,          "false"),
         (CCVars.GameDummyTicker.Name, "true"),

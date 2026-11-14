@@ -44,7 +44,8 @@ namespace Content.IntegrationTests.Tests
         private static readonly string[] NoSpawnMaps =
         {
             "CentComm",
-            "Dart"
+            "Dart",
+            "Prospect" // Prospect: players spawn on the arrivals shuttle, not on the station map
         };
 
         private static readonly string[] Grids =
