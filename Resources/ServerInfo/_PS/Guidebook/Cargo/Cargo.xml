@@ -70,31 +70,6 @@
 
   -------------------------------------------------------------
 
-  ## Storage System
-
-  Cargo has access to a unique **high-capacity storage system**.
-  This system allows the department to store:
-  - Processed materials
-  - Most raw ores
-  - Common building supplies
-  - Bulk components
-
-  Not everything can be stored, but **raw materials and basic components almost always can**.
-
-  The storage system enables Cargo to:
-  - Stockpile large reserves
-  - Retrieve stored goods during construction spikes
-  - Ensure consistent material availability
-  - Efficiently support engineering, science, and medical fabrication requests
-
-  <Box>
-    <GuideEntityEmbed Entity="CargoStorageUnit"/>
-    <GuideEntityEmbed Entity="StorageConsole"/>
-    <GuideEntityEmbed Entity="CrateGenericPlastic"/>
-  </Box>
-
-  -------------------------------------------------------------
-
   ## How to Operate Cargo Effectively
 
   ### Keep the Magnet Busy
@@ -113,7 +88,6 @@
 
   ### Respond to Crew Needs
   When someone needs something printed or supplied, Cargo should:
-  - Check the storage system
   - Print required components
   - Deliver the items or make them available for pickup
 

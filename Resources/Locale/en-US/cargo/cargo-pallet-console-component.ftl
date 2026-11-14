@@ -6,6 +6,3 @@ cargo-pallet-menu-count-label = Number of sale items:{" "}
 cargo-pallet-appraise-button = Appraise
 cargo-pallet-sell-button = Sell
 cargo-pallet-menu-no-goods-text = Appraising...
-
-# Prospect: add store button
-cargo-pallet-store-button = Store
